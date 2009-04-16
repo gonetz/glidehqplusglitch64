@@ -460,7 +460,7 @@ grTexDownloadMipMap( GrChipID_t tmu,
           for (j=0; j<width; j++)
           {
 			unsigned int texel = (unsigned int)((unsigned char*)info->data)[m];
-#if 0
+#if 1
 			/* accurate conversion */
 		    unsigned int texel_hi = (texel & 0x000000F0) << 20;
 		    unsigned int texel_low = texel & 0x0000000F;
