@@ -396,34 +396,31 @@ TxImage::writePNG(uint8* src, FILE* fp, int width, int height, int rowStride, ui
 boolean
 TxImage::getBMPInfo(FILE* fp, BITMAPFILEHEADER* bmp_fhdr, BITMAPINFOHEADER* bmp_ihdr)
 {
-  BITMAPFILEHEADER tmp_bmp_fhdr;
-  BITMAPINFOHEADER tmp_bmp_ihdr;
-
   /*
    * read in BITMAPFILEHEADER
    */
 
   /* is this a BMP file? */
-  if (fread(&tmp_bmp_fhdr.bfType, 2, 1, fp) != 1)
+  if (fread(&bmp_fhdr->bfType, 2, 1, fp) != 1)
     return 0;
 
-  if (memcmp(&tmp_bmp_fhdr.bfType, "BM", 2) != 0)
+  if (memcmp(&bmp_fhdr->bfType, "BM", 2) != 0)
     return 0;
 
   /* get file size */
-  if (fread(&tmp_bmp_fhdr.bfSize, 4, 1, fp) != 1)
+  if (fread(&bmp_fhdr->bfSize, 4, 1, fp) != 1)
     return 0;
 
   /* reserved 1 */
-  if (fread(&tmp_bmp_fhdr.bfReserved1, 2, 1, fp) != 1)
+  if (fread(&bmp_fhdr->bfReserved1, 2, 1, fp) != 1)
     return 0;
 
   /* reserved 2 */
-  if (fread(&tmp_bmp_fhdr.bfReserved2, 2, 1, fp) != 1)
+  if (fread(&bmp_fhdr->bfReserved2, 2, 1, fp) != 1)
     return 0;
 
   /* offset to the image data */
-  if (fread(&tmp_bmp_fhdr.bfOffBits, 4, 1, fp) != 1)
+  if (fread(&bmp_fhdr->bfOffBits, 4, 1, fp) != 1)
     return 0;
 
   /*
@@ -431,27 +428,27 @@ TxImage::getBMPInfo(FILE* fp, BITMAPFILEHEADER* bmp_fhdr, BITMAPINFOHEADER* bmp_
    */
 
   /* size of BITMAPINFOHEADER */
-  if (fread(&tmp_bmp_ihdr.biSize, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biSize, 4, 1, fp) != 1)
     return 0;
 
   /* is this a Windows BMP? */
-  if (tmp_bmp_ihdr.biSize != 40)
+  if (bmp_ihdr->biSize != 40)
     return 0;
 
   /* width of the bitmap in pixels */
-  if (fread(&tmp_bmp_ihdr.biWidth, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biWidth, 4, 1, fp) != 1)
     return 0;
 
   /* height of the bitmap in pixels */
-  if (fread(&tmp_bmp_ihdr.biHeight, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biHeight, 4, 1, fp) != 1)
     return 0;
 
   /* number of planes (always 1) */
-  if (fread(&tmp_bmp_ihdr.biPlanes, 2, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biPlanes, 2, 1, fp) != 1)
     return 0;
 
   /* number of bits-per-pixel. (1, 4, 8, 16, 24, 32) */
-  if (fread(&tmp_bmp_ihdr.biBitCount, 2, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biBitCount, 2, 1, fp) != 1)
     return 0;
 
   /* compression for a compressed bottom-up bitmap
@@ -460,31 +457,28 @@ TxImage::getBMPInfo(FILE* fp, BITMAPFILEHEADER* bmp_fhdr, BITMAPINFOHEADER* bmp_
    *   2 : run-length encoded 8 bpp format
    *   3 : bitfield
    */
-  if (fread(&tmp_bmp_ihdr.biCompression, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biCompression, 4, 1, fp) != 1)
     return 0;
 
   /* size of the image in bytes */
-  if (fread(&tmp_bmp_ihdr.biSizeImage, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biSizeImage, 4, 1, fp) != 1)
     return 0;
 
   /* horizontal resolution in pixels-per-meter */
-  if (fread(&tmp_bmp_ihdr.biXPelsPerMeter, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biXPelsPerMeter, 4, 1, fp) != 1)
     return 0;
 
   /* vertical resolution in pixels-per-meter */
-  if (fread(&tmp_bmp_ihdr.biYPelsPerMeter, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biYPelsPerMeter, 4, 1, fp) != 1)
     return 0;
 
   /* number of color indexes in the color table that are actually used */
-  if (fread(&tmp_bmp_ihdr.biClrUsed, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biClrUsed, 4, 1, fp) != 1)
     return 0;
 
   /*  the number of color indexes that are required for displaying */
-  if (fread(&tmp_bmp_ihdr.biClrImportant, 4, 1, fp) != 1)
+  if (fread(&bmp_ihdr->biClrImportant, 4, 1, fp) != 1)
     return 0;
-
-  memcpy(bmp_fhdr, &tmp_bmp_fhdr, sizeof(BITMAPFILEHEADER));
-  memcpy(bmp_ihdr, &tmp_bmp_ihdr, sizeof(BITMAPINFOHEADER));
 
   return 1;
 }
@@ -651,6 +645,132 @@ TxImage::readBMP(FILE* fp, int* width, int* height, uint16* format)
     DBG_INFO(80, L"Error: failed to load bmp image!\n");
   }
 #endif
+
+  return image;
+}
+
+boolean
+getDDSInfo(FILE *fp, DDSFILEHEADER *dds_fhdr)
+{
+  /*
+   * read in DDSFILEHEADER
+   */
+
+  /* is this a DDS file? */
+  if (fread(&dds_fhdr->dwMagic, 4, 1, fp) != 1)
+    return 0;
+
+  if (memcmp(&dds_fhdr->dwMagic, "DDS ", 4) != 0)
+    return 0;
+
+  /* get file size */
+  if (fread(&dds_fhdr->dwSize, 4, 1, fp) != 1)
+    return 0;
+
+  /* get file flags */
+  if (fread(&dds_fhdr->dwFlags, 4, 1, fp) != 1)
+    return 0;
+
+  /* width of dds in pixels */
+  if (fread(&dds_fhdr->dwWidth, 4, 1, fp) != 1)
+    return 0;
+
+  /* height of dds in pixels */
+  if (fread(&dds_fhdr->dwHeight, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->dwLinearSize, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->dwMipMapCount, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->dwReserved1, 4 * 11, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->ddpf.dwSize, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->ddpf.dwFlags, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->ddpf.dwFourCC, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->ddpf.dwRGBBitCount, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->ddpf.dwRBitMask, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->ddpf.dwGBitMask, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->ddpf.dwBBitMask, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->ddpf.dwRGBAlphaBitMask, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->dwCaps1, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->dwCaps2, 4, 1, fp) != 1)
+    return 0;
+
+  return 1;
+}
+
+uint8*
+readDDS(FILE* fp, int* width, int* height, uint16* format)
+{
+  uint8 *image = NULL;
+  DDSFILEHEADER dds_fhdr;
+
+  /* initialize */
+  *width  = 0;
+  *height = 0;
+  *format = 0;
+
+  /* check if we have a valid dds file */
+  if (!fp)
+    return NULL;
+
+  if (!getDDSInfo(fp, &dds_fhdr))
+    return NULL;
+
+  DBG_INFO(80, L"dds format %d x %d fourcc:%x\n",
+           dds_fhdr.dwWidth, dds_fhdr.dwHeight, dds_fhdr.ddpf.dwFourCC);
+
+  if (!(dds_fhdr.dwFlags & (DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT|DDSD_LINEARSIZE))) {
+    DBG_INFO(80, L"Error: incompatible dds format!\n");
+    return NULL;
+  }
+
+  if ((dds_fhdr.dwFlags & DDSD_MIPMAPCOUNT) && dds_fhdr.dwMipMapCount != 1) {
+    DBG_INFO(80, L"Error: mipmapped dds not supported!\n");
+    return NULL;
+  }
+
+  if (!((dds_fhdr.ddpf.dwFlags & DDPF_FOURCC) &&
+        (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT1", 4) == 0 || memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT5", 4) == 0) &&
+        dds_fhdr.dwCaps2 == 0)) {
+    DBG_INFO(80, L"Error: not DXT1 or DXT5 texture!\n");
+    return NULL;
+  }
+
+  /* read in image */
+  image = (uint8*)malloc(dds_fhdr.dwLinearSize);
+  if (image) {
+    *width  = dds_fhdr.dwWidth;
+    *height = dds_fhdr.dwHeight;
+
+    if (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT1", 4) == 0) *format = GR_TEXFMT_ARGB_CMP_DXT1;
+    else if (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT5", 4) == 0) *format = GR_TEXFMT_ARGB_CMP_DXT5;
+
+    fseek(fp, dds_fhdr.dwSize, SEEK_SET);
+    fread(image, dds_fhdr.dwLinearSize, 1, fp);
+  }
 
   return image;
 }

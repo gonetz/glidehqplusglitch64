@@ -41,8 +41,8 @@
 #       Microsoft VisualC++ 8.0 (VS2005)
 #
 #    Libraries:
-#       boost  1.36.0   (http://www.boost.org)  bjam --toolset=msvc-8.0 link=static runtime-link=static variant=release,debug stage
-#       libpng 1.2.32   (http://www.libpng.org) built with /MT or /MTd switch
+#       boost  1.38.0   (http://www.boost.org)  bjam --toolset=msvc-8.0 link=static runtime-link=static variant=release,debug stage
+#       libpng 1.2.35   (http://www.libpng.org) built with /MT or /MTd switch
 #       zlib   1.2.3    (http://www.zlib.org)   built with /MT or /MTd switch
 #       tc     1.1+                             patched for ARGB input and ATI Radeon workaround
 #
@@ -67,8 +67,8 @@ EXT_INC = ./inc
 EXT_LIB = ./lib
 
 # boost library & headers
-BOOST_INC = ../boost_1_36_0
-BOOST_LIB = ../boost_1_36_0/stage/lib
+BOOST_INC = ../boost_1_38_0
+BOOST_LIB = ../boost_1_38_0/stage/lib
 
 CC = cl
 AS = nasm
@@ -93,7 +93,7 @@ else
 CFLAGS += -DNDEBUG -GL -MT
 LDFLAGS += -ltcg:STATUS
 LDLIBS += $(EXT_LIB)/dxtn.lib $(EXT_LIB)/libpng.lib $(EXT_LIB)/zlib.lib LIBCMT.LIB LIBCPMT.LIB $(BOOST_LIB)/libboost_filesystem-vc80-mt-s.lib $(BOOST_LIB)/libboost_system-vc80-mt-s.lib $(BOOST_LIB)/libboost_thread-vc80-mt-s.lib
-OPTFLAGS ?= -O2 -fp:fast
+OPTFLAGS ?= -O2
 endif
 
 CFLAGS += -I. -I$(EXT_INC) -I$(BOOST_INC)
