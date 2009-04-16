@@ -43,8 +43,8 @@
 #       GCC
 #
 #    Libraries:
-#       boost  1.36.0   (http://www.boost.org)  bjam --toolset=gcc link=static runtime-link=static variant=release,debug stage
-#       libpng 1.2.32   (http://www.libpng.org) static library
+#       boost  1.38.0   (http://www.boost.org)  bjam --toolset=gcc link=static runtime-link=static variant=release,debug stage
+#       libpng 1.2.35   (http://www.libpng.org) static library
 #       zlib   1.2.3    (http://www.zlib.org)   static library
 #       tc     1.1+                             patched for ARGB input and ATI Radeon workaround
 #

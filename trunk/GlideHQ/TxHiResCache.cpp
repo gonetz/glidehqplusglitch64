@@ -243,10 +243,18 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
     FILE *fp = NULL;
 
     wcstombs(fname, _ident.c_str(), MAX_PATH);
+    {
+      unsigned int i;
+      for (i = 0; i < strlen(fname); i++) fname[i] = tolower(fname[i]);
+    }
     ident.assign(fname);
 
     /* read in Rice's file naming convention */
     wcstombs(fname, it->path().leaf().c_str(), MAX_PATH);
+    {
+      unsigned int i;
+      for (i = 0; i < strlen(fname); i++) fname[i] = tolower(fname[i]);
+    }
     pfname = strstr(fname, ident.c_str());
     if (pfname != fname) pfname = 0;
     if (!pfname ||
@@ -458,7 +466,7 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
      * read in _all.png, _allciByRGBA.png. BMP variants are not used.
      */
     if (pfname == strstr(fname, "_all.png") ||
-        pfname == strstr(fname, "_allciByRGBA.png")) {
+        pfname == strstr(fname, "_allcibyrgba.png")) {
       if ((fp = fopen(fname, "rb")) != NULL) {
         tex = _txImage->readPNG(fp, &width, &height, &format);
         fclose(fp);
@@ -476,7 +484,7 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
     /*
      * read in _ciByRGBA.png. BMP variants are not used.
      */
-    if (strstr(fname, "_ciByRGBA.png")) {
+    if (strstr(fname, "_cibyrgba.png")) {
       if ((fp = fopen(fname, "rb")) != NULL) {
         tex = _txImage->readPNG(fp, &width, &height, &format);
         fclose(fp);
@@ -930,8 +938,8 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
     /* texture compression */
     if (tex && format == GR_TEXFMT_ARGB_8888 &&
         (_options & COMPRESSION_MASK) &&
-        (width >= 32 && height >= 32) /* Texture compression is not suitable for low pixel coarse detail
-                                       * textures. The assumption here is that textures larger than 32x32
+        (width >= 64 && height >= 64) /* Texture compression is not suitable for low pixel coarse detail
+                                       * textures. The assumption here is that textures larger than 64x64
                                        * have enough detail to produce decent quality when compressed. The
                                        * down side is that narrow stripped textures that the N64 often use
                                        * for large background textures are also ignored. It would be more

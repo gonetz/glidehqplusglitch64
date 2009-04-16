@@ -113,7 +113,7 @@ LDFLAGS += -ltcg:STATUS
 ifdef DLL
 LDLIBS += LIBCMT.lib
 endif
-OPTFLAGS ?= -O2 -fp:fast
+OPTFLAGS ?= -O2
 endif
 
 CFLAGS += -I.

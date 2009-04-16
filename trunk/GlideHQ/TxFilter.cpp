@@ -67,12 +67,12 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
   INFO(0, L" Glide64 official website : http://glide64.emuxhaven.net\n");
   INFO(0, L"------------------------------------------------------------------\n");
 
-  /* get number of CPU cores. */
-  _numcore = _txUtil->getNumberofProcessors();
-
   _txImage      = new TxImage();
   _txQuantize   = new TxQuantize();
   _txUtil       = new TxUtil();
+
+  /* get number of CPU cores. */
+  _numcore = _txUtil->getNumberofProcessors();
 
   _initialized = 0;
 
