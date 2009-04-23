@@ -11,12 +11,17 @@ void dump_stop();
 extern int dumping;
 #endif
 
-// VP z precision fix
-// no more necessary, now using z clamping instead.
-//#define zscale 0.025f
 #define zscale 1.0f
-//#define zscale 2.0f
-//#define zscale 0.5f
+
+typedef struct _wrapper_config
+{
+  int res;
+  int fbo;
+  int anisofilter;
+  int vram_size;
+} wrapper_config;
+extern wrapper_config config;
+
 
 // VP added this utility function
 // returns the bytes per pixel of a given GR texture format
@@ -38,6 +43,7 @@ extern int buffer_cleared; // mark that the buffer has been cleared, used to che
 extern "C" {
 #include "gl.h"
 #include "glext.h"
+#include "wglext.h"
 }
 #ifdef GCC
 #include <stdio.h>
@@ -84,11 +90,6 @@ extern PFNGLGETINFOLOGARBPROC glGetInfoLogARB;
 extern PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB;
 extern PFNGLSECONDARYCOLOR3FPROC glSecondaryColor3f;
 
-#ifdef _WIN32
-GLvoid KillGLWindow(GLvoid);
-BOOL CreateGLWindow();
-#endif
-
 extern int w_buffer_mode;
 extern int nbTextureUnits;
 extern int width, height, widtho, heighto;
@@ -128,15 +129,14 @@ void set_copy_shader();
 
 // config functions
 
-FX_ENTRY void FX_CALL grConfigWrapperExt(HINSTANCE instance, HWND hwnd);
+//FX_ENTRY void FX_CALL grConfigWrapperExt(HINSTANCE instance, HWND hwnd);
+FX_ENTRY void FX_CALL grConfigWrapperExt(FxI32, FxI32, FxBool, FxBool);
 FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(DWORD*, DWORD*);
+FX_ENTRY char ** FX_CALL grQueryResolutionsExt(FxI32*);
 
 
 int getFullScreenWidth();
 int getFullScreenHeight();
-int getDisableGLSL();
-int getAnisoFilter();
-
 
 // ZIGGY framebuffer copy extension
 // allow to copy the depth or color buffer from back/front to front/back
