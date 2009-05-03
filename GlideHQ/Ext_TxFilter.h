@@ -120,6 +120,7 @@ typedef unsigned char boolean;
 #define GR_TEXFMT_ARGB_8888          0x12
 
 #define GR_TEXFMT_ARGB_CMP_DXT1      0x16
+#define GR_TEXFMT_ARGB_CMP_DXT3      0x18
 #define GR_TEXFMT_ARGB_CMP_DXT5      0x1A
 #endif /* GLIDE3 */
 

@@ -650,7 +650,7 @@ TxImage::readBMP(FILE* fp, int* width, int* height, uint16* format)
 }
 
 boolean
-getDDSInfo(FILE *fp, DDSFILEHEADER *dds_fhdr)
+TxImage::getDDSInfo(FILE *fp, DDSFILEHEADER *dds_fhdr)
 {
   /*
    * read in DDSFILEHEADER
@@ -663,7 +663,6 @@ getDDSInfo(FILE *fp, DDSFILEHEADER *dds_fhdr)
   if (memcmp(&dds_fhdr->dwMagic, "DDS ", 4) != 0)
     return 0;
 
-  /* get file size */
   if (fread(&dds_fhdr->dwSize, 4, 1, fp) != 1)
     return 0;
 
@@ -671,15 +670,18 @@ getDDSInfo(FILE *fp, DDSFILEHEADER *dds_fhdr)
   if (fread(&dds_fhdr->dwFlags, 4, 1, fp) != 1)
     return 0;
 
-  /* width of dds in pixels */
-  if (fread(&dds_fhdr->dwWidth, 4, 1, fp) != 1)
-    return 0;
-
   /* height of dds in pixels */
   if (fread(&dds_fhdr->dwHeight, 4, 1, fp) != 1)
     return 0;
 
+  /* width of dds in pixels */
+  if (fread(&dds_fhdr->dwWidth, 4, 1, fp) != 1)
+    return 0;
+
   if (fread(&dds_fhdr->dwLinearSize, 4, 1, fp) != 1)
+    return 0;
+
+  if (fread(&dds_fhdr->dwDepth, 4, 1, fp) != 1)
     return 0;
 
   if (fread(&dds_fhdr->dwMipMapCount, 4, 1, fp) != 1)
@@ -722,10 +724,11 @@ getDDSInfo(FILE *fp, DDSFILEHEADER *dds_fhdr)
 }
 
 uint8*
-readDDS(FILE* fp, int* width, int* height, uint16* format)
+TxImage::readDDS(FILE* fp, int* width, int* height, uint16* format)
 {
   uint8 *image = NULL;
   DDSFILEHEADER dds_fhdr;
+  uint16 tmpformat = 0;
 
   /* initialize */
   *width  = 0;
@@ -739,8 +742,8 @@ readDDS(FILE* fp, int* width, int* height, uint16* format)
   if (!getDDSInfo(fp, &dds_fhdr))
     return NULL;
 
-  DBG_INFO(80, L"dds format %d x %d fourcc:%x\n",
-           dds_fhdr.dwWidth, dds_fhdr.dwHeight, dds_fhdr.ddpf.dwFourCC);
+  DBG_INFO(80, L"dds format %d x %d HeaderSize %d LinearSize %d\n",
+           dds_fhdr.dwWidth, dds_fhdr.dwHeight, dds_fhdr.dwSize, dds_fhdr.dwLinearSize);
 
   if (!(dds_fhdr.dwFlags & (DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT|DDSD_LINEARSIZE))) {
     DBG_INFO(80, L"Error: incompatible dds format!\n");
@@ -752,10 +755,26 @@ readDDS(FILE* fp, int* width, int* height, uint16* format)
     return NULL;
   }
 
-  if (!((dds_fhdr.ddpf.dwFlags & DDPF_FOURCC) &&
-        (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT1", 4) == 0 || memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT5", 4) == 0) &&
-        dds_fhdr.dwCaps2 == 0)) {
-    DBG_INFO(80, L"Error: not DXT1 or DXT5 texture!\n");
+  if (!((dds_fhdr.ddpf.dwFlags & DDPF_FOURCC) && dds_fhdr.dwCaps2 == 0)) {
+    DBG_INFO(80, L"Error: not fourcc standard texture!\n");
+    return NULL;
+  }
+
+  if (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT1", 4) == 0) {
+    DBG_INFO(80, L"DXT1 format\n");
+    /* compensate for missing LinearSize */
+    dds_fhdr.dwLinearSize = (dds_fhdr.dwWidth * dds_fhdr.dwHeight) >> 1;
+    tmpformat = GR_TEXFMT_ARGB_CMP_DXT1;
+  } else if (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT3", 4) == 0) {
+    DBG_INFO(80, L"DXT3 format\n");
+    dds_fhdr.dwLinearSize = dds_fhdr.dwWidth * dds_fhdr.dwHeight;
+    tmpformat = GR_TEXFMT_ARGB_CMP_DXT3;
+  } else if (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT5", 4) == 0) {
+    DBG_INFO(80, L"DXT5 format\n");
+    dds_fhdr.dwLinearSize = dds_fhdr.dwWidth * dds_fhdr.dwHeight;
+    tmpformat = GR_TEXFMT_ARGB_CMP_DXT5;
+  } else {
+    DBG_INFO(80, L"Error: not DXT1 or DXT3 or DXT5 format!\n");
     return NULL;
   }
 
@@ -764,11 +783,9 @@ readDDS(FILE* fp, int* width, int* height, uint16* format)
   if (image) {
     *width  = dds_fhdr.dwWidth;
     *height = dds_fhdr.dwHeight;
+    *format = tmpformat;
 
-    if (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT1", 4) == 0) *format = GR_TEXFMT_ARGB_CMP_DXT1;
-    else if (memcmp(&dds_fhdr.ddpf.dwFourCC, "DXT5", 4) == 0) *format = GR_TEXFMT_ARGB_CMP_DXT5;
-
-    fseek(fp, dds_fhdr.dwSize, SEEK_SET);
+    fseek(fp, 128, SEEK_SET); /* size of header is 128 bytes */
     fread(image, dds_fhdr.dwLinearSize, 1, fp);
   }
 

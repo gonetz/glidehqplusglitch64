@@ -101,6 +101,7 @@ TxUtil::sizeofTx(int width, int height, uint16 format)
   case GR_TEXFMT_ARGB_CMP_DXT1:
     dataSize = (((width + 0x3) & ~0x3) * ((height + 0x3) & ~0x3)) >> 1;
     break;
+  case GR_TEXFMT_ARGB_CMP_DXT3:
   case GR_TEXFMT_ARGB_CMP_DXT5:
     dataSize = ((width + 0x3) & ~0x3) * ((height + 0x3) & ~0x3);
     break;
