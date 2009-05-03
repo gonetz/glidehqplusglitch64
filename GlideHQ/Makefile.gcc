@@ -40,7 +40,7 @@
 #  Requirements:
 #
 #    Compiler:
-#       GCC
+#       GCC 4.2
 #
 #    Libraries:
 #       boost  1.38.0   (http://www.boost.org)  bjam --toolset=gcc link=static runtime-link=static variant=release,debug stage
@@ -62,8 +62,8 @@ EXT_INC = ./inc
 EXT_LIB = ./lib
 
 # boost library & headers
-BOOST_INC = ../boost_1_36_0
-BOOST_LIB = ../boost_1_36_0/stage/lib
+BOOST_INC = ../boost_1_38_0
+BOOST_LIB = ../boost_1_38_0/stage/lib
 
 CC = g++
 CFLAGS = -Wall -W -pedantic -ansi -Wno-long-long
