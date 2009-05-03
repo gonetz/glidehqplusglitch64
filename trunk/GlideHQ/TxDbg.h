@@ -48,7 +48,7 @@ public:
 #else
 #define DBG_INFO 0 && (wchar_t)
 #if 0 /* XXX enable this to log basic hires texture checks */
-#define INFO if (_options & DUMP_TEX) TxDbg::getInstance()->output
+#define INFO TxDbg::getInstance()->output
 #else
 #define INFO DBG_INFO
 #endif
