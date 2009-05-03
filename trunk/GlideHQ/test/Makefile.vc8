@@ -39,7 +39,7 @@ LD = _link # change this to suite your build environment
 
 UNLINK = $(RM) $(1)
 
-CFLAGS += -D__MSC__ -DWIN32 -D_CONSOLE -EHa -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NON_CONFORMING_SWPRINTFS
+CFLAGS += -D__MSC__ -DWIN32 -D_CONSOLE -EHa -D_CRT_SECURE_NO_DEPRECATE
 CFLAGS += -I. -I../
 
 #LDFLAGS += -ltcg:STATUS

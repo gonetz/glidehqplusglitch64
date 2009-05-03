@@ -25,25 +25,37 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-/*void DisplayLoadProgress(const wchar_t *format, ...)
+void DisplayLoadProgress(const wchar_t *format, ...)
 {
+#if 0
   va_list args;
   wchar_t wbuf[INFO_BUF];
   char buf[INFO_BUF];
 
-  // process input
+  /* process input */
   va_start(args, format);
   vswprintf(wbuf, format, args);
   va_end(args);
 
-  // XXX: convert to multibyte
+  /* XXX: convert to multibyte */
   wcstombs(buf, wbuf, INFO_BUF);
-
   printf(buf);
-}*/
+#else
+  static unsigned int i = 0;
+  i++;
+  if (i == 1) printf("\b-");
+  else if (i == 2) printf("\b\\");
+  else if (i == 3) printf("\b|");
+  else {
+    printf("\b/");
+    i = 0;
+  }
+#endif
+}
 
 int main(int argc, char* argv[])
 {
+  float dummy = 1.1; /* force the compiler to load floating point support */
   boolean bret = 0;
   int options = 0;
 
@@ -61,7 +73,7 @@ int main(int argc, char* argv[])
   wchar_t name[21] = L"DEFAULT";
 
   printf("------------------------------------------------------------------\n");
-  printf("  GlideHQ Hires Texture Checker version 1.0\n");
+  printf("  GlideHQ Hires Texture Checker version 1.1\n");
   printf("  Copyright (C) 2007  Hiroshi Morii   All Rights Reserved\n");
   printf("     email   : koolsmoky(at)users.sourceforge.net\n");
   printf("     website : http://www.3dfxzone.it/koolsmoky\n");
@@ -73,35 +85,35 @@ int main(int argc, char* argv[])
 
   if (argc != 2) return 0;
 
-  printf("Checking \"%s\"...\n", argv[1]);
+  printf("Checking \"%s\"...  ", argv[1]);
 
   mbstowcs(name, argv[1], 21);
 
-  options |= COMPRESS_TEX;
-  options |= COMPRESS_HIRESTEX;
-  options |= S3TC_COMPRESSION;
+  //options |= COMPRESS_TEX;
+  //options |= COMPRESS_HIRESTEX;
+  //options |= S3TC_COMPRESSION;
   //options |= TILE_HIRESTEX;
   //options |= FORCE16BPP_TEX;
   //options |= FORCE16BPP_HIRESTEX;
-  options |= GZ_TEXCACHE;
+  //options |= GZ_TEXCACHE;
   options |= GZ_HIRESTEXCACHE;
   //options |= (DUMP_TEXCACHE|DUMP_HIRESTEXCACHE);
   options |= LET_TEXARTISTS_FLY;
-  options |= DUMP_TEX;
+  //options |= DUMP_TEX;
   options |= RICE_HIRESTEXTURES;
 
   bret = ext_ghq_init(2048, // max texture width supported by hardware
                       2048, // max texture height supported by hardware
                       32, // max texture bpp supported by hardware
                       options,
-                      256 * 1024 * 1024, // cache texture to system memory
+                      0, // cache texture to system memory
                       path, // plugin path
                       name, // name of ROM. must be no longer than 256 characters
-                      NULL);
+                      DisplayLoadProgress);
 
   ext_ghq_shutdown();
 
-  printf("Done! -- results logged to glidehq.dbg\n");
+  printf("\bDone!\nLogged to ghqchk.txt\n");
 
   return bret;
 }
