@@ -68,13 +68,13 @@ TxReSample::nextPow2(uint8** image, int* width, int* height, int bpp, boolean us
    * power of 2 size. This is a dirty hack for textures that have
    * munged aspect ratio by (n) pixel to the original.
    */
-  if (n_width > 64)       n_width -= 4;
-  else if (n_width > 16)  n_width -= 2;
-  else if (n_width > 4)   n_width -= 1;
+  if      (n_width  > 64) n_width  -= 4;
+  else if (n_width  > 16) n_width  -= 2;
+  else if (n_width  >  4) n_width  -= 1;
 
-  if (n_height > 64)      n_height -= 4;
+  if      (n_height > 64) n_height -= 4;
   else if (n_height > 16) n_height -= 2;
-  else if (n_height > 4)  n_height -= 1;
+  else if (n_height >  4) n_height -= 1;
 
   n_width = nextPow2(n_width);
   n_height = nextPow2(n_height);
