@@ -96,13 +96,11 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
     _ident.assign(ident);
 
   /* check for dxtn extensions */
-  if (!TxLoadLib::getInstance()->getdxtCompressTexFuncExt() &&
-      (options & COMPRESSION_MASK) == S3TC_COMPRESSION)
-    _options &= ~COMPRESSION_MASK;
+  if (!TxLoadLib::getInstance()->getdxtCompressTexFuncExt())
+    _options &= ~S3TC_COMPRESSION;
 
-  if (!TxLoadLib::getInstance()->getfxtCompressTexFuncExt() &&
-      (options & COMPRESSION_MASK) == FXT1_COMPRESSION)
-    _options &= ~COMPRESSION_MASK;
+  if (!TxLoadLib::getInstance()->getfxtCompressTexFuncExt())
+    _options &= ~FXT1_COMPRESSION;
 
   switch (options & COMPRESSION_MASK) {
   case FXT1_COMPRESSION:
@@ -137,9 +135,7 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
     _options &= ~HIRESTEXTURES_MASK;
 #endif
 
-  /* assert local options */
-  /* allow texture compression only if we are using texture enhancers */
-  if (!(_options & COMPRESS_TEX) || !(_options & ENHANCEMENT_MASK))
+  if (!(_options & COMPRESS_TEX))
     _options &= ~COMPRESSION_MASK;
 
   if (_tex1 && _tex2)
@@ -154,43 +150,35 @@ TxFilter::filter(uint8 *src, int srcwidth, int srcheight, uint16 srcformat, uint
   uint16 destformat = srcformat;
 
   /* We need to be initialized first! */
-  /* bypass _options to do ARGB8888->ARGB4444 if _maxbpp=16 */
-  /* ignore if we only have texture compression option on. */
-  if (!_initialized ||
-      !((_options & (FILTER_MASK|ENHANCEMENT_MASK/*|COMPRESSION_MASK*/)) ||
-        (srcformat == GR_TEXFMT_ARGB_8888 && (_maxbpp < 32 || _options & FORCE16BPP_TEX))))
-    return 0;
+  if (!_initialized) return 0;
+
+  /* find cached textures */
+  if (_cacheSize) {
+
+    /* calculate checksum of source texture */
+    if (!g64crc)
+      g64crc = (uint64)(_txUtil->checksumTx(texture, srcwidth, srcheight, srcformat));
+
+    DBG_INFO(80, L"filter: crc:%08X %08X %d x %d gfmt:%x\n",
+             (uint32)(g64crc >> 32), (uint32)(g64crc & 0xffffffff), srcwidth, srcheight, srcformat);
+
+#if 0 /* use hirestex to retrieve cached textures. */
+    /* check if we have it in cache */
+    if (!(g64crc & 0xffffffff00000000) && /* we reach here only when there is no hires texture for this crc */
+        _txTexCache->get(g64crc, info)) {
+      DBG_INFO(80, L"cache hit: %d x %d gfmt:%x\n", info->width, info->height, info->format);
+      return 1; /* yep, we've got it */
+    }
+#endif
+  }
 
   /* Leave small textures alone because filtering makes little difference.
    * Moreover, some filters require at least 4 * 4 to work.
+   * Bypass _options to do ARGB8888->16bpp if _maxbpp=16 or forced color reduction.
    */
-  if (srcwidth >= 4 && srcheight >= 4) {
-
-    /* check if width * height >= 4
-     * TexConv requirement.
-     */
-    /*if ((srcwidth * srcheight) < 4)
-      return NULL;*//* intentionally skipped! we get here only if have 4x4 or larger textures */
-
-    /* find cached textures */
-    if (_cacheSize) {
-
-      /* calculate checksum of source texture */
-      if (!g64crc)
-        g64crc = (uint64)(_txUtil->checksumTx(texture, srcwidth, srcheight, srcformat));
-
-      DBG_INFO(80, L"filter: crc:%08X %08X %d x %d gfmt:%x\n",
-               (uint32)(g64crc >> 32), (uint32)(g64crc & 0xffffffff), srcwidth, srcheight, srcformat);
-
-#if 0 /* use hirestex to retrieve cached textures. */
-      /* check if we have it in cache */
-      if (!(g64crc & 0xffffffff00000000) && /* we reach here only when there is no hires texture for this crc */
-          _txTexCache->get(g64crc, info)) {
-        DBG_INFO(80, L"cache hit: %d x %d gfmt:%x\n", info->width, info->height, info->format);
-        return 1; /* yep, we've got it */
-      }
-#endif
-    }
+  if ((srcwidth >= 4 && srcheight >= 4) &&
+      ((_options & (FILTER_MASK|ENHANCEMENT_MASK|COMPRESSION_MASK)) ||
+       (srcformat == GR_TEXFMT_ARGB_8888 && (_maxbpp < 32 || _options & FORCE16BPP_TEX)))) {
 
 #if !_16BPP_HACK
     /* convert textures to a format that the compressor accepts (ARGB8888) */
@@ -305,8 +293,8 @@ TxFilter::filter(uint8 *src, int srcwidth, int srcheight, uint16 srcformat, uint
       /* ignored if we only have texture compression option on.
        * only done when texture enhancer is used. see constructor. */
       if ((_options & COMPRESSION_MASK) &&
-          (srcwidth >= 32 && srcheight >= 32) /* Texture compression is not suitable for low pixel coarse detail
-                                               * textures. The assumption here is that textures larger than 32x32
+          (srcwidth >= 64 && srcheight >= 64) /* Texture compression is not suitable for low pixel coarse detail
+                                               * textures. The assumption here is that textures larger than 64x64
                                                * have enough detail to produce decent quality when compressed. The
                                                * down side is that narrow stripped textures that the N64 often use
                                                * for large background textures are also ignored. It would be more
@@ -434,27 +422,22 @@ TxFilter::filter(uint8 *src, int srcwidth, int srcheight, uint16 srcformat, uint
     }
   }
 
-  /* if texture == src, then nothing was done. */
-  if (texture != src) {
+  /* fill in the texture info. */
+  info->data = texture;
+  info->width  = srcwidth;
+  info->height = srcheight;
+  info->format = destformat;
+  info->smallLodLog2 = _txUtil->grLodLog2(srcwidth, srcheight);
+  info->largeLodLog2 = info->smallLodLog2;
+  info->aspectRatioLog2 = _txUtil->grAspectRatioLog2(srcwidth, srcheight);
+  info->is_hires_tex = 0;
 
-    /* cache the filtered texture. */
-    info->data = texture;
-    info->width  = srcwidth;
-    info->height = srcheight;
-    info->format = destformat;
-    info->smallLodLog2 = _txUtil->grLodLog2(srcwidth, srcheight);
-    info->largeLodLog2 = info->smallLodLog2;
-    info->aspectRatioLog2 = _txUtil->grAspectRatioLog2(srcwidth, srcheight);
-    info->is_hires_tex = 0;
+  /* cache the texture. */
+  if (_cacheSize) _txTexCache->add(g64crc, info);
 
-    _txTexCache->add(g64crc, info);
+  DBG_INFO(80, L"filtered texture: %d x %d gfmt:%x\n", info->width, info->height, info->format);
 
-    DBG_INFO(80, L"filtered texture: %d x %d gfmt:%x\n", info->width, info->height, info->format);
-
-    return 1;
-  }
-
-  return 0;
+  return 1;
 }
 
 boolean
@@ -473,14 +456,6 @@ TxFilter::hirestex(uint64 g64crc, uint64 r_crc64, uint16 *palette, GHQTexInfo *i
   DBG_INFO(80, L"hirestex: r_crc64:%08X %08X, g64crc:%08X %08X\n",
            (uint32)(r_crc64 >> 32), (uint32)(r_crc64 & 0xffffffff),
            (uint32)(g64crc >> 32), (uint32)(g64crc & 0xffffffff));
-
-  /* check if we have it in memory cache */
-  if (_cacheSize && g64crc) {
-    if (_txTexCache->get(g64crc, info)) {
-      DBG_INFO(80, L"cache hit: %d x %d gfmt:%x\n", info->width, info->height, info->format);
-      return 1; /* yep, we've got it */
-    }
-  }
 
 #if HIRES_TEXTURE
   /* check if we have it in hires memory cache. */
@@ -540,7 +515,7 @@ TxFilter::hirestex(uint64 g64crc, uint64 r_crc64, uint16 *palette, GHQTexInfo *i
         format = GR_TEXFMT_ARGB_1555;
 
 #if 1
-        /* XXX: compressed if memory cache compression is ON (not hires cache) */
+        /* XXX: compressed if memory cache compression is ON */
         if (_options & COMPRESSION_MASK) {
           tmptex = (texture == _tex1) ? _tex2 : _tex1;
           if (_txQuantize->quantize(texture, tmptex, info->width, info->height, format, GR_TEXFMT_ARGB_8888)) {
@@ -576,20 +551,24 @@ TxFilter::hirestex(uint64 g64crc, uint64 r_crc64, uint16 *palette, GHQTexInfo *i
         info->aspectRatioLog2 = _txUtil->grAspectRatioLog2(width, height);
         info->is_hires_tex = 1;
 
-        /* try adding it to memory cache. */
-        if (_cacheSize && g64crc) {
-          DBG_INFO(80, L"Yes! the user has memory cache ON. Let's use it.\n");
+        /* XXX: add to hires texture cache!!! */
+        _txHiResCache->add(r_crc64, info);
 
-          _txTexCache->add(g64crc, info);
-        }
-
-        DBG_INFO(80, L"GR_TEXFMT_P_8 loaded as GR_TEXFMT_ARGB_1555!\n");
+        DBG_INFO(80, L"GR_TEXFMT_P_8 loaded as gfmt:%x!\n", format);
       }
 
       return 1;
     }
   }
 #endif
+
+  /* check if we have it in memory cache */
+  if (_cacheSize && g64crc) {
+    if (_txTexCache->get(g64crc, info)) {
+      DBG_INFO(80, L"cache hit: %d x %d gfmt:%x\n", info->width, info->height, info->format);
+      return 1; /* yep, we've got it */
+    }
+  }
 
   DBG_INFO(80, L"no cache hits.\n");
 
