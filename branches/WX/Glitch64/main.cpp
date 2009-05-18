@@ -4,11 +4,10 @@
 #include <windows.h>
 #include <commctrl.h>
 #else
-#include "../winlnxdefs.h"
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 #endif // _WIN32
 #include <stdlib.h>
 #include <stdio.h>
@@ -167,7 +166,7 @@ static GLuint g_depthRenderBuffer;
 struct { int min, max; } tmu_usage[2] = { 0xfffffff, 0, 0xfffffff, 0 };
 
 struct texbuf_t {
-  DWORD start, end;
+  FxU32 start, end;
   int fmt;
 };
 #define NB_TEXBUFS 128 // MUST be a power of two
@@ -333,7 +332,7 @@ grSstSelect( int which_sst )
   LOG("grSstSelect(%d)\r\n", which_sst);
 }
 
-BOOL isExtensionSupported(const char *extension)
+int isExtensionSupported(const char *extension)
 {
   const GLubyte *extensions = NULL;
   const GLubyte *start;
@@ -355,16 +354,16 @@ BOOL isExtensionSupported(const char *extension)
     terminator = where + strlen(extension);
     if (where == start || *(where - 1) == ' ')
       if (*terminator == ' ' || *terminator == '\0')
-        return TRUE;
+        return 1;
 
     start = terminator;
   }
 
-  return FALSE;
+  return 0;
 }
 
 #ifdef _WIN32
-BOOL isWglExtensionSupported(const char *extension)
+int isWglExtensionSupported(const char *extension)
 {
   const GLubyte *extensions = NULL;
   const GLubyte *start;
@@ -386,12 +385,12 @@ BOOL isWglExtensionSupported(const char *extension)
     terminator = where + strlen(extension);
     if (where == start || *(where - 1) == ' ')
       if (*terminator == ' ' || *terminator == '\0')
-        return TRUE;
+        return 1;
 
     start = terminator;
   }
 
-  return FALSE;
+  return 0;
 }
 #endif // _WIN32
 
@@ -416,7 +415,7 @@ grSstWinOpenExt(
 #ifdef WIN32
 # include <fcntl.h>
 # ifndef ATTACH_PARENT_PROCESS
-#  define ATTACH_PARENT_PROCESS ((DWORD)-1)
+#  define ATTACH_PARENT_PROCESS ((FxU32)-1)
 # endif
 #endif
 
@@ -676,7 +675,7 @@ grSstWinOpen(
     display_warning("ChoosePixelFormat failed");
     return FXFALSE;
   }
-  if (SetPixelFormat(hDC, pfm, &pfd) == FALSE)
+  if (SetPixelFormat(hDC, pfm, &pfd) == 0)
   {
     display_warning("SetPixelFormat failed");
     return FXFALSE;
@@ -777,13 +776,13 @@ grSstWinOpen(
   if (nColBuffers != 2) display_warning("number of color buffer is not 2");
   if (nAuxBuffers != 1) display_warning("number of auxiliary buffer is not 1");
 
-  if (isExtensionSupported("GL_ARB_texture_env_combine") == FALSE &&
-    isExtensionSupported("GL_EXT_texture_env_combine") == FALSE &&
+  if (isExtensionSupported("GL_ARB_texture_env_combine") == 0 &&
+    isExtensionSupported("GL_EXT_texture_env_combine") == 0 &&
     show_warning)
     display_warning("Your video card doesn't support GL_ARB_texture_env_combine extension");
-  if (isExtensionSupported("GL_ARB_multitexture") == FALSE && show_warning)
+  if (isExtensionSupported("GL_ARB_multitexture") == 0 && show_warning)
     display_warning("Your video card doesn't support GL_ARB_multitexture extension");
-  if (isExtensionSupported("GL_ARB_texture_mirrored_repeat") == FALSE && show_warning)
+  if (isExtensionSupported("GL_ARB_texture_mirrored_repeat") == 0 && show_warning)
     display_warning("Your video card doesn't support GL_ARB_texture_mirrored_repeat extension");
   show_warning = 0;
 
@@ -808,19 +807,19 @@ grSstWinOpen(
   nbTextureUnits = 2;
 #endif
 
-  if (isExtensionSupported("GL_EXT_blend_func_separate") == FALSE)
+  if (isExtensionSupported("GL_EXT_blend_func_separate") == 0)
     blend_func_separate_support = 0;
   else
     blend_func_separate_support = 1;
 
-  if (isExtensionSupported("GL_EXT_packed_pixels") == FALSE)
+  if (isExtensionSupported("GL_EXT_packed_pixels") == 0)
     packed_pixels_support = 0;
   else {
     printf("packed pixels extension used\n");
     packed_pixels_support = 1;
   }
 
-  if (isExtensionSupported("GL_ARB_texture_non_power_of_two") == FALSE)
+  if (isExtensionSupported("GL_ARB_texture_non_power_of_two") == 0)
     npot_support = 0;
   else {
     printf("NPOT extension used\n");
@@ -833,7 +832,7 @@ grSstWinOpen(
   glBlendFuncSeparateEXT = (PFNGLBLENDFUNCSEPARATEEXTPROC)SDL_GL_GetProcAddress("glBlendFuncSeparateEXT");
 #endif // _WIN32
 
-  if (isExtensionSupported("GL_EXT_fog_coord") == FALSE)
+  if (isExtensionSupported("GL_EXT_fog_coord") == 0)
     fog_coord_support = 0;
   else
     fog_coord_support = 1;
@@ -923,9 +922,9 @@ grSstWinOpen(
 #endif // _WIN32
   }
 
-  if (isExtensionSupported("GL_EXT_texture_compression_s3tc") == FALSE  && show_warning)
+  if (isExtensionSupported("GL_EXT_texture_compression_s3tc") == 0  && show_warning)
     display_warning("Your video card doesn't support GL_EXT_texture_compression_s3tc extension");
-  if (isExtensionSupported("GL_3DFX_texture_compression_FXT1") == FALSE  && show_warning)
+  if (isExtensionSupported("GL_3DFX_texture_compression_FXT1") == 0  && show_warning)
     display_warning("Your video card doesn't support GL_3DFX_texture_compression_FXT1 extension");
 
 #ifdef _WIN32
@@ -1056,20 +1055,16 @@ grSstWinClose( GrContext_t context )
 
   free_combiners();
 #ifndef WIN32
-#ifndef GCC
-  __try // I don't know why, but opengl can be killed before this function call when emulator is closed (Gonetz).
+  try // I don't know why, but opengl can be killed before this function call when emulator is closed (Gonetz).
     // ZIGGY : I found the problem : it is a function pointer, when the extension isn't supported , it is then zero, so just need to check the pointer prior to do the call.
-#endif
   {
     if (use_fbo && glBindFramebufferEXT)
       glBindFramebufferEXT( GL_FRAMEBUFFER_EXT, 0 );
   }
-#ifndef GCC
-  __except(EXCEPTION_EXECUTE_HANDLER)
+  catch (...)
   {
     clear_texbuff = 0;
   }
-#endif
 
   if (clear_texbuff)
   {
@@ -1209,7 +1204,7 @@ FX_ENTRY void FX_CALL grTextureBufferExt( GrChipID_t  		tmu,
 
     if (startAddress+1 != curBufferAddr ||
       (curBufferAddr == 0L && nbAuxBuffers == 0))
-      buffer_cleared = FALSE;
+      buffer_cleared = 0;
 
     curBufferAddr = pBufferAddress = startAddress+1;
     pBufferFmt = fmt;
@@ -1310,7 +1305,7 @@ FX_ENTRY void FX_CALL grTextureBufferExt( GrChipID_t  		tmu,
           glScissor( 0, 0, width, height);
           if (fbs[i].buff_clear)
           {
-            glDepthMask(TRUE);
+            glDepthMask(1);
             glClear( GL_DEPTH_BUFFER_BIT ); //clear z-buffer only. we may need content, stored in the frame buffer
             fbs[i].buff_clear = 0;
           }
@@ -1357,7 +1352,7 @@ FX_ENTRY void FX_CALL grTextureBufferExt( GrChipID_t  		tmu,
     glViewport(0,0,width,height);
     glScissor(0,0,width,height);
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-    glDepthMask(TRUE);
+    glDepthMask(1);
     glClear( GL_DEPTH_BUFFER_BIT );
     CHECK_FRAMEBUFFER_STATUS();
     curBufferAddr = pBufferAddress;
@@ -1721,7 +1716,7 @@ void reloadTexture()
   LOG("reload texture %dx%d\n", width, height);
   printf("reload texture %dx%d\n", width, height);
 
-  buffer_cleared = TRUE;
+  buffer_cleared = 1;
 
   glPushAttrib(GL_ALL_ATTRIB_BITS);
   glActiveTextureARB(texture_unit);
@@ -2010,7 +2005,7 @@ grBufferClear( GrColor_t color, GrAlpha_t alpha, FxU32 depth )
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // ZIGGY TODO check that color mask is on
-  buffer_cleared = TRUE;
+  buffer_cleared = 1;
 
 }
 
@@ -2367,6 +2362,7 @@ grLfbWriteRegion( GrBuffer_t dst_buffer,
 FX_ENTRY char ** FX_CALL 
 grQueryResolutionsExt(FxI32 * Size)
 {
+#ifdef _WIN32
   DEVMODE enumMode;
   int iModeNum = 0;
   memset(&enumMode, 0, sizeof(DEVMODE));
@@ -2396,9 +2392,12 @@ grQueryResolutionsExt(FxI32 * Size)
   }
   *Size = _numResolutions;
   return _aResolutions;
+#else // _WIN32
+  return 0; //!todo Unix resolutions list
+#endif // _WIN32
 }
 
-FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(DWORD* width, DWORD* height)
+FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(FxU32* width, FxU32* height)
 {
 #ifdef _WIN32
   static DEVMODE enumMode;
@@ -2422,7 +2421,7 @@ FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(DWORD* wi
 
   return config.res;
 #else // _WIN32
-  return settings.full_res;
+  return config.res; //!todo Unix functionality
 #endif // _WIN32
 }
 

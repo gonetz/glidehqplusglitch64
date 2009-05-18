@@ -1,10 +1,6 @@
 #include <stdio.h>
 #ifdef _WIN32
 #include <windows.h>
-// #include <gl/gl.h>
-// #include "glext.h"
-#else // _WIN32
-#include "../winlnxdefs.h"
 #endif // _WIN32
 #include "glide.h"
 #include "main.h"
@@ -659,7 +655,7 @@ grDrawVertexArrayContiguous(FxU32 mode, FxU32 Count, void *pointers, FxU32 strid
 
   // ZIGGY apparently, grDrawVertexArrayContiguous is only used to overwrite the
   // whole screen, so we treat it as a grClearBuffer, no need to reload the texture
-  buffer_cleared = TRUE;
+  buffer_cleared = 1;
   //reloadTexture();
 
   if(need_to_compile) compile_shader();

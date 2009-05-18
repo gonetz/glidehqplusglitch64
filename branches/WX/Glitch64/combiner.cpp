@@ -1,9 +1,6 @@
 #ifdef _WIN32
 #include <windows.h>
-// #include <gl/gl.h>
-// #include "glext.h"
 #else // _WIN32
-#include "../winlnxdefs.h"
 #include <string.h>
 #include <stdlib.h>
 #endif // _WIN32
