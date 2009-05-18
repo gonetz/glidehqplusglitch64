@@ -1,4 +1,6 @@
 #include <stdio.h>
+
+#ifdef _WIN32 //Windows, duh!
 #include <objbase.h>
 #include "dxdiag.h"
 #pragma comment(lib, "ole32.lib")
@@ -107,3 +109,17 @@ int getVRAMSize()
   }
   return mem * 1024 * 1024;
 }
+
+#else //Mac/Linux VRAM code
+#include <SDL\SDL.h>
+int getVRAMSize()
+{
+     int amountVRAM;
+     const SDL_VideoInfo *video_info = SDL_GetVideoInfo( );
+     amountVRAM = video_info->video_mem / 1024;
+	 return amountVRAM;
+
+}
+#endif
+
+
