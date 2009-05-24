@@ -163,7 +163,7 @@ static unsigned int curBufferAddr = 0;
 
 static GLuint g_depthRenderBuffer;
 
-struct { int min, max; } tmu_usage[2] = { 0xfffffff, 0, 0xfffffff, 0 };
+struct TMU_USAGE { int min, max; } tmu_usage[2] = { 0xfffffff, 0, 0xfffffff, 0 };
 
 struct texbuf_t {
   FxU32 start, end;
@@ -184,17 +184,17 @@ unsigned short depthBuffer[2048*2048];
 
 //#define VOODOO1
 
-void display_warning(char *text, ...)
+void display_warning(const char *text, ...)
 {
   static int first_message = 100;
   if (first_message)
   {
-    unsigned char buf[1000];
+    char buf[1000];
 
     va_list ap;
 
     va_start(ap, text);
-    vsprintf((char*)buf, (char*)text, ap);
+    vsprintf(buf, text, ap);
     va_end(ap);
 
     // #ifdef _WIN32
@@ -210,9 +210,9 @@ void display_warning(char *text, ...)
 void display_error()
 {
   LPVOID lpMsgBuf;
-  if (!FormatMessage( 
-    FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-    FORMAT_MESSAGE_FROM_SYSTEM | 
+  if (!FormatMessage(
+    FORMAT_MESSAGE_ALLOCATE_BUFFER |
+    FORMAT_MESSAGE_FROM_SYSTEM |
     FORMAT_MESSAGE_IGNORE_INSERTS,
     NULL,
     GetLastError(),
@@ -249,7 +249,7 @@ void CLOSE_LOG()
   log_file = NULL;
 }
 
-void LOG(char *text, ...)
+void LOG(const char *text, ...)
 {
 #ifdef VPDEBUG
   if (!dumping) return;
@@ -276,16 +276,16 @@ grSstOrigin(GrOriginLocation_t  origin)
     display_warning("grSstOrigin : %x", origin);
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grClipWindow( FxU32 minx, FxU32 miny, FxU32 maxx, FxU32 maxy )
 {
   LOG("grClipWindow(%d,%d,%d,%d)\r\n", minx, miny, maxx, maxy);
 
   if (use_fbo && render_to_texture) {
-    if (int(minx) < 0) minx = 0;    
-    if (int(miny) < 0) miny = 0;    
-    if (maxx < minx) maxx = minx;    
-    if (maxy < miny) maxy = miny;    
+    if (int(minx) < 0) minx = 0;
+    if (int(miny) < 0) miny = 0;
+    if (maxx < minx) maxx = minx;
+    if (maxy < miny) maxy = miny;
     glScissor(minx, miny, maxx - minx, maxy - miny);
     glEnable(GL_SCISSOR_TEST);
     return;
@@ -297,12 +297,12 @@ grClipWindow( FxU32 minx, FxU32 miny, FxU32 maxx, FxU32 maxy )
     maxy = th - maxy;
     miny = th - miny;
     FxU32 tmp = maxy; maxy = miny; miny = tmp;
-    if (maxx > width) maxx = width;    
-    if (maxy > height) maxy = height;    
-    if (int(minx) < 0) minx = 0;    
-    if (int(miny) < 0) miny = 0;    
-    if (maxx < minx) maxx = minx;    
-    if (maxy < miny) maxy = miny;    
+    if (maxx > width) maxx = width;
+    if (maxy > height) maxy = height;
+    if (int(minx) < 0) minx = 0;
+    if (int(miny) < 0) miny = 0;
+    if (maxx < minx) maxx = minx;
+    if (maxy < miny) maxy = miny;
     glScissor(minx, miny+viewport_offset, maxx - minx, maxy - miny);
     //printf("gl scissor %d %d %d %d\n", minx, miny, maxx, maxy);
     //glScissor(minx, (viewport_offset)+height-maxy, maxx - minx, maxy - miny);
@@ -326,7 +326,7 @@ grGlideInit( void )
   LOG("grGlideInit()\r\n");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grSstSelect( int which_sst )
 {
   LOG("grSstSelect(%d)\r\n", which_sst);
@@ -396,7 +396,7 @@ int isWglExtensionSupported(const char *extension)
 
 #define GrPixelFormat_t int
 
-FX_ENTRY GrContext_t FX_CALL 
+FX_ENTRY GrContext_t FX_CALL
 grSstWinOpenExt(
                 FxU32                hWnd,
                 GrScreenResolution_t screen_resolution,
@@ -408,7 +408,7 @@ grSstWinOpenExt(
                 int                  nAuxBuffers)
 {
   LOG("grSstWinOpenExt(%d, %d, %d, %d, %d, %d %d)\r\n", hWnd, screen_resolution, refresh_rate, color_format, origin_location, nColBuffers, nAuxBuffers);
-  return grSstWinOpen(hWnd, screen_resolution, refresh_rate, color_format, 
+  return grSstWinOpen(hWnd, screen_resolution, refresh_rate, color_format,
     origin_location, nColBuffers, nAuxBuffers);
 }
 
@@ -419,7 +419,7 @@ grSstWinOpenExt(
 # endif
 #endif
 
-FX_ENTRY GrContext_t FX_CALL 
+FX_ENTRY GrContext_t FX_CALL
 grSstWinOpen(
              FxU32                hWnd,
              GrScreenResolution_t screen_resolution,
@@ -626,7 +626,7 @@ grSstWinOpen(
     width = fullscreenMode.dmPelsWidth;
     height = fullscreenMode.dmPelsHeight;
 
-    TMU_SIZE = (config.vram_size - fullscreenMode.dmPelsWidth * fullscreenMode.dmPelsHeight * 4 * 3) / 2; 
+    TMU_SIZE = (config.vram_size - fullscreenMode.dmPelsWidth * fullscreenMode.dmPelsHeight * 4 * 3) / 2;
 
     ZeroMemory(&windowedRect, sizeof(RECT));
     GetWindowRect(hwnd_win, &windowedRect);
@@ -1094,7 +1094,7 @@ grSstWinClose( GrContext_t context )
     hGLRC = NULL;
   }
   /*
-  if (hDC != NULL) 
+  if (hDC != NULL)
   {
   ReleaseDC(hwnd_win,hDC);
   hDC = NULL;
@@ -1103,9 +1103,9 @@ grSstWinClose( GrContext_t context )
   if (fullscreen)
   {
     ChangeDisplaySettings(NULL, 0);
-    SetWindowPos(hwnd_win, NULL, 
-      windowedRect.left, windowedRect.top, 
-      0, 0, 
+    SetWindowPos(hwnd_win, NULL,
+      windowedRect.left, windowedRect.top,
+      0, 0,
       SWP_NOZORDER | SWP_NOSIZE);
     SetWindowLong(hwnd_win, GWL_STYLE, windowedStyle);
     SetWindowLong(hwnd_win, GWL_EXSTYLE, windowedExStyle);
@@ -1120,12 +1120,12 @@ grSstWinClose( GrContext_t context )
   return FXTRUE;
 }
 
-FX_ENTRY void FX_CALL grTextureBufferExt( GrChipID_t  		tmu, 
-                                         FxU32 				startAddress, 
-                                         GrLOD_t 			lodmin, 
-                                         GrLOD_t 			lodmax, 
-                                         GrAspectRatio_t 	aspect, 
-                                         GrTextureFormat_t 	fmt, 
+FX_ENTRY void FX_CALL grTextureBufferExt( GrChipID_t  		tmu,
+                                         FxU32 				startAddress,
+                                         GrLOD_t 			lodmin,
+                                         GrLOD_t 			lodmax,
+                                         GrAspectRatio_t 	aspect,
+                                         GrTextureFormat_t 	fmt,
                                          FxU32 				evenOdd)
 {
   int i;
@@ -1326,17 +1326,17 @@ FX_ENTRY void FX_CALL grTextureBufferExt( GrChipID_t  		tmu,
     }
 
     remove_tex(pBufferAddress, pBufferAddress + width*height*2/*grTexFormatSize(fmt)*/);
-    //create new FBO 
+    //create new FBO
     glGenFramebuffersEXT( 1, &(fbs[nb_fb].fbid) );
     glGenRenderbuffersEXT( 1, &(fbs[nb_fb].zbid) );
     glBindRenderbufferEXT( GL_RENDERBUFFER_EXT, fbs[nb_fb].zbid );
     // VP ported from mudlord
     glRenderbufferStorageEXT( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT, width, height);
     //glRenderbufferStorageEXT( GL_RENDERBUFFER_EXT, GL_DEPTH_COMPONENT24, width, height);
-    fbs[nb_fb].address = pBufferAddress;  
-    fbs[nb_fb].width = width;  
-    fbs[nb_fb].height = height;  
-    fbs[nb_fb].texid = pBufferAddress;  
+    fbs[nb_fb].address = pBufferAddress;
+    fbs[nb_fb].width = width;
+    fbs[nb_fb].height = height;
+    fbs[nb_fb].texid = pBufferAddress;
     fbs[nb_fb].buff_clear = 0;
     add_tex(fbs[nb_fb].texid);
     glBindTexture(GL_TEXTURE_2D, fbs[nb_fb].texid);
@@ -1463,8 +1463,8 @@ int CheckTextureBufferFormat(GrChipID_t tmu, FxU32 startAddress, GrTexInfo *info
 }
 
 
-FX_ENTRY void FX_CALL 
-grTextureAuxBufferExt( GrChipID_t tmu, 
+FX_ENTRY void FX_CALL
+grTextureAuxBufferExt( GrChipID_t tmu,
                       FxU32      startAddress,
                       GrLOD_t    thisLOD,
                       GrLOD_t    largeLOD,
@@ -1521,7 +1521,7 @@ grGetProcAddress( char *procName )
   return 0;
 }
 
-FX_ENTRY FxU32 FX_CALL 
+FX_ENTRY FxU32 FX_CALL
 grGet( FxU32 pname, FxU32 plength, FxI32 *params )
 {
   LOG("grGet(%d,%d)\r\n", pname, plength);
@@ -1633,7 +1633,7 @@ grGet( FxU32 pname, FxU32 plength, FxI32 *params )
   return 0;
 }
 
-FX_ENTRY const char * FX_CALL 
+FX_ENTRY const char * FX_CALL
 grGetString( FxU32 pname )
 {
   LOG("grGetString(%d)\r\n", pname);
@@ -1816,7 +1816,7 @@ FX_ENTRY void FX_CALL grFramebufferCopyExt(int x, int y, int w, int h,
       return;
     }
 
-  }    
+  }
 }
 
 FX_ENTRY void FX_CALL
@@ -1892,7 +1892,7 @@ grRenderBuffer( GrBuffer_t buffer )
 
           save_w = save_h = 0;
         }
-      }  
+      }
 #endif
 
       // ZIGGY
@@ -2058,7 +2058,7 @@ case 'w': {
 
 FX_ENTRY FxBool FX_CALL
 grLfbLock( GrLock_t type, GrBuffer_t buffer, GrLfbWriteMode_t writeMode,
-          GrOriginLocation_t origin, FxBool pixelPipeline, 
+          GrOriginLocation_t origin, FxBool pixelPipeline,
           GrLfbInfo_t *info )
 {
   LOG("grLfbLock(%d,%d,%d,%d,%d)\r\n", type, buffer, writeMode, origin, pixelPipeline);
@@ -2208,10 +2208,10 @@ grLfbReadRegion( GrBuffer_t src_buffer,
 }
 
 FX_ENTRY FxBool FX_CALL
-grLfbWriteRegion( GrBuffer_t dst_buffer, 
-                 FxU32 dst_x, FxU32 dst_y, 
-                 GrLfbSrcFmt_t src_format, 
-                 FxU32 src_width, FxU32 src_height, 
+grLfbWriteRegion( GrBuffer_t dst_buffer,
+                 FxU32 dst_x, FxU32 dst_y,
+                 GrLfbSrcFmt_t src_format,
+                 FxU32 src_width, FxU32 src_height,
                  FxBool pixelPipeline,
                  FxI32 src_stride, void *src_data )
 {
@@ -2315,7 +2315,7 @@ grLfbWriteRegion( GrBuffer_t dst_buffer,
     {
       for (i=0; i<src_width; i++)
       {
-        buf[(j+(viewport_offset))*src_width+i] = 
+        buf[(j+(viewport_offset))*src_width+i] =
           (frameBuffer[(src_height-j-1)*(src_stride/2)+i]/(65536.0f*(2.0f/zscale)))+1-zscale/2.0f;
         //(frameBuffer[(src_height-j-1)*(src_stride/2)+i]/(65536.0f));
       }
@@ -2359,7 +2359,7 @@ grLfbWriteRegion( GrBuffer_t dst_buffer,
 
 /* wrapper-specific glide extensions */
 
-FX_ENTRY char ** FX_CALL 
+FX_ENTRY char ** FX_CALL
 grQueryResolutionsExt(FxI32 * Size)
 {
 #ifdef _WIN32
@@ -2369,10 +2369,10 @@ grQueryResolutionsExt(FxI32 * Size)
   int nbResolutions = 0;
   while (EnumDisplaySettings(NULL, iModeNum++, &enumMode) != 0)
   {
-    if (enumMode.dmBitsPerPel == 32) 
+    if (enumMode.dmBitsPerPel == 32)
       nbResolutions++;
   }
-  if (nbResolutions != _numResolutions) 
+  if (nbResolutions != _numResolutions)
   {
     clear_resolutions();
     _numResolutions = nbResolutions;
@@ -2440,7 +2440,7 @@ FX_ENTRY void FX_CALL grConfigWrapperExt(FxI32 resolution, FxI32 vram, FxBool fb
 
 // unused by glide64
 
-FX_ENTRY FxI32 FX_CALL 
+FX_ENTRY FxI32 FX_CALL
 grQueryResolutions( const GrResolution *resTemplate, GrResolution *output )
 {
   int res_inf = 0;
@@ -2468,60 +2468,60 @@ grQueryResolutions( const GrResolution *resTemplate, GrResolution *output )
   return res_sup - res_inf + 1;
 }
 
-FX_ENTRY FxBool FX_CALL 
+FX_ENTRY FxBool FX_CALL
 grReset( FxU32 what )
 {
   display_warning("grReset");
   return 1;
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grEnable( GrEnableMode_t mode )
 {
   if (mode == GR_TEXTURE_UMA_EXT)
     UMAmode = 1;
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDisable( GrEnableMode_t mode )
 {
   if (mode == GR_TEXTURE_UMA_EXT)
     UMAmode = 0;
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDisableAllEffects( void )
 {
   display_warning("grDisableAllEffects");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grErrorSetCallback( GrErrorCallbackFnc_t fnc )
 {
   display_warning("grErrorSetCallback");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grFinish(void)
 {
   display_warning("grFinish");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grFlush(void)
 {
   display_warning("grFlush");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexMultibase( GrChipID_t tmu,
                FxBool     enable )
 {
   display_warning("grTexMultibase");
 }
 
-FX_ENTRY void FX_CALL 
-grTexMipMapMode( GrChipID_t     tmu, 
+FX_ENTRY void FX_CALL
+grTexMipMapMode( GrChipID_t     tmu,
                 GrMipMapMode_t mode,
                 FxBool         lodBlend )
 {
@@ -2529,7 +2529,7 @@ grTexMipMapMode( GrChipID_t     tmu,
 }
 
 FX_ENTRY void FX_CALL
-grTexDownloadTablePartial( GrTexTable_t type, 
+grTexDownloadTablePartial( GrTexTable_t type,
                           void         *data,
                           int          start,
                           int          end )
@@ -2538,13 +2538,13 @@ grTexDownloadTablePartial( GrTexTable_t type,
 }
 
 FX_ENTRY void FX_CALL
-grTexDownloadTable( GrTexTable_t type, 
+grTexDownloadTable( GrTexTable_t type,
                    void         *data )
 {
   display_warning("grTexDownloadTable");
 }
 
-FX_ENTRY FxBool FX_CALL 
+FX_ENTRY FxBool FX_CALL
 grTexDownloadMipMapLevelPartial( GrChipID_t        tmu,
                                 FxU32             startAddress,
                                 GrLOD_t           thisLod,
@@ -2560,7 +2560,7 @@ grTexDownloadMipMapLevelPartial( GrChipID_t        tmu,
   return 1;
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexDownloadMipMapLevel( GrChipID_t        tmu,
                          FxU32             startAddress,
                          GrLOD_t           thisLod,
@@ -2573,19 +2573,19 @@ grTexDownloadMipMapLevel( GrChipID_t        tmu,
   display_warning("grTexDownloadMipMapLevel");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexNCCTable( GrNCCTable_t table )
 {
   display_warning("grTexNCCTable");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grViewport( FxI32 x, FxI32 y, FxI32 width, FxI32 height )
 {
   display_warning("grViewport");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDepthRange( FxFloat n, FxFloat f )
 {
   display_warning("grDepthRange");
@@ -2649,19 +2649,19 @@ grLfbWriteColorFormat(GrColorFormat_t colorFormat)
   display_warning("grLfbWriteColorFormat");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grLfbWriteColorSwizzle(FxBool swizzleBytes, FxBool swapWords)
 {
   display_warning("grLfbWriteColorSwizzle");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grLfbConstantDepth( FxU32 depth )
 {
   display_warning("grLfbConstantDepth");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grLfbConstantAlpha( GrAlpha_t alpha )
 {
   display_warning("grLfbConstantAlpha");
@@ -2677,13 +2677,13 @@ grTexMultibaseAddress( GrChipID_t       tmu,
   display_warning("grTexMultibaseAddress");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grLoadGammaTable( FxU32 nentries, FxU32 *red, FxU32 *green, FxU32 *blue)
 {
   display_warning("grLoadGammaTable");
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDitherMode( GrDitherMode_t mode )
 {
   display_warning("grDitherMode");
@@ -2780,7 +2780,7 @@ void dump_stop()
     } else {
       glGetTexImage(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, pixels);
       int i;
-      for (i=0; i<w*h; i++) 
+      for (i=0; i<w*h; i++)
         ((unsigned char *)frameBuffer)[i] = ((unsigned short *)pixels)[i]/256;
       ilTexImage(w, h, 1, 1, IL_LUMINANCE, IL_UNSIGNED_BYTE, frameBuffer);
     }

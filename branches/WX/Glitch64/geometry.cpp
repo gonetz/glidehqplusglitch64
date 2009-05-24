@@ -26,11 +26,8 @@ static int fog_ext_en;
 int w_buffer_mode;
 int inverted_culling;
 int culling_mode;
-static float depth_bias;
 
 inline float ZCALC(const float & z, const float & q) {
-  //float res = z_en ? ((z) / Z_MAX) / (q-(float)depth_bias*q*q*zscale*2/128.0f) : 1.0f;
-  //float res = z_en ? ((z) / Z_MAX) / (q-(float)depth_bias*zscale*9/255000000.0f) : 1.0f;
   float res = z_en ? ((z) / Z_MAX) / (q) : 1.0f;
   return res;
 }
@@ -61,7 +58,7 @@ void init_geometry()
   glDisable(GL_DEPTH_TEST);
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grCoordinateSpace( GrCoordinateSpaceMode_t mode )
 {
   LOG("grCoordinateSpace(%d)\r\n", mode);
@@ -113,7 +110,7 @@ grVertexLayout(FxU32 param, FxI32 offset, FxU32 mode)
   }
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grCullMode( GrCullMode_t mode )
 {
   LOG("grCullMode(%d)\r\n", mode);
@@ -174,7 +171,7 @@ grDepthBufferMode( GrDepthBufferMode_t mode )
   }
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDepthBufferFunction( GrCmpFnc_t function )
 {
   LOG("grDepthBufferFunction(%d)\r\n", function);
@@ -228,7 +225,7 @@ grDepthBufferFunction( GrCmpFnc_t function )
   }
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDepthMask( FxBool mask )
 {
   LOG("grDepthMask(%d)\r\n", mask);
@@ -276,11 +273,10 @@ void FindBestDepthBias()
   glPopAttrib();
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDepthBiasLevel( FxI32 level )
 {
   LOG("grDepthBiasLevel(%d)\r\n", level);
-  //depth_bias = level;
   if (level)
   {
     if(w_buffer_mode)
@@ -377,7 +373,7 @@ grDrawTriangle( const void *a, const void *b, const void *c )
     else
       glSecondaryColor3f((1.0f / *a_fog) / 255.0f, 0.0f, 0.0f);
   }
-  glVertex4f((*a_x - (float)widtho) / (float)(width/2) / *a_q, 
+  glVertex4f((*a_x - (float)widtho) / (float)(width/2) / *a_q,
     -(*a_y - (float)heighto) / (float)(height/2) / *a_q, ZCALC(*a_z, *a_q), 1.0f / *a_q);
 
   if (nbTextureUnits > 2)
@@ -483,7 +479,7 @@ grDrawPoint( const void *pt )
     else
       glSecondaryColor3f((1.0f / *fog) / 255.0f, 0.0f, 0.0f);
   }
-  glVertex4f((*x - (float)widtho) / (float)(width/2) / *q, 
+  glVertex4f((*x - (float)widtho) / (float)(width/2) / *q,
     -(*y - (float)heighto) / (float)(height/2) / *q, ZCALC(*z ,*q), 1.0f / *q);
 
   glEnd();
@@ -545,7 +541,7 @@ grDrawLine( const void *a, const void *b )
     else
       glSecondaryColor3f((1.0f / *a_fog) / 255.0f, 0.0f, 0.0f);
   }
-  glVertex4f((*a_x - (float)widtho) / (float)(width/2) / *a_q, 
+  glVertex4f((*a_x - (float)widtho) / (float)(width/2) / *a_q,
     -(*a_y - (float)heighto) / (float)(height/2) / *a_q, ZCALC(*a_z, *a_q), 1.0f / *a_q);
 
   if (nbTextureUnits > 2)
@@ -578,7 +574,7 @@ grDrawLine( const void *a, const void *b )
   glEnd();
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDrawVertexArray(FxU32 mode, FxU32 Count, void *pointers2)
 {
   unsigned int i;
@@ -639,13 +635,13 @@ grDrawVertexArray(FxU32 mode, FxU32 Count, void *pointers2)
       else
         glSecondaryColor3f((1.0f / *fog) / 255.0f, 0.0f, 0.0f);
     }
-    glVertex4f((*x - (float)widtho) / (float)(width/2) / *q, 
+    glVertex4f((*x - (float)widtho) / (float)(width/2) / *q,
       -(*y - (float)heighto) / (float)(height/2) / *q, ZCALC(*z, *q), 1.0f / *q);
   }
   glEnd();
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grDrawVertexArrayContiguous(FxU32 mode, FxU32 Count, void *pointers, FxU32 stride)
 {
   unsigned int i;
@@ -712,7 +708,7 @@ grDrawVertexArrayContiguous(FxU32 mode, FxU32 Count, void *pointers, FxU32 strid
         glSecondaryColor3f((1.0f / *fog) / 255.0f, 0.0f, 0.0f);
     }
 
-    glVertex4f((*x - (float)widtho) / (float)(width/2) / *q, 
+    glVertex4f((*x - (float)widtho) / (float)(width/2) / *q,
       -(*y - (float)heighto) / (float)(height/2) / *q, ZCALC(*z, *q), 1.0f / *q);
   }
   glEnd();

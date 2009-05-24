@@ -3,6 +3,7 @@
 #ifdef _WIN32 //Windows, duh!
 #include <objbase.h>
 #include "dxdiag.h"
+#include "main.h"
 #pragma comment(lib, "ole32.lib")
 #pragma comment(lib, "dxguid.lib")
 #define SAFE_RELEASE(x) { if (x != NULL) { x->Release(); x = NULL; } }
@@ -39,7 +40,7 @@ static void InitCom()
   }
   catch (const char* msg)
   {
-    sprintf("\nDxDiag Error: %s", msg);
+    LOG("\nDxDiag Error: %s", msg);
   }             
 }
 

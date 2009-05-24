@@ -57,8 +57,8 @@ extern "C" {
 #endif // _WIN32
 #include "glide.h"
 
-void display_warning(unsigned char *text, ...);
-void display_warning(char *text, ...);
+void display_warning(const unsigned char *text, ...);
+void display_warning(const char *text, ...);
 void init_geometry();
 void init_textures();
 void init_combiner();
