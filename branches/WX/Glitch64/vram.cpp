@@ -115,10 +115,9 @@ int getVRAMSize()
 #include <SDL\SDL.h>
 int getVRAMSize()
 {
-     int amountVRAM;
      const SDL_VideoInfo *video_info = SDL_GetVideoInfo( );
-     amountVRAM = video_info->video_mem / 1024;
-	 return amountVRAM;
+     int amountVRAM = video_info->video_mem*1024;
+     return amountVRAM;
 
 }
 #endif
