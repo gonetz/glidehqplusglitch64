@@ -9,11 +9,11 @@
 #define SAFE_RELEASE(x) { if (x != NULL) { x->Release(); x = NULL; } }
 
 IDxDiagProvider* Provider;
-IDxDiagContainer* RootContainer;         
-bool ComInitialized;    
+IDxDiagContainer* RootContainer;
+bool ComInitialized;
 
 static void InitCom()
-{ 
+{
   try
   {
     Provider = NULL;
@@ -41,7 +41,7 @@ static void InitCom()
   catch (const char* msg)
   {
     LOG("\nDxDiag Error: %s", msg);
-  }             
+  }
 }
 
 static IDxDiagContainer* GetContainer(IDxDiagContainer* parent, const WCHAR* name)
@@ -58,7 +58,7 @@ static void GetPropertyValue(IDxDiagContainer* container, const WCHAR* name, WCH
   VARIANT var;
   VariantInit(&var);
   if (SUCCEEDED(container->GetProp(name, &var)))
-  {     
+  {
     // Assuming an integer or bstring value here
     // @@ Handle all the VT_* types properly...
     if (var.vt != VT_BSTR)
@@ -69,7 +69,7 @@ static void GetPropertyValue(IDxDiagContainer* container, const WCHAR* name, WCH
     value[maxValueLen - 1] = 0;
     VariantClear(&var);
   }
-  else 
+  else
   {
     value[0] = 0;
   }
@@ -86,7 +86,7 @@ static int GetTotalVideoMemory()
       // Get device name
       container = GetContainer(container, L"0");
       if (container != NULL)
-      {                         
+      {
         const int bufferLength = 256;
         WCHAR buffer[bufferLength];
         GetPropertyValue(container, L"szDisplayMemoryLocalized", buffer, bufferLength);
@@ -109,16 +109,6 @@ int getVRAMSize()
     mem = GetTotalVideoMemory();
   }
   return mem * 1024 * 1024;
-}
-
-#else //Mac/Linux VRAM code
-#include <SDL\SDL.h>
-int getVRAMSize()
-{
-     const SDL_VideoInfo *video_info = SDL_GetVideoInfo( );
-     int amountVRAM = video_info->video_mem*1024;
-     return amountVRAM;
-
 }
 #endif
 

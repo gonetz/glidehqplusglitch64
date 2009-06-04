@@ -59,13 +59,14 @@ static inline void opt_glCopyTexImage2D( GLenum target,
 }
 #define glCopyTexImage2D opt_glCopyTexImage2D
 
+
+#ifdef _WIN32
 PFNGLACTIVETEXTUREARBPROC glActiveTextureARB;
 PFNGLBLENDFUNCSEPARATEEXTPROC glBlendFuncSeparateEXT;
 PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB;
 PFNGLFOGCOORDFPROC glFogCoordfEXT;
-#ifdef _WIN32
+
 PFNWGLGETEXTENSIONSSTRINGARBPROC wglGetExtensionsStringARB;
-#endif // _WIN32
 
 PFNGLBINDFRAMEBUFFEREXTPROC glBindFramebufferEXT;
 PFNGLFRAMEBUFFERTEXTURE2DEXTPROC glFramebufferTexture2DEXT;
@@ -102,6 +103,9 @@ PFNGLSECONDARYCOLOR3FPROC glSecondaryColor3f;
 // GL_COMPRESSED_RGB_FXT1_3DFX
 // GL_COMPRESSED_RGBA_FXT1_3DFX
 PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2DARB;
+#endif // _WIN32
+
+
 
 typedef struct
 {
@@ -730,15 +734,10 @@ grSstWinOpen(
   if(videoInfo->blit_hw)
     videoFlags |= SDL_HWACCEL;
 
-  if(screen_resolution & 0x80)
-    ;
-  else
-  {
-    viewport_offset = 0;
+  if (!(screen_resolution & 0x80000000))
     videoFlags |= SDL_FULLSCREEN;
-  }
-  viewport_offset = ((screen_resolution>>2) > 20) ? screen_resolution >> 2 : 20;
 
+  //viewport_offset = ((screen_resolution>>2) > 20) ? screen_resolution >> 2 : 20;
   // ZIGGY viewport_offset is WIN32 specific, with SDL just set it to zero
   viewport_offset = 0; //-10 //-20;
 
@@ -762,9 +761,9 @@ grSstWinOpen(
 
   char caption[500];
 # ifdef _DEBUG
-  sprintf(caption, "Glide64 Wonder Plus Debug for OpenGL ported by Hacktarux and Josh + experiments by Ziggy");
+  sprintf(caption, "Glide64 Napalm for Linux ported by Hacktarux/Josh/Ziggy/mudlord/Gonetz/KoolSmoky");
 # else // _DEBUG
-  sprintf(caption, "Glide64 Wonder Plus for OpenGL ported by Hacktarux and Josh + experiments by Ziggy");
+  sprintf(caption, "Glide64 Napalm for Linux ported by Hacktarux/Josh/Ziggy/mudlord/Gonetz/KoolSmoky");
 # endif // _DEBUG
   SDL_WM_SetCaption(caption, caption);
   glViewport(0, viewport_offset, width, height);
@@ -789,9 +788,6 @@ grSstWinOpen(
 #ifdef _WIN32
   glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
   glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
-#else // _WIN32
-  glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)SDL_GL_GetProcAddress("glActiveTextureARB");
-  glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)SDL_GL_GetProcAddress("glMultiTexCoord2fARB");
 #endif // _WIN32
 
   nbTextureUnits = 0;
@@ -828,8 +824,6 @@ grSstWinOpen(
 
 #ifdef _WIN32
   glBlendFuncSeparateEXT = (PFNGLBLENDFUNCSEPARATEEXTPROC)wglGetProcAddress("glBlendFuncSeparateEXT");
-#else // _WIN32
-  glBlendFuncSeparateEXT = (PFNGLBLENDFUNCSEPARATEEXTPROC)SDL_GL_GetProcAddress("glBlendFuncSeparateEXT");
 #endif // _WIN32
 
   if (isExtensionSupported("GL_EXT_fog_coord") == 0)
@@ -839,8 +833,6 @@ grSstWinOpen(
 
 #ifdef _WIN32
   glFogCoordfEXT = (PFNGLFOGCOORDFPROC)wglGetProcAddress("glFogCoordfEXT");
-#else // _WIN32
-  glFogCoordfEXT = (PFNGLFOGCOORDFPROC)SDL_GL_GetProcAddress("glFogCoordfEXT");
 #endif // _WIN32
 
 #ifdef _WIN32
@@ -859,18 +851,6 @@ grSstWinOpen(
   glGenRenderbuffersEXT = (PFNGLGENRENDERBUFFERSEXTPROC)wglGetProcAddress("glGenRenderbuffersEXT");
   glRenderbufferStorageEXT = (PFNGLRENDERBUFFERSTORAGEEXTPROC)wglGetProcAddress("glRenderbufferStorageEXT");
   glFramebufferRenderbufferEXT = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)wglGetProcAddress("glFramebufferRenderbufferEXT");
-#else // _WIN32
-  glBindFramebufferEXT = (PFNGLBINDFRAMEBUFFEREXTPROC)SDL_GL_GetProcAddress("glBindFramebufferEXT");
-  glFramebufferTexture2DEXT = (PFNGLFRAMEBUFFERTEXTURE2DEXTPROC)SDL_GL_GetProcAddress("glFramebufferTexture2DEXT");
-  glGenFramebuffersEXT = (PFNGLGENFRAMEBUFFERSEXTPROC)SDL_GL_GetProcAddress("glGenFramebuffersEXT");
-  glCheckFramebufferStatusEXT = (PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC)SDL_GL_GetProcAddress("glCheckFramebufferStatusEXT");
-  glDeleteFramebuffersEXT = (PFNGLDELETEFRAMEBUFFERSEXTPROC)SDL_GL_GetProcAddress("glDeleteFramebuffersEXT");
-
-  glBindRenderbufferEXT = (PFNGLBINDRENDERBUFFEREXTPROC)SDL_GL_GetProcAddress("glBindRenderbufferEXT");
-  glDeleteRenderbuffersEXT = (PFNGLDELETERENDERBUFFERSEXTPROC)SDL_GL_GetProcAddress("glDeleteRenderbuffersEXT");
-  glGenRenderbuffersEXT = (PFNGLGENRENDERBUFFERSEXTPROC)SDL_GL_GetProcAddress("glGenRenderbuffersEXT");
-  glRenderbufferStorageEXT = (PFNGLRENDERBUFFERSTORAGEEXTPROC)SDL_GL_GetProcAddress("glRenderbufferStorageEXT");
-  glFramebufferRenderbufferEXT = (PFNGLFRAMEBUFFERRENDERBUFFEREXTPROC)SDL_GL_GetProcAddress("glFramebufferRenderbufferEXT");
 #endif // _WIN32
 
   use_fbo = config.fbo && glFramebufferRenderbufferEXT;
@@ -901,24 +881,6 @@ grSstWinOpen(
     glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)wglGetProcAddress("glGetObjectParameterivARB");
 
     glSecondaryColor3f = (PFNGLSECONDARYCOLOR3FPROC)wglGetProcAddress("glSecondaryColor3f");
-#else // _WIN32
-    glCreateShaderObjectARB = (PFNGLCREATESHADEROBJECTARBPROC)SDL_GL_GetProcAddress("glCreateShaderObjectARB");
-    glShaderSourceARB = (PFNGLSHADERSOURCEARBPROC)SDL_GL_GetProcAddress("glShaderSourceARB");
-    glCompileShaderARB = (PFNGLCOMPILESHADERARBPROC)SDL_GL_GetProcAddress("glCompileShaderARB");
-    glCreateProgramObjectARB = (PFNGLCREATEPROGRAMOBJECTARBPROC)SDL_GL_GetProcAddress("glCreateProgramObjectARB");
-    glAttachObjectARB = (PFNGLATTACHOBJECTARBPROC)SDL_GL_GetProcAddress("glAttachObjectARB");
-    glLinkProgramARB = (PFNGLLINKPROGRAMARBPROC)SDL_GL_GetProcAddress("glLinkProgramARB");
-    glUseProgramObjectARB = (PFNGLUSEPROGRAMOBJECTARBPROC)SDL_GL_GetProcAddress("glUseProgramObjectARB");
-    glGetUniformLocationARB = (PFNGLGETUNIFORMLOCATIONARBPROC)SDL_GL_GetProcAddress("glGetUniformLocationARB");
-    glUniform1iARB = (PFNGLUNIFORM1IARBPROC)SDL_GL_GetProcAddress("glUniform1iARB");
-    glUniform4iARB = (PFNGLUNIFORM4IARBPROC)SDL_GL_GetProcAddress("glUniform4iARB");
-    glUniform4fARB = (PFNGLUNIFORM4FARBPROC)SDL_GL_GetProcAddress("glUniform4fARB");
-    glUniform1fARB = (PFNGLUNIFORM1FARBPROC)SDL_GL_GetProcAddress("glUniform1fARB");
-    glDeleteObjectARB = (PFNGLDELETEOBJECTARBPROC)SDL_GL_GetProcAddress("glDeleteObjectARB");
-    glGetInfoLogARB = (PFNGLGETINFOLOGARBPROC)SDL_GL_GetProcAddress("glGetInfoLogARB");
-    glGetObjectParameterivARB = (PFNGLGETOBJECTPARAMETERIVARBPROC)SDL_GL_GetProcAddress("glGetObjectParameterivARB");
-
-    glSecondaryColor3f = (PFNGLSECONDARYCOLOR3FPROC)SDL_GL_GetProcAddress("glSecondaryColor3f");
 #endif // _WIN32
   }
 
@@ -929,8 +891,6 @@ grSstWinOpen(
 
 #ifdef _WIN32
   glCompressedTexImage2DARB = (PFNGLCOMPRESSEDTEXIMAGE2DPROC)wglGetProcAddress("glCompressedTexImage2DARB");
-#else
-  glCompressedTexImage2DARB = (PFNGLCOMPRESSEDTEXIMAGE2DPROC)SDL_GL_GetProcAddress("glCompressedTexImage2DARB");
 #endif
 
 

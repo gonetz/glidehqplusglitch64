@@ -45,15 +45,11 @@ extern "C" {
 #include "glext.h"
 #include "wglext.h"
 }
-#ifdef GCC
+#else
 #include <stdio.h>
 //#define printf(...)
-#endif
-#else
-#include "gl.h" 
-#include "glext.h" 
-// #include <GL/gl.h>
-// #include <GL/glext.h>
+#define GL_GLEXT_PROTOTYPES
+#include <SDL_opengl.h>
 #endif // _WIN32
 #include "glide.h"
 
@@ -68,6 +64,7 @@ void updateCombinera(int i);
 void remove_tex(unsigned int idmin, unsigned int idmax);
 void add_tex(unsigned int id);
 
+#ifdef _WIN32
 extern PFNGLACTIVETEXTUREARBPROC glActiveTextureARB;
 extern PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB;
 extern PFNGLBLENDFUNCSEPARATEEXTPROC glBlendFuncSeparateEXT;
@@ -89,6 +86,7 @@ extern PFNGLDELETEOBJECTARBPROC glDeleteObjectARB;
 extern PFNGLGETINFOLOGARBPROC glGetInfoLogARB;
 extern PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB;
 extern PFNGLSECONDARYCOLOR3FPROC glSecondaryColor3f;
+#endif
 
 extern int w_buffer_mode;
 extern int nbTextureUnits;
@@ -182,7 +180,7 @@ typedef FxU32 GrCombineMode_t;
 #define GR_CMBX_TMU_CCOLOR                0x11
 
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grColorCombineExt(GrCCUColor_t a, GrCombineMode_t a_mode,
 				  GrCCUColor_t b, GrCombineMode_t b_mode,
                   GrCCUColor_t c, FxBool c_invert,
@@ -196,7 +194,7 @@ grAlphaCombineExt(GrACUColor_t a, GrCombineMode_t a_mode,
 				  GrACUColor_t d, FxBool d_invert,
 				  FxU32 shift, FxBool invert);
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexColorCombineExt(GrChipID_t       tmu,
                      GrTCCUColor_t a, GrCombineMode_t a_mode,
                      GrTCCUColor_t b, GrCombineMode_t b_mode,
@@ -204,7 +202,7 @@ grTexColorCombineExt(GrChipID_t       tmu,
                      GrTCCUColor_t d, FxBool d_invert,
                      FxU32 shift, FxBool invert);
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexAlphaCombineExt(GrChipID_t       tmu,
                      GrTACUColor_t a, GrCombineMode_t a_mode,
                      GrTACUColor_t b, GrCombineMode_t b_mode,

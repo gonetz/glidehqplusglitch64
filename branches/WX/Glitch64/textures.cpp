@@ -48,8 +48,11 @@ typedef struct _texlist
 static int nbTex = 0, szTex = 0;
 static texlist *list = NULL;
 
+#ifdef _WIN32
 extern PFNGLDELETERENDERBUFFERSEXTPROC glDeleteRenderbuffersEXT;
 extern PFNGLDELETEFRAMEBUFFERSEXTPROC glDeleteFramebuffersEXT;
+extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC glCompressedTexImage2DARB;
+#endif
 void remove_tex(unsigned int idmin, unsigned int idmax)
 {
   unsigned int *t;
@@ -134,7 +137,7 @@ void free_textures()
   }
 }
 
-FX_ENTRY FxU32 FX_CALL 
+FX_ENTRY FxU32 FX_CALL
 grTexMinAddress( GrChipID_t tmu )
 {
   LOG("grTexMinAddress(%d)\r\n", tmu);
@@ -144,7 +147,7 @@ grTexMinAddress( GrChipID_t tmu )
     return tmu*TMU_SIZE;
 }
 
-FX_ENTRY FxU32 FX_CALL 
+FX_ENTRY FxU32 FX_CALL
 grTexMaxAddress( GrChipID_t tmu )
 {
   LOG("grTexMaxAddress(%d)\r\n", tmu);
@@ -154,7 +157,7 @@ grTexMaxAddress( GrChipID_t tmu )
     return tmu*TMU_SIZE + TMU_SIZE - 1;
 }
 
-FX_ENTRY FxU32 FX_CALL 
+FX_ENTRY FxU32 FX_CALL
 grTexTextureMemRequired( FxU32     evenOdd,
                         GrTexInfo *info   )
 {
@@ -203,7 +206,7 @@ grTexTextureMemRequired( FxU32     evenOdd,
   return 0;
 }
 
-FX_ENTRY FxU32 FX_CALL 
+FX_ENTRY FxU32 FX_CALL
 grTexCalcMemRequired(
                      GrLOD_t lodmin, GrLOD_t lodmax,
                      GrAspectRatio_t aspect, GrTextureFormat_t fmt)
@@ -241,7 +244,7 @@ grTexCalcMemRequired(
     break;
   case GR_TEXFMT_ARGB_CMP_DXT1:  // FXT1,DXT1,5 support - H.Morii
     return ((((width+0x3)&~0x3)*((height+0x3)&~0x3))>>1);
-  case GR_TEXFMT_ARGB_CMP_DXT3:  
+  case GR_TEXFMT_ARGB_CMP_DXT3:
     return ((width+0x3)&~0x3)*((height+0x3)&~0x3);
   case GR_TEXFMT_ARGB_CMP_DXT5:
     return ((width+0x3)&~0x3)*((height+0x3)&~0x3);
@@ -360,7 +363,7 @@ int grTexFormat2GLPackedFmt(int fmt, int * gltexfmt, int * glpixfmt, int * glpac
     break;
   case GR_TEXFMT_ARGB_CMP_DXT3:
     factor = 16;
-    *gltexfmt = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT; 
+    *gltexfmt = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
     *glpixfmt = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
     *glpackfmt = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
     break;
@@ -382,9 +385,7 @@ int grTexFormat2GLPackedFmt(int fmt, int * gltexfmt, int * glpixfmt, int * glpac
   return factor;
 }
 
-extern PFNGLCOMPRESSEDTEXIMAGE2DARBPROC glCompressedTexImage2DARB;
-
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexDownloadMipMap( GrChipID_t tmu,
                     FxU32      startAddress,
                     FxU32      evenOdd,
@@ -422,7 +423,7 @@ grTexDownloadMipMap( GrChipID_t tmu,
     {
     case GR_TEXFMT_ALPHA_8:
       for (i=0; i<height; i++)
-      { 
+      {
         for (j=0; j<width; j++)
         {
           unsigned int texel = (unsigned int)((unsigned char*)info->data)[m];
@@ -438,7 +439,7 @@ grTexDownloadMipMap( GrChipID_t tmu,
       break;
     case GR_TEXFMT_INTENSITY_8: // I8 support - H.Morii
       for (i=0; i<height; i++)
-      { 
+      {
         for (j=0; j<width; j++)
         {
           unsigned int texel = (unsigned int)((unsigned char*)info->data)[m];
@@ -645,7 +646,7 @@ grTexDownloadMipMap( GrChipID_t tmu,
 
 int CheckTextureBufferFormat(GrChipID_t tmu, FxU32 startAddress, GrTexInfo *info );
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexSource( GrChipID_t tmu,
             FxU32      startAddress,
             FxU32      evenOdd,
@@ -728,7 +729,7 @@ grTexSource( GrChipID_t tmu,
 #endif
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexDetailControl(
                    GrChipID_t tmu,
                    int lod_bias,
@@ -753,7 +754,7 @@ grTexDetailControl(
   set_lambda();
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexLodBiasValue(GrChipID_t tmu, float bias )
 {
   LOG("grTexLodBiasValue(%d,%f)\r\n", tmu, bias);
@@ -761,7 +762,7 @@ grTexLodBiasValue(GrChipID_t tmu, float bias )
   display_warning("grTexLodBiasValue : %f", bias);*/
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexFilterMode(
                 GrChipID_t tmu,
                 GrTextureFilterMode_t minfilter_mode,
@@ -796,7 +797,7 @@ grTexFilterMode(
   }
 }
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexClampMode(
                GrChipID_t tmu,
                GrTextureClampMode_t s_clampmode,
