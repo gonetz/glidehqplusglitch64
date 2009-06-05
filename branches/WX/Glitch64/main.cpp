@@ -701,6 +701,7 @@ grSstWinOpen(
     return FXFALSE;
   }
 #else // _WIN32
+
   // init sdl & gl
   const SDL_VideoInfo *videoInfo;
   Uint32 videoFlags = 0;
@@ -734,8 +735,46 @@ grSstWinOpen(
   if(videoInfo->blit_hw)
     videoFlags |= SDL_HWACCEL;
 
-  if (!(screen_resolution & 0x80000000))
-    videoFlags |= SDL_FULLSCREEN;
+  //if (!(screen_resolution & 0x80000000))
+  //videoFlags |= SDL_FULLSCREEN;
+
+  if (screen_resolution & 0x80000000)
+      ;
+      else{
+      SDL_Rect** modes;
+      SDL_Surface *check_surface;
+      SDL_PixelFormat *fmt;
+      int iModeNum;
+      static int res_w = 0, res_h = 0;
+      static int iCount = -1;
+
+    check_surface = SDL_CreateRGBSurface(NULL, 0, 0, 32, 0, 0, 0, 0);
+
+   if (iCount != screen_resolution) {
+
+    fmt=check_surface->format;
+    modes = SDL_ListModes(fmt, SDL_FULLSCREEN|SDL_HWSURFACE);
+
+     for (iModeNum=0; modes[iModeNum]; ++iModeNum){
+         if (fmt->BitsPerPixel == 32) {
+         if (screen_resolution == iCount){
+         res_w = modes[iCount]-> w;
+         res_h = modes[iCount]-> h;
+         break;
+         }
+         iCount++;
+      }
+     }
+   }
+
+   SDL_FreeSurface(check_surface);
+
+ width = res_w;
+ height = res_h;
+
+      videoFlags |= SDL_FULLSCREEN;
+      }
+
 
   //viewport_offset = ((screen_resolution>>2) > 20) ? screen_resolution >> 2 : 20;
   // ZIGGY viewport_offset is WIN32 specific, with SDL just set it to zero
@@ -2353,7 +2392,50 @@ grQueryResolutionsExt(FxI32 * Size)
   *Size = _numResolutions;
   return _aResolutions;
 #else // _WIN32
-  return 0; //!todo Unix resolutions list
+//_aResolutions
+  SDL_Rect** modes;
+  SDL_Surface *check_surface;
+  SDL_PixelFormat *fmt;
+  int iModeNum;
+  static int res_w = 0, res_h = 0;
+  int nbResolutions = 0;
+
+  SDL_InitSubSystem(SDL_INIT_VIDEO);
+  check_surface = SDL_CreateRGBSurface(NULL, 0, 0, 32, 0, 0, 0, 0);
+  if (!check_surface){
+    return 0; //failtrain!
+  }
+
+  fmt=check_surface->format;
+  modes = SDL_ListModes(fmt, SDL_FULLSCREEN|SDL_HWSURFACE);
+
+  for (iModeNum=0; modes[iModeNum]; ++iModeNum){
+         if (fmt->BitsPerPixel == 32)
+         nbResolutions++;
+  }
+
+  if (nbResolutions != _numResolutions)
+  {
+    clear_resolutions();
+    _numResolutions = nbResolutions;
+    _aResolutions = new char*[_numResolutions];
+    iModeNum = 0;
+    int current = 0;
+    for (iModeNum=0; modes[iModeNum]; ++iModeNum){
+         if (fmt->BitsPerPixel == 32) {
+         char smode[256];
+         sprintf(smode,"%d x %d 32bpp", modes[iModeNum]->w, modes[iModeNum]->h);
+         _aResolutions[current] = new char[strlen(smode)+1];
+         strcpy(_aResolutions[current], smode);
+         current++;
+         }
+      }
+     }
+  SDL_FreeSurface(check_surface);
+  *Size = _numResolutions;
+  return _aResolutions;
+
+  //return 0; //!todo Unix resolutions list
 #endif // _WIN32
 }
 
@@ -2381,6 +2463,45 @@ FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(FxU32* wi
 
   return config.res;
 #else // _WIN32
+  SDL_Rect** modes;
+  SDL_Surface *check_surface;
+  SDL_PixelFormat *fmt;
+  int iModeNum;
+  static int res_w = 0, res_h = 0;
+  static int iCount = -1;
+
+    SDL_InitSubSystem(SDL_INIT_VIDEO);
+    check_surface = SDL_CreateRGBSurface(NULL, 0, 0, 32, 0, 0, 0, 0);
+    if (!check_surface){
+        return config.res; //failtrain!
+    }
+
+   if (iCount != config.res) {
+
+    fmt=check_surface->format;
+    modes = SDL_ListModes(fmt, SDL_FULLSCREEN|SDL_HWSURFACE);
+
+     for (iModeNum=0; modes[iModeNum]; ++iModeNum){
+         if (fmt->BitsPerPixel == 32) {
+         if (config.res == iCount){
+         res_w = modes[iCount]-> w;
+         res_h = modes[iCount]-> h;
+         break;
+         }
+         iCount++;
+      }
+     }
+   }
+
+   SDL_FreeSurface(check_surface);
+
+ *width = res_w;
+ *height = res_h;
+
+  //do http://www.libsdl.org/cgi/docwiki.cgi/SDL_ListModes
+ // http://sdl.beuc.net/sdl.wiki/SDL_PixelFormat
+// int SDL_GL_GetAttribute(SDL_GLattr attr, int *value);
+
   return config.res; //!todo Unix functionality
 #endif // _WIN32
 }
