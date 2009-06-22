@@ -24,6 +24,7 @@
 #include "TxUtil.h"
 #include "TxDbg.h"
 #include <zlib.h>
+#include <malloc.h>
 
 /*
  * External libraries
