@@ -21,6 +21,8 @@
  * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
+#include <memory.h>
+#include <stdlib.h>
 #include "Ext_TxFilter.h"
 
 typedef boolean (*txfilter_init)(int maxwidth, int maxheight, int maxbpp,
