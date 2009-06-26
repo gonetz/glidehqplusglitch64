@@ -242,7 +242,8 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
 
     wcstombs(fname, _ident.c_str(), MAX_PATH);
     /* XXX case sensitivity fiasco!
-     * _a, _rgb, _all and file extensions must be in lower case letters! */
+     * files must use _a, _rgb, _all, _allciByRGBA, _ciByRGBA, _ci
+     * and file extensions must be in lower case letters! */
 #ifdef WIN32
     {
       unsigned int i;
@@ -256,7 +257,8 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
 #define PALCRC_LEN 9
     wcstombs(fname, it->path().leaf().c_str(), MAX_PATH);
     /* XXX case sensitivity fiasco!
-     * _a, _rgb, _all and file extensions must be in lower case letters! */
+     * files must use _a, _rgb, _all, _allciByRGBA, _ciByRGBA, _ci
+     * and file extensions must be in lower case letters! */
 #ifdef WIN32
     {
       unsigned int i;
@@ -459,10 +461,17 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
      */
     if (pfname == strstr(fname, "_all.png") ||
         pfname == strstr(fname, "_all.dds") ||
+#ifdef WIN32
         pfname == strstr(fname, "_allcibyrgba.png") ||
         pfname == strstr(fname, "_allcibyrgba.dds") ||
         pfname == strstr(fname, "_cibyrgba.png") ||
         pfname == strstr(fname, "_cibyrgba.dds") ||
+#else
+        pfname == strstr(fname, "_allciByRGBA.png") ||
+        pfname == strstr(fname, "_allciByRGBA.dds") ||
+        pfname == strstr(fname, "_ciByRGBA.png") ||
+        pfname == strstr(fname, "_ciByRGBA.dds") ||
+#endif
         pfname == strstr(fname, "_ci.bmp")) {
       if ((fp = fopen(fname, "rb")) != NULL) {
         if      (strstr(fname, ".png")) tex = _txImage->readPNG(fp, &width, &height, &format);
