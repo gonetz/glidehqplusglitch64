@@ -241,20 +241,28 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
     FILE *fp = NULL;
 
     wcstombs(fname, _ident.c_str(), MAX_PATH);
+    /* XXX case sensitivity fiasco!
+     * _a, _rgb, _all and file extensions must be in lower case letters! */
+#ifdef WIN32
     {
       unsigned int i;
       for (i = 0; i < strlen(fname); i++) fname[i] = tolower(fname[i]);
     }
+#endif
     ident.assign(fname);
 
     /* read in Rice's file naming convention */
 #define CRCFMTSIZ_LEN 13
 #define PALCRC_LEN 9
     wcstombs(fname, it->path().leaf().c_str(), MAX_PATH);
+    /* XXX case sensitivity fiasco!
+     * _a, _rgb, _all and file extensions must be in lower case letters! */
+#ifdef WIN32
     {
       unsigned int i;
       for (i = 0; i < strlen(fname); i++) fname[i] = tolower(fname[i]);
     }
+#endif
     pfname = fname + strlen(fname) - 4;
     if (!(pfname == strstr(fname, ".png") ||
           pfname == strstr(fname, ".bmp") ||
