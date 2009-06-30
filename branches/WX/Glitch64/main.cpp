@@ -1514,6 +1514,8 @@ grGetProcAddress( char *procName )
     return (GrProc)grWrapperFullScreenResolutionExt;
   if(!strcmp(procName, "grConfigWrapperExt"))
     return (GrProc)grConfigWrapperExt;
+  if(!strcmp(procName, "grKeyPressedExt"))
+    return (GrProc)grKeyPressedExt;
   if(!strcmp(procName, "grQueryResolutionsExt"))
     return (GrProc)grQueryResolutionsExt;
   display_warning("grGetProcAddress : %s", procName);
@@ -2506,6 +2508,24 @@ FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(FxU32* wi
 #endif // _WIN32
 }
 
+FX_ENTRY FxBool FX_CALL grKeyPressedExt(FxU32 key)
+{
+    #ifdef _WIN32
+    return (GetAsyncKeyState(key) & 0x8000);
+    #else
+    Uint8 *keystates = SDL_GetKeyState( NULL );
+    if( keystates[ key ] )
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+    #endif
+
+}
+
 FX_ENTRY void FX_CALL grConfigWrapperExt(FxI32 resolution, FxI32 vram, FxBool fbo, FxBool aniso)
 {
   config.res = resolution;
@@ -2518,6 +2538,8 @@ FX_ENTRY void FX_CALL grConfigWrapperExt(FxI32 resolution, FxI32 vram, FxBool fb
     config.vram_size = getVRAMSize();
 #endif // _WIN32
 }
+
+
 
 // unused by glide64
 
