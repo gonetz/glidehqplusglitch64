@@ -608,26 +608,26 @@ TxFilter::dmptx(uint8 *src, int width, int height, int rowStridePixel, uint16 gf
     std::wstring tmpbuf;
 
     /* create directories */
-    tmpbuf.assign(_path + L"\\texture_dump");
+    tmpbuf.assign(_path + L"/texture_dump");
     if (!boost::filesystem::exists(tmpbuf) &&
         !boost::filesystem::create_directory(tmpbuf))
       return 0;
 
-    tmpbuf.append(L"\\" + _ident);
+    tmpbuf.append(L"/" + _ident);
     if (!boost::filesystem::exists(tmpbuf) &&
         !boost::filesystem::create_directory(tmpbuf))
       return 0;
 
-    tmpbuf.append(L"\\GlideHQ");
+    tmpbuf.append(L"/GlideHQ");
     if (!boost::filesystem::exists(tmpbuf) &&
         !boost::filesystem::create_directory(tmpbuf))
       return 0;
 
     if ((n64fmt >> 8) == 0x2) {
-      tmpbuf.append(boost::str(boost::wformat(L"\\%ls#%08X#%01X#%01X#%08X_ciByRGBA.png")
+      tmpbuf.append(boost::str(boost::wformat(L"/%ls#%08X#%01X#%01X#%08X_ciByRGBA.png")
                                % _ident.c_str() % (uint32)(r_crc64 & 0xffffffff) % (n64fmt >> 8) % (n64fmt & 0xf) % (uint32)(r_crc64 >> 32)));
     } else {
-      tmpbuf.append(boost::str(boost::wformat(L"\\%ls#%08X#%01X#%01X_all.png")
+      tmpbuf.append(boost::str(boost::wformat(L"/%ls#%08X#%01X#%01X_all.png")
                                % _ident.c_str() % (uint32)(r_crc64 & 0xffffffff) % (n64fmt >> 8) % (n64fmt & 0xf)));
     }
 
