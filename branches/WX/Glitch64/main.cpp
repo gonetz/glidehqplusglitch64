@@ -50,7 +50,7 @@ static inline void opt_glCopyTexImage2D( GLenum target,
     }
     glCopyTexSubImage2D(target, level, 0, 0, x, y, width, height);
   } else {
-    printf("copyteximage %dx%d fmt %x old %dx%d oldfmt %x\n", width, height, internalFormat, w, h, fmt);
+    //printf("copyteximage %dx%d fmt %x old %dx%d oldfmt %x\n", width, height, internalFormat, w, h, fmt);
     //       glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, internalFormat, GL_UNSIGNED_BYTE, 0);
     //       glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, &fmt);
     //       printf("--> %dx%d newfmt %x\n", width, height, fmt);
@@ -204,7 +204,7 @@ void display_warning(const char *text, ...)
     // #ifdef _WIN32
     // 		MessageBox(NULL, (LPCTSTR)buf, "Glide3x warning : ", MB_OK);
     // #else // _WIN32
-    printf("Glide3x warning : %s\n", buf);
+    //printf("Glide3x warning : %s\n", buf);
     // #endif // _WIN32
     first_message--;
   }
@@ -670,7 +670,7 @@ grSstWinOpen(
   //SetWindowExtEx(hDC, width, height, NULL);
 
   if ((pfm = ChoosePixelFormat(hDC, &pfd)) == 0) {
-    printf("disabling auxiliary buffers\n");
+    //printf("disabling auxiliary buffers\n");
     pfd.cAuxBuffers = 0;
     pfm = ChoosePixelFormat(hDC, &pfd);
   }
@@ -800,9 +800,9 @@ grSstWinOpen(
 
   char caption[500];
 # ifdef _DEBUG
-  sprintf(caption, "Glide64 Napalm for Linux ported by Hacktarux/Josh/Ziggy/mudlord/Gonetz/KoolSmoky");
+  sprintf(caption, "Glide64 debug");
 # else // _DEBUG
-  sprintf(caption, "Glide64 Napalm for Linux ported by Hacktarux/Josh/Ziggy/mudlord/Gonetz/KoolSmoky");
+  sprintf(caption, "Glide64");
 # endif // _DEBUG
   SDL_WM_SetCaption(caption, caption);
   glViewport(0, viewport_offset, width, height);
@@ -1715,7 +1715,7 @@ void reloadTexture()
     return;
 
   LOG("reload texture %dx%d\n", width, height);
-  printf("reload texture %dx%d\n", width, height);
+  //printf("reload texture %dx%d\n", width, height);
 
   buffer_cleared = 1;
 
@@ -1784,7 +1784,7 @@ FX_ENTRY void FX_CALL grFramebufferCopyExt(int x, int y, int w, int h,
     }
 
     if (from == GR_FBCOPY_BUFFER_BACK && to == GR_FBCOPY_BUFFER_FRONT) {
-      printf("save depth buffer %d\n", render_to_texture);
+      //printf("save depth buffer %d\n", render_to_texture);
       // save the depth image in a texture
       //glDisable(GL_ALPHA_TEST);
       glReadBuffer(current_buffer);
@@ -1795,7 +1795,7 @@ FX_ENTRY void FX_CALL grFramebufferCopyExt(int x, int y, int w, int h,
       return;
     }
     if (from == GR_FBCOPY_BUFFER_FRONT && to == GR_FBCOPY_BUFFER_BACK) {
-      printf("writing to depth buffer %d\n", render_to_texture);
+      //printf("writing to depth buffer %d\n", render_to_texture);
 
       glPushAttrib(GL_ALL_ATTRIB_BITS);
       glDisable(GL_ALPHA_TEST);
@@ -2090,7 +2090,7 @@ grLfbLock( GrLock_t type, GrBuffer_t buffer, GrLfbWriteMode_t writeMode,
     if(buffer != GR_BUFFER_AUXBUFFER)
     {
       if (writeMode == GR_LFBWRITEMODE_888) {
-        printf("LfbLock GR_LFBWRITEMODE_888\n");
+        //printf("LfbLock GR_LFBWRITEMODE_888\n");
         info->lfbPtr = frameBuffer;
         info->strideInBytes = width*4;
         info->writeMode = GR_LFBWRITEMODE_888;
@@ -2284,7 +2284,7 @@ grLfbWriteRegion( GrBuffer_t dst_buffer,
       static int id;
       sprintf(name, "dump/writecolor%d.png", id++);
       ilSaveImage(name);
-      printf("dumped gdLfbWriteRegion %s\n", name);
+      //printf("dumped gdLfbWriteRegion %s\n", name);
     }
 #endif
 
@@ -2332,7 +2332,7 @@ grLfbWriteRegion( GrBuffer_t dst_buffer,
       static int id;
       sprintf(name, "dump/writedepth%d.png", id++);
       ilSaveImage(name);
-      printf("dumped gdLfbWriteRegion %s\n", name);
+      //printf("dumped gdLfbWriteRegion %s\n", name);
       free(buf2);
     }
 #endif
@@ -2394,7 +2394,6 @@ grQueryResolutionsExt(FxI32 * Size)
   *Size = _numResolutions;
   return _aResolutions;
 #else // _WIN32
-//_aResolutions
   SDL_Rect** modes;
   SDL_Surface *check_surface;
   SDL_PixelFormat *fmt;
@@ -2436,8 +2435,6 @@ grQueryResolutionsExt(FxI32 * Size)
   SDL_FreeSurface(check_surface);
   *Size = _numResolutions;
   return _aResolutions;
-
-  //return 0; //!todo Unix resolutions list
 #endif // _WIN32
 }
 
@@ -2510,20 +2507,27 @@ FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(FxU32* wi
 
 FX_ENTRY FxBool FX_CALL grKeyPressedExt(FxU32 key)
 {
-    #ifdef _WIN32
-    return (GetAsyncKeyState(key) & 0x8000);
-    #else
+#ifdef _WIN32
+  return (GetAsyncKeyState(key) & 0x8000);
+#else
+  if (key == 1) //LBUTTON
+  {
+    Uint8 mstate = SDL_GetMouseState(NULL, NULL);
+    return (mstate & SDL_BUTTON_LMASK);
+  }
+  else
+  {
     Uint8 *keystates = SDL_GetKeyState( NULL );
     if( keystates[ key ] )
     {
-        return 1;
+      return 1;
     }
     else
     {
-        return 0;
+      return 0;
     }
-    #endif
-
+  }
+#endif
 }
 
 FX_ENTRY void FX_CALL grConfigWrapperExt(FxI32 resolution, FxI32 vram, FxBool fbo, FxBool aniso)
@@ -2538,8 +2542,6 @@ FX_ENTRY void FX_CALL grConfigWrapperExt(FxI32 resolution, FxI32 vram, FxBool fb
     config.vram_size = getVRAMSize();
 #endif // _WIN32
 }
-
-
 
 // unused by glide64
 

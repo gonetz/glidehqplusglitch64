@@ -267,9 +267,9 @@ void FindBestDepthBias()
       bestz = z;
       biasFactor = f;
     }
-    printf("f %g z %g\n", f, z);
+    //printf("f %g z %g\n", f, z);
   }
-  printf(" --> bias factor %g\n", biasFactor);
+  //printf(" --> bias factor %g\n", biasFactor);
   glPopAttrib();
 }
 
