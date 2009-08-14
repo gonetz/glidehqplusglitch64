@@ -99,6 +99,9 @@ LD = g++
 LDFLAGS2 = --out-implib=libglide3x.a
 
 LDLIBS = -L"." -L"lib" `sdl-config --libs`
+ifeq ($(OS), MACOSX)
+LDLIBS += -framework OpenGL -framework GLUT
+endif
 
 RM = rm
 
@@ -118,7 +121,7 @@ all: $(DLLNAME)
 
 $(DLLNAME): $(OBJECTS)
 	$(LD) -o $@ $(LDFLAGS) $^ $(LDLIBS) --out-implib=libglide3x.a
-ifneq ($(OS), WINDOWS)
+ifeq ($(OS), Linux)
 	$(STRIP) $@
 endif
 
