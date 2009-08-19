@@ -40,10 +40,10 @@
 #  Requirements:
 #
 #    Compiler:
-#       GCC 4.2
+#       GCC 4.3
 #
 #    Libraries:
-#       boost  1.38.0   (http://www.boost.org)  bjam --toolset=gcc link=static runtime-link=static variant=release,debug stage
+#       boost  1.39.0   (http://www.boost.org)  bjam --toolset=gcc link=static runtime-link=static variant=release,debug stage
 #       libpng 1.2.35   (http://www.libpng.org) static library
 #       zlib   1.2.3    (http://www.zlib.org)   static library
 #       tc     1.1+                             patched for ARGB input and ATI Radeon workaround
@@ -62,8 +62,8 @@ EXT_INC = ./inc
 EXT_LIB = ./lib
 
 # boost library & headers
-BOOST_INC = ../boost_1_38_0
-BOOST_LIB = ../boost_1_38_0/stage/lib
+BOOST_INC = ../boost_1_39_0
+BOOST_LIB = ../boost_1_39_0/stage/lib
 
 CC = g++
 CFLAGS = -Wall -W -pedantic -ansi -Wno-long-long
@@ -79,7 +79,7 @@ endif
 
 LD = g++
 LDFLAGS = -shared -lstdc++ -lpthread
-LDLIBS = $(EXT_LIB)/libdxtn.a $(EXT_LIB)/libpng.a $(EXT_LIB)/libz.a $(BOOST_LIB)/libboost_filesystem-gcc42-mt-s.a $(BOOST_LIB)/libboost_system-gcc42-mt-s.a $(BOOST_LIB)/libboost_thread-gcc42-mt-s.a
+LDLIBS = $(EXT_LIB)/libdxtn.a $(EXT_LIB)/libpng.a $(EXT_LIB)/libz.a $(BOOST_LIB)/libboost_filesystem-gcc43-mt-s.a $(BOOST_LIB)/libboost_system-gcc43-mt-s.a $(BOOST_LIB)/libboost_thread-gcc43-mt-s.a
 
 RM = rm
 
