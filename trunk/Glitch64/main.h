@@ -11,12 +11,17 @@ void dump_stop();
 extern int dumping;
 #endif
 
-// VP z precision fix
-// no more necessary, now using z clamping instead.
-//#define zscale 0.025f
 #define zscale 1.0f
-//#define zscale 2.0f
-//#define zscale 0.5f
+
+typedef struct _wrapper_config
+{
+  int res;
+  int fbo;
+  int anisofilter;
+  int vram_size;
+} wrapper_config;
+extern wrapper_config config;
+
 
 // VP added this utility function
 // returns the bytes per pixel of a given GR texture format
@@ -38,21 +43,18 @@ extern int buffer_cleared; // mark that the buffer has been cleared, used to che
 extern "C" {
 #include "gl.h"
 #include "glext.h"
+#include "wglext.h"
 }
-#ifdef GCC
+#else
 #include <stdio.h>
 //#define printf(...)
-#endif
-#else
-#include "gl.h" 
-#include "glext.h" 
-// #include <GL/gl.h>
-// #include <GL/glext.h>
+#define GL_GLEXT_PROTOTYPES
+#include <SDL_opengl.h>
 #endif // _WIN32
 #include "glide.h"
 
-void display_warning(unsigned char *text, ...);
-void display_warning(char *text, ...);
+void display_warning(const unsigned char *text, ...);
+void display_warning(const char *text, ...);
 void init_geometry();
 void init_textures();
 void init_combiner();
@@ -62,6 +64,7 @@ void updateCombinera(int i);
 void remove_tex(unsigned int idmin, unsigned int idmax);
 void add_tex(unsigned int id);
 
+#ifdef _WIN32
 extern PFNGLACTIVETEXTUREARBPROC glActiveTextureARB;
 extern PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB;
 extern PFNGLBLENDFUNCSEPARATEEXTPROC glBlendFuncSeparateEXT;
@@ -83,10 +86,6 @@ extern PFNGLDELETEOBJECTARBPROC glDeleteObjectARB;
 extern PFNGLGETINFOLOGARBPROC glGetInfoLogARB;
 extern PFNGLGETOBJECTPARAMETERIVARBPROC glGetObjectParameterivARB;
 extern PFNGLSECONDARYCOLOR3FPROC glSecondaryColor3f;
-
-#ifdef _WIN32
-GLvoid KillGLWindow(GLvoid);
-BOOL CreateGLWindow();
 #endif
 
 extern int w_buffer_mode;
@@ -128,15 +127,15 @@ void set_copy_shader();
 
 // config functions
 
-FX_ENTRY void FX_CALL grConfigWrapperExt(HINSTANCE instance, HWND hwnd);
-FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(DWORD*, DWORD*);
+//FX_ENTRY void FX_CALL grConfigWrapperExt(HINSTANCE instance, HWND hwnd);
+FX_ENTRY void FX_CALL grConfigWrapperExt(FxI32, FxI32, FxBool, FxBool);
+FX_ENTRY GrScreenResolution_t FX_CALL grWrapperFullScreenResolutionExt(FxU32*, FxU32*);
+FX_ENTRY char ** FX_CALL grQueryResolutionsExt(FxI32*);
+FX_ENTRY FxBool FX_CALL grKeyPressedExt(FxU32 key);
 
 
 int getFullScreenWidth();
 int getFullScreenHeight();
-int getDisableGLSL();
-int getAnisoFilter();
-
 
 // ZIGGY framebuffer copy extension
 // allow to copy the depth or color buffer from back/front to front/back
@@ -182,7 +181,7 @@ typedef FxU32 GrCombineMode_t;
 #define GR_CMBX_TMU_CCOLOR                0x11
 
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grColorCombineExt(GrCCUColor_t a, GrCombineMode_t a_mode,
 				  GrCCUColor_t b, GrCombineMode_t b_mode,
                   GrCCUColor_t c, FxBool c_invert,
@@ -196,7 +195,7 @@ grAlphaCombineExt(GrACUColor_t a, GrCombineMode_t a_mode,
 				  GrACUColor_t d, FxBool d_invert,
 				  FxU32 shift, FxBool invert);
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexColorCombineExt(GrChipID_t       tmu,
                      GrTCCUColor_t a, GrCombineMode_t a_mode,
                      GrTCCUColor_t b, GrCombineMode_t b_mode,
@@ -204,7 +203,7 @@ grTexColorCombineExt(GrChipID_t       tmu,
                      GrTCCUColor_t d, FxBool d_invert,
                      FxU32 shift, FxBool invert);
 
-FX_ENTRY void FX_CALL 
+FX_ENTRY void FX_CALL
 grTexAlphaCombineExt(GrChipID_t       tmu,
                      GrTACUColor_t a, GrCombineMode_t a_mode,
                      GrTACUColor_t b, GrCombineMode_t b_mode,
