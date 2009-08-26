@@ -317,10 +317,6 @@ int grTexFormat2GLPackedFmt(int fmt, int * gltexfmt, int * glpixfmt, int * glpac
     *glpackfmt = GL_UNSIGNED_BYTE;
     break;
   case GR_TEXFMT_ALPHA_INTENSITY_44:
-    /*factor = 1;
-    *gltexfmt = GL_LUMINANCE4_ALPHA4_EXT;
-    *glpixfmt = GL_LUMINANCE_ALPHA;
-    *glpackfmt = GL_UNSIGNED_BYTE;*/
     break;
   case GR_TEXFMT_RGB_565:
     factor = 2;
@@ -336,10 +332,6 @@ int grTexFormat2GLPackedFmt(int fmt, int * gltexfmt, int * glpixfmt, int * glpac
     *glpackfmt = GL_UNSIGNED_SHORT_1_5_5_5_REV;
     break;
   case GR_TEXFMT_ALPHA_INTENSITY_88:
-    /*factor = 2;
-    *gltexfmt = GL_LUMINANCE8_ALPHA8_EXT;
-    *glpixfmt = GL_LUMINANCE_ALPHA;
-    *glpackfmt = GL_UNSIGNED_SHORT;*/
     break;
   case GR_TEXFMT_ARGB_4444:
     factor = 2;
@@ -653,8 +645,6 @@ grTexSource( GrChipID_t tmu,
             GrTexInfo  *info )
 {
   LOG("grTexSource(%d,%d,%d)\r\n", tmu, startAddress, evenOdd);
-  //if ((startAddress+1) == pBufferAddress && render_to_texture) updateTexture();
-  //if ((startAddress+1) == pBufferAddress) display_warning("texsource");
 
   if (tmu == GR_TMU1 || nbTextureUnits <= 2)
   {
@@ -758,8 +748,6 @@ FX_ENTRY void FX_CALL
 grTexLodBiasValue(GrChipID_t tmu, float bias )
 {
   LOG("grTexLodBiasValue(%d,%f)\r\n", tmu, bias);
-  /*if (bias != 0 && bias != 1.0f)
-  display_warning("grTexLodBiasValue : %f", bias);*/
 }
 
 FX_ENTRY void FX_CALL
