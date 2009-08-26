@@ -6,7 +6,6 @@
 #include "main.h"
 
 #define Z_MAX (65536.0f)
-//#define Z_MAX 1000.0f
 
 static int xy_off;
 static int xy_en;
@@ -199,9 +198,6 @@ grDepthBufferFunction( GrCmpFnc_t function )
     glDepthFunc(GL_ALWAYS);
     break;
   case GR_CMP_EQUAL:
-    // 	  if (w_buffer_mode)
-    // 	    glDepthFunc(GL_NOTEQUAL);
-    // 	  else
     glDepthFunc(GL_EQUAL);
     break;
   case GR_CMP_GREATER:
@@ -214,9 +210,6 @@ grDepthBufferFunction( GrCmpFnc_t function )
     glDepthFunc(GL_NEVER);
     break;
   case GR_CMP_NOTEQUAL:
-    // 	  if (w_buffer_mode)
-    // 	    glDepthFunc(GL_EQUAL);
-    // 	  else
     glDepthFunc(GL_NOTEQUAL);
     break;
 
@@ -283,7 +276,6 @@ grDepthBiasLevel( FxI32 level )
       glPolygonOffset(1.0f, -(float)level*zscale/255.0f);
     else
       glPolygonOffset(0, (float)level*biasFactor);
-    //glPolygonOffset(0, (float)level*128.0f*zscale/2);
     glEnable(GL_POLYGON_OFFSET_FILL);
   }
   else
@@ -331,10 +323,6 @@ grDrawTriangle( const void *a, const void *b, const void *c )
   float *c_t1 = (float*)c + st1_off/sizeof(float) + 1;
   float *c_fog = (float*)c + fog_ext_off/sizeof(float);
   LOG("grDrawTriangle()\r\n");
-
-  //if(*a_fog == 0.0f) *a_fog = 1.0f;
-  //if(*b_fog == 0.0f) *b_fog = 1.0f;
-  //if(*c_fog == 0.0f) *c_fog = 1.0f;
 
   // ugly ? i know but nvidia drivers are losing the viewport otherwise
   if(nvidia_viewport_hack && !render_to_texture)
@@ -511,9 +499,6 @@ grDrawLine( const void *a, const void *b )
   float *b_fog = (float*)b + fog_ext_off/sizeof(float);
   LOG("grDrawLine()\r\n");
 
-  //if(*a_fog == 0.0f) *a_fog = 1.0f;
-  //if(*b_fog == 0.0f) *b_fog = 1.0f;
-
   reloadTexture();
 
   if(need_to_compile) compile_shader();
@@ -609,8 +594,6 @@ grDrawVertexArray(FxU32 mode, FxU32 Count, void *pointers2)
     t1 = (float*)pointers[i] + st1_off/sizeof(float) + 1;
     fog = (float*)pointers[i] + fog_ext_off/sizeof(float);
 
-    //if(*fog == 0.0f) *fog = 1.0f;
-
     if (nbTextureUnits > 2)
     {
       if (st0_en)
@@ -652,7 +635,6 @@ grDrawVertexArrayContiguous(FxU32 mode, FxU32 Count, void *pointers, FxU32 strid
   // ZIGGY apparently, grDrawVertexArrayContiguous is only used to overwrite the
   // whole screen, so we treat it as a grClearBuffer, no need to reload the texture
   buffer_cleared = 1;
-  //reloadTexture();
 
   if(need_to_compile) compile_shader();
 

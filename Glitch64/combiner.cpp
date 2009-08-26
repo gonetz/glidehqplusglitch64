@@ -73,18 +73,6 @@ static const char* fragment_shader_header =
 "{                                 \n"
 ;
 
-// normal version compliant with glsl specs
-/*static const char* fragment_shader_dither =
-"  if(texture2D(ditherTex, vec2(mod(gl_FragCoord.x,32)/32, \n"
-"                               mod(gl_FragCoord.y,32)/32)).a > 0.5) discard; \n"
-;*/
-
-// version without mod function (not supported by ATI drivers)
-/*static const char* fragment_shader_dither =
-"  if(texture2D(ditherTex, vec2((gl_FragCoord.x-32.0*floor(gl_FragCoord.x/32.0))/32.0, \n"
-"                               (gl_FragCoord.y-32.0*floor(gl_FragCoord.y/32.0))/32.0)).a > 0.5) discard; \n"
-;*/
-
 // using gl_FragCoord is terribly slow on ATI and varying variables don't work for some unknown
 // reason, so we use the unused components of the texture2 coordinates
 static const char* fragment_shader_dither =
@@ -99,16 +87,11 @@ static const char* fragment_shader_default =
 ;
 
 static const char* fragment_shader_depth =
-//"  gl_FragDepth = dot(texture2D(texture0, vec2(gl_TexCoord[0])), vec4(0.3, 0.3, 0.3, 0)); \n"
 "  gl_FragDepth = dot(texture2D(texture0, vec2(gl_TexCoord[0])), vec4(32*64*32/65536.0, 64*32/65536.0, 32/65536.0, 0))*0.5 + 0.5; \n"
-//"  gl_FragDepth = (float(texture2D(texture0, vec2(gl_TexCoord[0]))[0])*31*64*32/65536.0 + float(texture2D(texture0, vec2(gl_TexCoord[0]))[1])*63*32/65536.0 + float(texture2D(texture0, vec2(gl_TexCoord[0]))[2])*31/65536.0)*0.5 + 0.5; \n"
-//"  gl_FragDepth = texture2D(texture0, vec2(gl_TexCoord[0]))[0]*0.5+0.5; \n"
 ;
 
 static const char* fragment_shader_bw =
 "  vec4 readtex0 = texture2D(texture0, vec2(gl_TexCoord[0])); \n"
-// "  gl_FragColor = vec4(0.5,1,0,0.5);     \n"
-// "  gl_FragColor.a = 0.5;     \n"
 "  gl_FragColor = vec4(vec3(readtex0.b),                      \n"
 "                 readtex0.r + readtex0.g * 8.0 / 256.0);     \n"
 ;
@@ -121,21 +104,9 @@ static const char* fragment_shader_readtex0bw =
 "  vec4 readtex0 = texture2D(texture0, vec2(gl_TexCoord[0])); \n"
 "  readtex0 = vec4(vec3(readtex0.b),                          \n"
 "                  readtex0.r + readtex0.g * 8.0 / 256.0);    \n"
-// "  vec4 readtex0 = texture2D(texture0, vec2(gl_TexCoord[0])); \n"
-// "  readtex0 = vec4(vec3(readtex0.b),                          \n"
-// "                  readtex0.r);    \n"
 ;
 static const char* fragment_shader_readtex0bw_2 =
-// "  float I = dot(texture2D(texture0, vec2(gl_TexCoord[0])), vec4(31*64*32, 63*32, 31, 0)) / 256.0; \n"
-// "  float A = (I - floor(I))*256/255.0;                        \n"
-// "  vec4 readtex0 = vec4(vec3(A),                        \n"
-// "                  I/255.0);                                        \n"
 "  vec4 readtex0 = vec4(dot(texture2D(texture0, vec2(gl_TexCoord[0])), vec4(1.0/3, 1.0/3, 1.0/3, 0)));                        \n"
-// "  vec4 readtex0 = texture2D(texture0, vec2(gl_TexCoord[0])); \n"
-// "  readtex0 = vec4(vec3(readtex0.b),                          \n"
-// "                  readtex0.r + readtex0.g * 8.0 / 256.0);    \n"
-// "  readtex0 = vec4(vec3(readtex0.r / 3.0 + readtex0.g / 3.0 + \n"
-// "                  readtex0.b / 3.0), readtex0.a);            \n"
 ;
 
 static const char* fragment_shader_readtex1color =
@@ -146,21 +117,9 @@ static const char* fragment_shader_readtex1bw =
 "  vec4 readtex1 = texture2D(texture1, vec2(gl_TexCoord[1])); \n"
 "  readtex1 = vec4(vec3(readtex1.b),                          \n"
 "                  readtex1.r + readtex1.g * 8.0 / 256.0);    \n"
-// "  vec4 readtex1 = texture2D(texture1, vec2(gl_TexCoord[1])); \n"
-// "  readtex1 = vec4(vec3(readtex1.b),                          \n"
-// "                  readtex1.r);    \n"
 ;
 static const char* fragment_shader_readtex1bw_2 =
-// "  float I = dot(texture2D(texture1, vec2(gl_TexCoord[1])), vec4(31*64*32, 63*32, 31, 0)) / 256.0; \n"
-// "  float A = (I - floor(I))*256/255.0;                        \n"
-// "  vec4 readtex1 = vec4(vec3(A),                        \n"
-// "                  I/255.0);                                        \n"
 "  vec4 readtex1 = vec4(dot(texture2D(texture1, vec2(gl_TexCoord[1])), vec4(1.0/3, 1.0/3, 1.0/3, 0)));                        \n"
-// "  vec4 readtex1 = texture2D(texture1, vec2(gl_TexCoord[1])); \n"
-// "  readtex1 = vec4(vec3(readtex1.b),                          \n"
-// "                  readtex1.r + readtex1.g * 8.0 / 256.0);    \n"
-// "  readtex1 = vec4(vec3(readtex1.r / 3.0 + readtex1.g / 3.0 + \n"
-// "                  readtex1.b / 3.0), readtex1.a);            \n"
 ;
 
 static const char* fragment_shader_fog =
@@ -168,24 +127,6 @@ static const char* fragment_shader_fog =
 "  fog = gl_TexCoord[0].b;                                                            \n"
 "  gl_FragColor = vec4(mix(gl_Fog.color.rgb, gl_FragColor.rgb, fog), gl_FragColor.a); \n"
 ;
-
-/*static const char* fragment_shader_fog =
-"  float fog;                                                                           \n"
-"  fog = (gl_Fog.end - gl_FogFragCoord) * gl_Fog.scale;                                 \n"
-"  fog = clamp(fog, 0.0, 1.0);                                                          \n"
-"  gl_FragColor = vec4(mix(vec3(gl_Fog.color), gl_FragColor.rgb, fog), gl_FragColor.a); \n"
-;*/
-
-/*static const char* fragment_shader_fog =
-"  float fog;                                                                           \n"
-"  fog = (far - gl_FogFragCoord) / (far - near);                                        \n"
-"  fog = clamp(fog, 0.0, 1.0);                                                          \n"
-"  gl_FragColor = vec4(mix(vec3(gl_Fog.color), gl_FragColor.rgb*256.0, fog), gl_FragColor.a); \n"
-;*/
-
-/*static const char* fragment_shader_fog =
-"  gl_FragColor = vec4(mix(vec3(gl_Fog.color), gl_FragColor.rgb, fogValue), gl_FragColor.a); \n"
-;*/
 
 static const char* fragment_shader_end =
 "}                               \n"
@@ -267,7 +208,6 @@ void init_combiner()
   char s[128];
   // ZIGGY convert a 565 texture into depth component
   sprintf(s, "gl_FragDepth = dot(texture2D(texture0, vec2(gl_TexCoord[0])), vec4(31*64*32, 63*32, 31, 0))*%g + %g; \n", zscale/2/65535.0, 1-zscale/2);
-  //sprintf(s, "gl_FragDepth = texture2D(texture0, vec2(gl_TexCoord[0]))[0]*%g + %g; \n", zscale/2, 1-zscale/2);
   fragment_shader = (char*)malloc(strlen(fragment_shader_header)+
     strlen(s)+
     strlen(fragment_shader_end)+1);
@@ -511,20 +451,6 @@ void compile_shader()
 
   fragment_shader = (char*)malloc(4096);
 
-  // 	fragment_shader = (char*)malloc(strlen(fragment_shader_header)+
-  //                                   strlen(fragment_shader_readtex0bw)+
-  //                                   strlen(fragment_shader_readtex1bw)+
-  //                                   strlen(fragment_shader_readtex0bw_2)+
-  //                                   strlen(fragment_shader_readtex1bw_2)+
-  //                                   strlen(fragment_shader_texture0)+
-  //                                   strlen(fragment_shader_texture1)+
-  //                                   strlen(fragment_shader_color_combiner)+
-  //                                   strlen(fragment_shader_alpha_combiner)+
-  //                                   strlen(fragment_shader_fog)+
-  //                                   strlen(fragment_shader_end)+
-  //                                   strlen(fragment_shader_chroma)+
-  //                                   strlen(fragment_shader_dither)+1);
-
   strcpy(fragment_shader, fragment_shader_header);
   if(dither_enabled) strcat(fragment_shader, fragment_shader_dither);
   switch (blackandwhite0) {
@@ -537,10 +463,6 @@ void compile_shader()
     case 2: strcat(fragment_shader, fragment_shader_readtex1bw_2); break;
     default: strcat(fragment_shader, fragment_shader_readtex1color);
   }
-  // 	if(blackandwhite0) strcat(fragment_shader, fragment_shader_readtex0bw);
-  // 	else strcat(fragment_shader, fragment_shader_readtex0color);
-  // 	if(blackandwhite1) strcat(fragment_shader, fragment_shader_readtex1bw);
-  // 	else strcat(fragment_shader, fragment_shader_readtex1color);
   strcat(fragment_shader, fragment_shader_texture0);
   strcat(fragment_shader, fragment_shader_texture1);
   strcat(fragment_shader, fragment_shader_color_combiner);
@@ -554,11 +476,6 @@ void compile_shader()
   free(fragment_shader);
 
   glCompileShaderARB(shader_programs[number_of_programs].fragment_shader_object);
-
-  // vertex shader compilation (workaround ATI bug)
-  /*vertex_shader_object = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-  glShaderSourceARB(vertex_shader_object, 1, &vertex_shader, NULL);
-  glCompileShaderARB(vertex_shader_object);*/
 
   program_object = glCreateProgramObjectARB();
   shader_programs[number_of_programs].program_object = program_object;
@@ -1476,8 +1393,6 @@ grTexCombine(
     else
       strcat(fragment_shader_texture1, "ctexture1.a = 1.0 - ctexture1.a; \n");
   }
-
-  //compile_shader();
   need_to_compile = 1;
 }
 

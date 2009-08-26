@@ -90,7 +90,6 @@ static int GetTotalVideoMemory()
         const int bufferLength = 256;
         WCHAR buffer[bufferLength];
         GetPropertyValue(container, L"szDisplayMemoryLocalized", buffer, bufferLength);
-
         // Value in MB is first token in string
         return _wtoi(buffer);
       }
