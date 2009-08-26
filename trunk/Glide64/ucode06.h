@@ -1670,6 +1670,10 @@ void uc6_sprite2d ()
     rdp.tlut_mode = 2;
     load_palette (segoffset(tlut), 0, 256);
   }
+  else
+  {
+    rdp.tlut_mode = 0;
+  }
   wxUint16 stride = (((wxUint16 *)gfx.RDRAM)[(addr+4)^1]);	// 4
   d.imageW	= (((wxUint16 *)gfx.RDRAM)[(addr+5)^1]);	// 5
   d.imageH	= (((wxUint16 *)gfx.RDRAM)[(addr+6)^1]);	// 6
