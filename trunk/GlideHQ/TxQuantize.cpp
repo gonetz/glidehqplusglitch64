@@ -57,12 +57,12 @@ TxQuantize::ARGB1555_ARGB8888(uint32* src, uint32* dest, int width, int height)
   int i;
   for (i = 0; i < siz; i++) {
     *dest = (((*src & 0x00008000) ? 0xff000000 : 0x00000000) |
-           ((*src & 0x00007c00) << 9) | ((*src & 0x00007000) << 4) |
-           ((*src & 0x000003e0) << 6) | ((*src & 0x00000380) << 1) |
-           ((*src & 0x0000001f) << 3) | ((*src & 0x0000001c) >> 2));
+            ((*src & 0x00007c00) << 9) | ((*src & 0x00007000) << 4) |
+            ((*src & 0x000003e0) << 6) | ((*src & 0x00000380) << 1) |
+            ((*src & 0x0000001f) << 3) | ((*src & 0x0000001c) >> 2));
     dest++;
     *dest = (((*src & 0x80000000) ? 0xff000000 : 0x00000000) |
-            ((*src & 0x7c000000) >> 7) | ((*src & 0x70000000) >> 12) |
+            ((*src & 0x7c000000) >>  7) | ((*src & 0x70000000) >> 12) |
             ((*src & 0x03e00000) >> 10) | ((*src & 0x03800000) >> 15) |
             ((*src & 0x001f0000) >> 13) | ((*src & 0x001c0000) >> 18));
     dest++;
@@ -166,10 +166,10 @@ TxQuantize::ARGB4444_ARGB8888(uint32* src, uint32* dest, int width, int height)
   int siz = (width * height) >> 1;
   int i;
   for (i = 0; i < siz; i++) {
-    *dest = (((*src & 0x0000f000) << 12) |
+    *dest = ((*src & 0x0000f000) << 12) |
             ((*src & 0x00000f00) << 8) |
             ((*src & 0x000000f0) << 4) |
-            (*src & 0x0000000f));
+             (*src & 0x0000000f);
     *dest |= (*dest << 4);
     dest++;
     *dest = ((*src & 0xf0000000) |
@@ -264,7 +264,7 @@ TxQuantize::RGB565_ARGB8888(uint32* src, uint32* dest, int width, int height)
             ((*src & 0x0000001f) << 3) | ((*src & 0x0000001c) >> 2));
     dest++;
     *dest = (0xff000000 |
-            ((*src & 0xf8000000) >> 8) | ((*src & 0xe0000000) >> 13) |
+            ((*src & 0xf8000000) >>  8) | ((*src & 0xe0000000) >> 13) |
             ((*src & 0x07e00000) >> 11) | ((*src & 0x06000000) >> 17) |
             ((*src & 0x001f0000) >> 13) | ((*src & 0x001c0000) >> 18));
     dest++;
@@ -1738,26 +1738,33 @@ TxQuantize::quantize(uint8* src, uint8* dest, int width, int height, uint16 srcf
 {
   typedef void (TxQuantize::*quantizerFunc)(uint32* src, uint32* dest, int width, int height);
   quantizerFunc quantizer;
+  int bpp_shift = 0;
 
   if (destformat == GR_TEXFMT_ARGB_8888) {
     switch (srcformat) {
     case GR_TEXFMT_ARGB_1555:
       quantizer = &TxQuantize::ARGB1555_ARGB8888;
+      bpp_shift = 1;
       break;
     case GR_TEXFMT_ARGB_4444:
       quantizer = &TxQuantize::ARGB4444_ARGB8888;
+      bpp_shift = 1;
       break;
     case GR_TEXFMT_RGB_565:
       quantizer = &TxQuantize::RGB565_ARGB8888;
+      bpp_shift = 1;
       break;
     case GR_TEXFMT_ALPHA_8:
       quantizer = &TxQuantize::A8_ARGB8888;
+      bpp_shift = 2;
       break;
     case GR_TEXFMT_ALPHA_INTENSITY_44:
       quantizer = &TxQuantize::AI44_ARGB8888;
+      bpp_shift = 2;
       break;
     case GR_TEXFMT_ALPHA_INTENSITY_88:
       quantizer = &TxQuantize::AI88_ARGB8888;
+      bpp_shift = 1;
       break;
     default:
       return 0;
@@ -1766,15 +1773,15 @@ TxQuantize::quantize(uint8* src, uint8* dest, int width, int height, uint16 srcf
     unsigned int numcore = _numcore;
     unsigned int blkrow = 0;
     while (numcore > 1 && blkrow == 0) {
-      blkrow = (height >> 1) / numcore;
+      blkrow = (height >> 2) / numcore;
       numcore--;
     }
     if (blkrow > 0 && numcore > 1) {
       boost::thread *thrd[MAX_NUMCORE];
       unsigned int i;
-      int blkheight = blkrow << 1;
-      unsigned int srcStride = (width * blkheight) << 1;
-      unsigned int destStride = srcStride << 1;
+      int blkheight = blkrow << 2;
+      unsigned int srcStride = (width * blkheight) << (2 - bpp_shift);
+      unsigned int destStride = srcStride << bpp_shift;
       for (i = 0; i < numcore - 1; i++) {
         thrd[i] = new boost::thread(boost::bind(quantizer,
                                                 this,
@@ -1803,22 +1810,28 @@ TxQuantize::quantize(uint8* src, uint8* dest, int width, int height, uint16 srcf
     switch (destformat) {
     case GR_TEXFMT_ARGB_1555:
       quantizer = fastQuantizer ? &TxQuantize::ARGB8888_ARGB1555 : &TxQuantize::ARGB8888_ARGB1555_ErrD;
+      bpp_shift = 1;
       break;
     case GR_TEXFMT_ARGB_4444:
       quantizer = fastQuantizer ? &TxQuantize::ARGB8888_ARGB4444 : &TxQuantize::ARGB8888_ARGB4444_ErrD;
+      bpp_shift = 1;
       break;
     case GR_TEXFMT_RGB_565:
       quantizer = fastQuantizer ? &TxQuantize::ARGB8888_RGB565 : &TxQuantize::ARGB8888_RGB565_ErrD;
+      bpp_shift = 1;
       break;
     case GR_TEXFMT_ALPHA_8:
     case GR_TEXFMT_INTENSITY_8:
       quantizer = fastQuantizer ? &TxQuantize::ARGB8888_A8 : &TxQuantize::ARGB8888_I8_Slow;
+      bpp_shift = 2;
       break;
     case GR_TEXFMT_ALPHA_INTENSITY_44:
       quantizer = fastQuantizer ? &TxQuantize::ARGB8888_AI44 : &TxQuantize::ARGB8888_AI44_ErrD;
+      bpp_shift = 2;
       break;
     case GR_TEXFMT_ALPHA_INTENSITY_88:
       quantizer = fastQuantizer ? &TxQuantize::ARGB8888_AI88 : &TxQuantize::ARGB8888_AI88_Slow;
+      bpp_shift = 1;
       break;
     default:
       return 0;
@@ -1827,15 +1840,15 @@ TxQuantize::quantize(uint8* src, uint8* dest, int width, int height, uint16 srcf
     unsigned int numcore = _numcore;
     unsigned int blkrow = 0;
     while (numcore > 1 && blkrow == 0) {
-      blkrow = height / numcore;
+      blkrow = (height >> 2) / numcore;
       numcore--;
     }
     if (blkrow > 0 && numcore > 1) {
       boost::thread *thrd[MAX_NUMCORE];
       unsigned int i;
-      int blkheight = blkrow;
-      unsigned int destStride = (width * blkheight) << 1;
-      unsigned int srcStride = destStride << 1;
+      int blkheight = blkrow << 2;
+      unsigned int srcStride = (width * blkheight) << 2;
+      unsigned int destStride = srcStride >> bpp_shift;
       for (i = 0; i < numcore - 1; i++) {
         thrd[i] = new boost::thread(boost::bind(quantizer,
                                                 this,
