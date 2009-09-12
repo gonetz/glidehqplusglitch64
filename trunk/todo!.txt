@@ -10,5 +10,6 @@ GlideHQ
 
 Glitch64
 -	Improve hardware frame buffer emulation support.
+        (FBO depth copies, MSAAed FBO based HWFBE)
 -	Add functions, necessary for interactive debugger.
 
