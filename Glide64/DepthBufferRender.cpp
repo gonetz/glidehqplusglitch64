@@ -240,7 +240,7 @@ void Rasterize(vertexi * vtx, int vertices, int dzdx)
     int x1 = iceil(left_x);
     if (x1 < (int)rdp.scissor_o.ul_x)
       x1 = rdp.scissor_o.ul_x;
-    int width = (wxUint32)iceil(right_x) - x1;
+    int width = iceil(right_x) - x1;
     if (x1+width >= (int)rdp.scissor_o.lr_x)
       width = rdp.scissor_o.lr_x - x1 - 1;
     

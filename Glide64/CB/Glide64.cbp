@@ -32,25 +32,6 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="3dmathSIMD.obj" />
-					<Add option="Texture.obj" />
-					<Add option="FixedPoint.obj" />
-					<Add option="-mwindows" />
-					<Add option="-lglide3x" />
-					<Add option="-lwxmsw28_core" />
-					<Add option="-lwxbase28" />
-					<Add option="-lwxexpat" />
-					<Add option="-lwxjpeg" />
-					<Add option="-lwxpng" />
-					<Add option="-lwxzlib" />
-					<Add option="-luuid" />
-					<Add option="-lole32" />
-					<Add option="-loleaut32" />
-					<Add option="-lwinmm" />
-					<Add option="-lcomctl32" />
-					<Add option="-lctl3d32" />
-					<Add option="-lgdi32" />
-					<Add library="user32" />
 					<Add directory="../" />
 					<Add directory="../lib" />
 					<Add directory="$(WXDIR)/lib/gcc_lib" />
@@ -60,11 +41,13 @@
 		<Compiler>
 			<Add option="`wx-config --cppflags`" />
 			<Add option="-fexceptions" />
+			<Add option="-fPIC" />
 			<Add option="-D__unix__" />
 			<Add directory="../inc" />
 		</Compiler>
 		<Linker>
 			<Add option="`wx-config --libs`" />
+			<Add library="../lib/glide3x.so" />
 			<Add directory="../lib" />
 		</Linker>
 		<Unit filename="../3dmath.cpp" />

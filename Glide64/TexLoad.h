@@ -42,13 +42,13 @@
 #include "TexLoad16b.h"
 #include "TexLoad32b.h"
 
-wxUint32 LoadNone (wxUint32 dst, wxUint32 src, int wid_64, int height, int line, int real_width, int tile)
+wxUint32 LoadNone (wxUIntPtr dst, wxUIntPtr src, int wid_64, int height, int line, int real_width, int tile)
 {
 	memset (texture, 0xFF, sizeof(texture));
 	return GR_TEXFMT_ARGB_1555;
 }
 
-typedef wxUint32 (*texfunc)(wxUint32, wxUint32, int, int, int, int, int);
+typedef wxUint32 (*texfunc)(wxUIntPtr, wxUIntPtr, int, int, int, int, int);
 texfunc load_table [4][5] = {	// [size][format]
 	Load4bSelect,
 	LoadNone,

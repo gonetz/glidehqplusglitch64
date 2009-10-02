@@ -45,11 +45,11 @@
 
 struct t3dGlobState {
   wxUint16		pad0;
-  wxUint16		perspNorm;	
+  wxUint16		perspNorm;
   wxUint32		flag;
   wxUint32		othermode0;
   wxUint32		othermode1;
-  wxUint32		segBases[16];	
+  wxUint32		segBases[16];
   /* the viewport to use */
   short     vsacle1;
   short     vsacle0;
@@ -85,16 +85,16 @@ static void t3dProcessRDP(wxUint32 a)
   if (a)
   {
     rdp.LLE = 1;
-    rdp.cmd0 = ((wxUint32*)gfx.RDRAM)[a++];   
-    rdp.cmd1 = ((wxUint32*)gfx.RDRAM)[a++]; 
+    rdp.cmd0 = ((wxUint32*)gfx.RDRAM)[a++];
+    rdp.cmd1 = ((wxUint32*)gfx.RDRAM)[a++];
     while (rdp.cmd0 + rdp.cmd1) {
       gfx_instruction[0][rdp.cmd0>>24] ();
-      rdp.cmd0 = ((wxUint32*)gfx.RDRAM)[a++];   
+      rdp.cmd0 = ((wxUint32*)gfx.RDRAM)[a++];
       rdp.cmd1 = ((wxUint32*)gfx.RDRAM)[a++];
-      wxUint32 cmd = rdp.cmd0>>24; 
+      wxUint32 cmd = rdp.cmd0>>24;
       if (cmd == 0xE4 || cmd == 0xE5)
       {
-        rdp.cmd2 = ((wxUint32*)gfx.RDRAM)[a++]; 
+        rdp.cmd2 = ((wxUint32*)gfx.RDRAM)[a++];
         rdp.cmd3 = ((wxUint32*)gfx.RDRAM)[a++];
       }
     }
@@ -131,18 +131,18 @@ static void t3dLoadGlobState(wxUint32 pgstate)
   rdp.update |= UPDATE_VIEWPORT;
   FRDP ("viewport scale(%d, %d, %d), trans(%d, %d, %d)\n", scale_x, scale_y, scale_z,
     trans_x, trans_y, trans_z);
-  
+
   t3dProcessRDP(segoffset(gstate->rdpCmds) >> 2);
 }
 
 static void t3d_vertex(wxUint32 addr, wxUint32 v0, wxUint32 n)
 {
     float x, y, z;
-    
+
     rdp.v0 = v0; // Current vertex
     rdp.vn = n; // Number of vertices to copy
     n <<= 4;
-    
+
     for (wxUint32 i=0; i < n; i+=16)
     {
       VERTEX *v = &rdp.vtx[v0 + (i>>4)];
@@ -157,22 +157,22 @@ static void t3d_vertex(wxUint32 addr, wxUint32 v0, wxUint32 n)
       v->g = ((wxUint8*)gfx.RDRAM)[(addr+i + 13)^3];
       v->b = ((wxUint8*)gfx.RDRAM)[(addr+i + 14)^3];
       v->a    = ((wxUint8*)gfx.RDRAM)[(addr+i + 15)^3];
-      
+
       v->x = x*rdp.combined[0][0] + y*rdp.combined[1][0] + z*rdp.combined[2][0] + rdp.combined[3][0];
       v->y = x*rdp.combined[0][1] + y*rdp.combined[1][1] + z*rdp.combined[2][1] + rdp.combined[3][1];
       v->z = x*rdp.combined[0][2] + y*rdp.combined[1][2] + z*rdp.combined[2][2] + rdp.combined[3][2];
       v->w = x*rdp.combined[0][3] + y*rdp.combined[1][3] + z*rdp.combined[2][3] + rdp.combined[3][3];
-      
+
       if (fabs(v->w) < 0.001) v->w = 0.001f;
       v->oow = 1.0f / v->w;
       v->x_w = v->x * v->oow;
       v->y_w = v->y * v->oow;
       v->z_w = v->z * v->oow;
-      
+
       v->uv_calculated = 0xFFFFFFFF;
       v->screen_translated = 0;
       v->shade_mod = 0;
-      
+
       v->scr_off = 0;
       if (v->x < -v->w) v->scr_off |= 1;
       if (v->x > v->w) v->scr_off |= 2;
@@ -197,14 +197,14 @@ static void t3dLoadObject(wxUint32 pstate, wxUint32 pvtx, wxUint32 ptri)
     rdp.tiles[rdp.cur_tile].t_scale = 0.015625;
 
 #ifdef EXTREME_LOGGING
-  FRDP("renderState: %08lx, textureState: %08lx, othermode0: %08lx, othermode1: %08lx, rdpCmds: %08lx, triCount : %d, v0: %d, vn: %d\n", ostate->renderState, ostate->textureState, 
+  FRDP("renderState: %08lx, textureState: %08lx, othermode0: %08lx, othermode1: %08lx, rdpCmds: %08lx, triCount : %d, v0: %d, vn: %d\n", ostate->renderState, ostate->textureState,
      ostate->othermode0, ostate->othermode1, ostate->rdpCmds, ostate->triCount, ostate->vtxV0, ostate->vtxCount);
 #endif
 
   rdp.cmd0 = ostate->othermode0;
   rdp.cmd1 = ostate->othermode1;
   rdp_setothermode();
-  
+
   rdp.cmd1 = ostate->renderState;
   uc0_setgeometrymode();
 
@@ -219,7 +219,7 @@ static void t3dLoadObject(wxUint32 pstate, wxUint32 pvtx, wxUint32 ptri)
       FRDP ("{%f,%f,%f,%f}\n", rdp.combined[3][0], rdp.combined[3][1], rdp.combined[3][2], rdp.combined[3][3]);
 #endif
   }
-  
+
   rdp.geom_mode &= ~0x00020000;
   rdp.geom_mode |= 0x00000200;
   if (pvtx) //load vtx
@@ -254,14 +254,14 @@ static void Turbo3D()
   settings.ucode = ucode_Fast3D;
   wxUint32 a = 0, pgstate = 0, pstate = 0, pvtx = 0, ptri = 0;
   do {
-    wxUint32 a = rdp.pc[rdp.pc_i] & BMASK;
-    pgstate = ((wxUint32*)gfx.RDRAM)[a>>2];   
-    pstate = ((wxUint32*)gfx.RDRAM)[(a>>2)+1]; 
-    pvtx = ((wxUint32*)gfx.RDRAM)[(a>>2)+2]; 
-    ptri = ((wxUint32*)gfx.RDRAM)[(a>>2)+3]; 
+    a = rdp.pc[rdp.pc_i] & BMASK;
+    pgstate = ((wxUint32*)gfx.RDRAM)[a>>2];
+    pstate = ((wxUint32*)gfx.RDRAM)[(a>>2)+1];
+    pvtx = ((wxUint32*)gfx.RDRAM)[(a>>2)+2];
+    ptri = ((wxUint32*)gfx.RDRAM)[(a>>2)+3];
     FRDP("GlobalState: %08lx, Object: %08lx, Vertices: %08lx, Triangles: %08lx\n", pgstate, pstate, pvtx, ptri);
     if (!pstate)
-    { 
+    {
       rdp.halt = 1;
       break;
     }

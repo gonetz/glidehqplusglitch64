@@ -51,28 +51,28 @@ static void uc8_vertex ()
 		rdp.update ^= UPDATE_MULT_MAT;
     	MulMatrices(rdp.model, rdp.proj, rdp.combined);
 	}
-	
+
 	wxUint32 addr = segoffset(rdp.cmd1);
 	int v0, i, n;
 	float x, y, z;
-	
+
 	rdp.vn = n = (rdp.cmd0 >> 12) & 0xFF;
 	rdp.v0 = v0 = ((rdp.cmd0 >> 1) & 0x7F) - n;
-	
+
 	FRDP ("uc8:vertex n: %d, v0: %d, from: %08lx\n", n, v0, addr);
-	
+
 	if (v0 < 0)
 	{
 		RDP_E ("** ERROR: uc2:vertex v0 < 0\n");
 		RDP ("** ERROR: uc2:vertex v0 < 0\n");
 		return;
 	}
-	//*  
+	//*
 	// This is special, not handled in update()
 	if (rdp.update & UPDATE_LIGHTS)
 	{
 		rdp.update ^= UPDATE_LIGHTS;
-		
+
 		// Calculate light vectors
 		for (wxUint32 l=0; l<rdp.num_lights; l++)
 		{
@@ -95,7 +95,7 @@ static void uc8_vertex ()
 		v->ov   = (float)((short*)gfx.RDRAM)[(((addr+i) >> 1) + 5)^1];
         v->uv_scaled = 0;
 		v->a    = ((wxUint8*)gfx.RDRAM)[(addr+i + 15)^3];
-		
+
 #ifdef EXTREME_LOGGING
 		FRDP ("before v%d - x: %f, y: %f, z: %f\n", i>>4, x, y, z);
 #endif
@@ -103,21 +103,21 @@ static void uc8_vertex ()
 		v->y = x*rdp.combined[0][1] + y*rdp.combined[1][1] + z*rdp.combined[2][1] + rdp.combined[3][1];
 		v->z = x*rdp.combined[0][2] + y*rdp.combined[1][2] + z*rdp.combined[2][2] + rdp.combined[3][2];
 		v->w = x*rdp.combined[0][3] + y*rdp.combined[1][3] + z*rdp.combined[2][3] + rdp.combined[3][3];
-		
+
 #ifdef EXTREME_LOGGING
 		FRDP ("v%d - x: %f, y: %f, z: %f, w: %f, u: %f, v: %f, flags: %d\n", i>>4, v->x, v->y, v->z, v->w, v->ou, v->ov, v->flags);
 #endif
-		
+
         if (fabs(v->w) < 0.001) v->w = 0.001f;
 		v->oow = 1.0f / v->w;
 		v->x_w = v->x * v->oow;
 		v->y_w = v->y * v->oow;
 		v->z_w = v->z * v->oow;
-		
+
 		v->uv_calculated = 0xFFFFFFFF;
 		v->screen_translated = 0;
 		v->shade_mod = 0;
-		
+
 		v->scr_off = 0;
 		if (v->x < -v->w) v->scr_off |= 1;
 		if (v->x > v->w) v->scr_off |= 2;
@@ -131,22 +131,22 @@ static void uc8_vertex ()
 #ifdef EXTREME_LOGGING
 		FRDP ("r: %02lx, g: %02lx, b: %02lx, a: %02lx\n", v->r, v->g, v->b, v->a);
 #endif
-		
+
 		if ((rdp.geom_mode & 0x00020000))
 		{
 			wxUint32 shift = v0 << 1;
 			v->vec[0] = ((char*)gfx.RDRAM)[(uc8_normale_addr + (i>>3) + shift + 0)^3];
 			v->vec[1] = ((char*)gfx.RDRAM)[(uc8_normale_addr + (i>>3) + shift + 1)^3];
 			v->vec[2] = (char)(v->flags&0xff);
-			
-  			if (rdp.geom_mode & 0x80000) 
+
+  			if (rdp.geom_mode & 0x80000)
   			{
   				calc_linear (v);
 #ifdef EXTREME_LOGGING
   				FRDP ("calc linear: v%d - u: %f, v: %f\n", i>>4, v->ou, v->ov);
 #endif
   			}
-  			else if (rdp.geom_mode & 0x40000) 
+  			else if (rdp.geom_mode & 0x40000)
   			{
   				calc_sphere (v);
 #ifdef EXTREME_LOGGING
@@ -168,7 +168,7 @@ static void uc8_vertex ()
             continue;
           light_intensity = DotProduct (rdp.light_vector[l], v->vec);
           FRDP("light %d, intensity : %f\n", l, light_intensity);
-          if (light_intensity < 0.0f) 
+          if (light_intensity < 0.0f)
             continue;
           //*
           if (rdp.light[l].ca > 0.0f)
@@ -188,10 +188,10 @@ static void uc8_vertex ()
           color[1] += rdp.light[l].g * light_intensity;
           color[2] += rdp.light[l].b * light_intensity;
           FRDP("light %d r: %f, g: %f, b: %f\n", l, color[0], color[1], color[2]);
-        }	
+        }
         light_intensity = DotProduct (rdp.light_vector[l], v->vec);
         FRDP("light %d, intensity : %f\n", l, light_intensity);
-        if (light_intensity > 0.0f) 
+        if (light_intensity > 0.0f)
         {
           color[0] += rdp.light[l].r * light_intensity;
           color[1] += rdp.light[l].g * light_intensity;
@@ -199,7 +199,7 @@ static void uc8_vertex ()
         }
         FRDP("light %d r: %f, g: %f, b: %f\n", l, color[0], color[1], color[2]);
       }
-			else 
+			else
 			{
 				for (l = 0; l < rdp.num_lights; l++)
 				{
@@ -217,7 +217,7 @@ static void uc8_vertex ()
 						color[1] += rdp.light[l].g * light_intensity;
 						color[2] += rdp.light[l].b * light_intensity;
 						//FRDP("light %d r: %f, g: %f, b: %f\n", l, color[0], color[1], color[2]);
-					}	
+					}
 				}
 			}
 			if (color[0] > 1.0f) color[0] = 1.0f;
@@ -238,20 +238,20 @@ static void uc8_moveword ()
 	wxUint8 index = (wxUint8)((rdp.cmd0 >> 16) & 0xFF);
 	wxUint16 offset = (wxUint16)(rdp.cmd0 & 0xFFFF);
 	wxUint32 data = rdp.cmd1;
-	
+
 	FRDP ("uc8:moveword ");
-	
+
 	switch (index)
 	{
 		// NOTE: right now it's assuming that it sets the integer part first.  This could
 		//  be easily fixed, but only if i had something to test with.
-		
+
 	case 0x02:
 		rdp.num_lights = (data / 48);
 		rdp.update |= UPDATE_LIGHTS;
 		FRDP ("numlights: %d\n", rdp.num_lights);
 		break;
-		
+
 	case 0x04:
     if (offset == 0x04)
     {
@@ -260,14 +260,14 @@ static void uc8_moveword ()
     }
 		FRDP ("mw_clip %08lx, %08lx\n", rdp.cmd0, rdp.cmd1);
 		break;
-		
+
 	case 0x06:  // moveword SEGMENT
 		{
 			FRDP ("SEGMENT %08lx -> seg%d\n", data, offset >> 2);
 			rdp.segment[(offset >> 2) & 0xF] = data;
 		}
 		break;
-		
+
 	case 0x08:
 		{
 			rdp.fog_multiplier = (short)(rdp.cmd1 >> 16);
@@ -275,20 +275,20 @@ static void uc8_moveword ()
 			FRDP ("fog: multiplier: %f, offset: %f\n", rdp.fog_multiplier, rdp.fog_offset);
 		}
 		break;
-		
+
 	case 0x0c:
 		RDP_E ("uc8:moveword forcemtx - IGNORED\n");
 		RDP ("forcemtx - IGNORED\n");
 		break;
-		
+
 	case 0x0e:
 		RDP ("perspnorm - IGNORED\n");
 		break;
-		
+
 	case 0x10:  // moveword coord mod
 		{
 			wxUint8 n = offset >> 2;
-			
+
 			FRDP ("coord mod:%d, %08lx\n", n, data);
 			if (rdp.cmd0&8)
 				return;
@@ -305,7 +305,7 @@ static void uc8_moveword ()
 				uc8_coord_mod[5+idx] = (rdp.cmd1&0xffff)/65536.0f;
 				uc8_coord_mod[12+idx] = uc8_coord_mod[0+idx] + uc8_coord_mod[4+idx];
 				uc8_coord_mod[13+idx] = uc8_coord_mod[1+idx] + uc8_coord_mod[5+idx];
-				
+
 			}
 			else if (pos == 0x20)
 			{
@@ -321,10 +321,10 @@ static void uc8_moveword ()
 				}
 #endif
 			}
-			
+
 		}
 		break;
-		
+
 	default:
 		FRDP_E("uc8:moveword unknown (index: 0x%08lx, offset 0x%08lx)\n", index, offset);
 		FRDP ("unknown (index: 0x%08lx, offset 0x%08lx)\n", index, offset);
@@ -336,9 +336,9 @@ static void uc8_movemem ()
 	int idx = rdp.cmd0 & 0xFF;
 	wxUint32 addr = segoffset(rdp.cmd1);
 	int ofs = (rdp.cmd0 >> 5) & 0x3FFF;
-	
+
 	FRDP ("uc8:movemem ofs:%d ", ofs);
-	
+
 	switch (idx)
 	{
 	case 8:   // VIEWPORT
@@ -356,14 +356,14 @@ static void uc8_movemem ()
 			rdp.view_trans[0] = trans_x * rdp.scale_x;
 			rdp.view_trans[1] = trans_y * rdp.scale_y;
 			rdp.view_trans[2] = 32.0f * trans_z;
-			
+
 			rdp.update |= UPDATE_VIEWPORT;
-			
+
 			FRDP ("viewport scale(%d, %d), trans(%d, %d), from:%08lx\n", scale_x, scale_y,
 				trans_x, trans_y, a);
 		}
 		break;
-		
+
 	case 10:  // LIGHT
 		{
 			int n = (ofs / 48);
@@ -400,7 +400,6 @@ static void uc8_movemem ()
 			rdp.light[n].dir_z = (float)(((char*)gfx.RDRAM)[(addr+10)^3]) / 127.0f;
 			// **
 			wxUint32 a = addr >> 1;
-			short pos = ((short*)gfx.RDRAM)[(a+16)^1];
 			rdp.light[n].x = (float)(((short*)gfx.RDRAM)[(a+16)^1]);
 			rdp.light[n].y = (float)(((short*)gfx.RDRAM)[(a+17)^1]);
 			rdp.light[n].z = (float)(((short*)gfx.RDRAM)[(a+18)^1]);
@@ -423,7 +422,7 @@ static void uc8_movemem ()
 #endif
 		}
 		break;
-		
+
 	case 14: //Normales
 		{
 			uc8_normale_addr = segoffset(rdp.cmd1);
@@ -444,7 +443,7 @@ static void uc8_movemem ()
 #endif
 		}
 		break;
-		
+
 	default:
 		FRDP ("uc8:movemem unknown (%d)\n", idx);
 	}
@@ -452,13 +451,13 @@ static void uc8_movemem ()
 
 
 static void uc8_tri4() //by Gugaman Apr 19 2002
-{ 
+{
     if (rdp.skip_drawing)
     {
 		RDP("uc8:tri4. skipped\n");
 		return;
     }
-	
+
 	FRDP("uc8:tri4 (#%d - #%d), %d-%d-%d, %d-%d-%d, %d-%d-%d, %d-%d-%d\n",
 		rdp.tri_n,
 		rdp.tri_n+3,
@@ -474,7 +473,7 @@ static void uc8_tri4() //by Gugaman Apr 19 2002
 		((rdp.cmd1 >> 10) & 0x1F),
 		((rdp.cmd1 >> 5) & 0x1F),
 		((rdp.cmd1 >> 0) & 0x1F));
-	
+
 	VERTEX *v[12] = {
 		&rdp.vtx[(rdp.cmd0 >> 23) & 0x1F],
 			&rdp.vtx[(rdp.cmd0 >> 18) & 0x1F],
@@ -489,20 +488,20 @@ static void uc8_tri4() //by Gugaman Apr 19 2002
 			&rdp.vtx[(rdp.cmd1 >> 5) & 0x1F],
 			&rdp.vtx[(rdp.cmd1 >> 0) & 0x1F]
 	};
-	
+
 	int updated = 0;
-	
+
 	if (cull_tri(v))
 		rdp.tri_n ++;
 	else
 	{
 		updated = 1;
 		update ();
-		
+
 		draw_tri (v);
 		rdp.tri_n ++;
 	}
-	
+
 	if (cull_tri(v+3))
 		rdp.tri_n ++;
 	else
@@ -512,11 +511,11 @@ static void uc8_tri4() //by Gugaman Apr 19 2002
 			updated = 1;
 			update ();
 		}
-		
+
 		draw_tri (v+3);
 		rdp.tri_n ++;
 	}
-	
+
 	if (cull_tri(v+6))
 		rdp.tri_n ++;
 	else
@@ -526,11 +525,11 @@ static void uc8_tri4() //by Gugaman Apr 19 2002
 			updated = 1;
 			update ();
 		}
-		
+
 		draw_tri (v+6);
 		rdp.tri_n ++;
 	}
-	
+
 	if (cull_tri(v+9))
 		rdp.tri_n ++;
 	else
@@ -540,7 +539,7 @@ static void uc8_tri4() //by Gugaman Apr 19 2002
 			updated = 1;
 			update ();
 		}
-		
+
 		draw_tri (v+9);
 		rdp.tri_n ++;
 	}
