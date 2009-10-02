@@ -252,12 +252,15 @@ void DrawImage (DRAWIMAGE *d)
       return;
     }
   }
-  if (d->imageW%2 == 1) d->imageW -= 1;
-  if (d->imageH%2 == 1) d->imageH -= 1;
-  if (d->imageY > d->imageH) d->imageY = (d->imageY%d->imageH);
-  //	if (d->imageX > d->imageW) d->imageX = (d->imageX%d->imageW);
 
-  if (!(settings.hacks&hack_PPL))
+  if ((settings.hacks&hack_PPL))
+  {
+    if (d->imageW%2 == 1) d->imageW -= 1;
+    if (d->imageH%2 == 1) d->imageH -= 1;
+    if (d->imageY > d->imageH) d->imageY = (d->imageY%d->imageH);
+    //	if (d->imageX > d->imageW) d->imageX = (d->imageX%d->imageW);
+  }
+  else
   {
     if ( (d->frameX > 0) && (d->frameW == rdp.ci_width) )
       d->frameW -= (wxUint16)(2.0f*d->frameX);

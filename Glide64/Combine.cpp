@@ -3329,15 +3329,31 @@ static void cc__t0a_mul_env_add_t0__mul_shade ()
 
 // ** A*B*C+D*E **
 //Added by Gonetz
-static void cc_t0_mul_prim_mul_shade_add_prim_mul_env ()
+static void cc__t0_sub_t1__mul_prim_mul_shade_add_prim_mul_env ()
 {
+  if (cmb.combine_ext)
+  {
+    T1CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO, 
+      GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO, 
+      GR_CMBX_ZERO, 0,
+      GR_CMBX_B, 0);
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X, 
+      GR_CMBX_OTHER_TEXTURE_RGB, GR_FUNC_MODE_NEGATIVE_X, 
+      GR_CMBX_ZERO, 1,
+      GR_CMBX_ZERO, 0);
+    cmb.tex |= 3;
+  }
+  else
+  {
+    USE_T0 ();
+  }
+
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
     GR_COMBINE_FACTOR_TEXTURE_RGB,
     GR_COMBINE_LOCAL_CONSTANT,
     GR_COMBINE_OTHER_ITERATED);
   CC_PRIMMULENV ();
   MULSHADE_PRIM ();
-  USE_T0 ();
 }
 
 //Added by Gonetz
@@ -11062,7 +11078,7 @@ static wxUint32 color_cmb_list[] = {
     0xa3f7a3f7, cmb(cc_prim_add_env),
     // monsters, Pokemon Stadium. Added by Gonetz
     // (t0-t1)*shade+env, (cmb-0)*prim+0 ** INC **
-    0xa421e3f0, cmb(cc_t0_mul_prim_mul_shade_add_prim_mul_env),
+    0xa421e3f0, cmb(cc__t0_sub_t1__mul_prim_mul_shade_add_prim_mul_env),
     // background, pokemon stadium 2
     // (t0-prim)*shade+env
     0xa431a431, cmb(cc_t0_mul_shade),
