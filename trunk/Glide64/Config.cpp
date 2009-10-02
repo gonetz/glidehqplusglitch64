@@ -565,7 +565,7 @@ void ConfigNotebook::set_properties()
     lblEnhancement->SetToolTip(tooltip);
     cmbEnhEnhancement->SetToolTip(tooltip);
     cmbEnhEnhancement->SetSelection(settings.ghq_enht);
-    tooltip = wxT("Texture cache size:\nEnhanced and filtered textures can be cached to aid performance.\nThis setting will adjust how much PC memory will be dedicated for texture cache.\nThis helps boost performance if there are subsequent requests for the same texture (usually the case).\nNormally, 128MB should be more than enough but there is a sweet spot for each game.\nSuper Mario may not need more than 32megs, but Conker streams a lot of textures,\nso setting 256+ megs can boost performance. Adjust accordingly if you are encountering speed issues.\n'0' disables cache.\n[Recommended: PC dependant / default: 100 megs]");
+    tooltip = wxT("Texture cache size:\nEnhanced and filtered textures can be cached to aid performance.\nThis setting will adjust how much PC memory will be dedicated for texture cache.\nThis helps boost performance if there are subsequent requests for the same texture (usually the case).\nNormally, 128MB should be more than enough but there is a sweet spot for each game.\nSuper Mario may not need more than 32megs, but Conker streams a lot of textures,\nso setting 256+ megs can boost performance. Adjust accordingly if you are encountering speed issues.\n'0' disables cache.\n[Recommended: PC and game dependant]");
     lblTexCache->SetToolTip(tooltip);
     lblTexCacheMB->SetToolTip(tooltip);
     spinEnhCacheSize->SetToolTip(tooltip);
@@ -1155,8 +1155,8 @@ void CALL DllConfig ( HWND hParent )
   Glide64Config->ShowModal();
 }
 
-//#ifndef _DEBUG
-#if 1
+#ifndef _DEBUG
+//#if 1
 #ifndef  __GNUG__
 void wxStringData::Free()
 {

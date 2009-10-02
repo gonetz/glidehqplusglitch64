@@ -694,7 +694,7 @@ EXPORT void CALL ProcessDList(void)
   fbreads_front = fbreads_back = 0;
   rdp.fog_multiplier = rdp.fog_offset = 0;
   rdp.zsrc = 0;
-  //rdp.tlut_mode = 0;
+  rdp.tlut_mode = 0; //is it correct?
   rdp.scissor_set = FALSE;
   ucode5_texshiftaddr = ucode5_texshiftcount = 0;
   cpu_fb_write = FALSE;
@@ -1042,9 +1042,9 @@ static void rdp_texrect()
     lr_x += 1.0f;
     lr_y += 1.0f;
   }
-  if (ul_y == lr_y)
+  if (lr_y - ul_y < 1.0f)
   {
-    lr_y += 1.0f;
+    lr_y = ul_y + 1.0f;
   }
 
   //*   
