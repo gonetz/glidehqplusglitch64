@@ -38,7 +38,7 @@
 //****************************************************************
 
 #include "Gfx #1.3.h"
-#include <wx/confbase.h> 
+#include <wx/confbase.h>
 #include "3dmath.h"
 #include "Util.h"
 #include "Debugger.h"
@@ -228,9 +228,9 @@ void rdp_reset ()
   rdp.cur_image = 0;
   rdp.tbuff_tex = 0;
 
-  hotkey_info.hk_ref = 90; 
-  hotkey_info.hk_motionblur = (settings.buff_clear == 0)?0:90; 
-  hotkey_info.hk_filtering = hotkey_info.hk_motionblur; 
+  hotkey_info.hk_ref = 90;
+  hotkey_info.hk_motionblur = (settings.buff_clear == 0)?0:90;
+  hotkey_info.hk_filtering = hotkey_info.hk_motionblur;
 
   rdp.offset_x_bak = 0;
   rdp.offset_y_bak = 0;
@@ -277,7 +277,7 @@ void microcheck ()
 #endif
 
   FRDP("ucode = %08lx\n", uc_crc);
-  
+
   wxConfigBase * ini = wxConfigBase::Get(false);
   ini->SetPath(wxT("/UCODE"));
   wxString str;
@@ -337,7 +337,7 @@ void drawNoFullscreenMessage()
 //the code below will compile on any OS
 //but it works only on windows, because
 //I don't know, how to initialize GFXWindow on other OS
-#ifdef __WINDOWS__ 
+#ifdef __WINDOWS__
   LOG ("drawNoFullscreenMessage ()\n");
   if (rdp.window_changed)
   {
@@ -379,7 +379,7 @@ static void DrawPartFrameBufferToScreen()
 {
   FB_TO_SCREEN_INFO fb_info;
   fb_info.addr   = rdp.cimg;
-  fb_info.size   = rdp.ci_size;   
+  fb_info.size   = rdp.ci_size;
   fb_info.width  = rdp.ci_width;
   fb_info.height = rdp.ci_height;
   fb_info.ul_x = d_ul_x;
@@ -464,12 +464,12 @@ static void CopyFrameBuffer (GrBuffer_t buffer = GR_BUFFER_BACKBUFFER)
     }
     delete[] ptr_src;
   }
-  else 
+  else
   {
     if (rdp.motionblur && fb_hwfbe_enabled)
     {
       return;
-    }       
+    }
     else
     {
       float scale_x = (settings.scr_res_x - rdp.offset_x*2.0f)  / rdp.vi_width;
@@ -523,7 +523,7 @@ static void CopyFrameBuffer (GrBuffer_t buffer = GR_BUFFER_BACKBUFFER)
       {
         RDP ("Framebuffer copy failed.\n");
       }
-    }   
+    }
   }
 }
 
@@ -555,7 +555,7 @@ Purpose:  This function is called when there is a Dlist to be
 processed. (High level GFX list)
 input:    none
 output:   none
-*******************************************************************/ 
+*******************************************************************/
 void DetectFrameBufferUsage ();
 wxUint32 fbreads_front = 0;
 wxUint32 fbreads_back = 0;
@@ -580,7 +580,7 @@ EXPORT void CALL ProcessDList(void)
     *gfx.MI_INTR_REG |= 0x20;
     gfx.CheckInterrupts();
     return;
-  }  
+  }
 
   no_dlist = FALSE;
   update_screen_count = 0;
@@ -589,7 +589,7 @@ EXPORT void CALL ProcessDList(void)
 #ifdef ALTTAB_FIX
   if (!hhkLowLevelKybd)
   {
-    hhkLowLevelKybd = SetWindowsHookEx(WH_KEYBOARD_LL, 
+    hhkLowLevelKybd = SetWindowsHookEx(WH_KEYBOARD_LL,
       LowLevelKeyboardProc, hInstance, 0);
   }
 #endif
@@ -647,7 +647,7 @@ EXPORT void CALL ProcessDList(void)
     }
 #endif
   }
-  if (!fullscreen && !settings.run_in_window) 
+  if (!fullscreen && !settings.run_in_window)
   {
     return;
   }
@@ -684,7 +684,7 @@ EXPORT void CALL ProcessDList(void)
   if (rdp.model_stack_size == 0)
     rdp.model_stack_size = 32;
   rdp.Persp_en = TRUE;
-  rdp.fb_drawn = rdp.fb_drawn_front = FALSE; 
+  rdp.fb_drawn = rdp.fb_drawn_front = FALSE;
   rdp.update = 0x7FFFFFFF;  // All but clear cache
   rdp.geom_mode = 0;
   rdp.acmp = 0;
@@ -797,7 +797,7 @@ EXPORT void CALL ProcessDList(void)
 #ifdef CATCH_EXCEPTIONS
   } catch (...) {
 
-    if (fullscreen) 
+    if (fullscreen)
     {
       ReleaseGfx ();
       rdp_reset ();
@@ -843,7 +843,7 @@ static void undef()
   *gfx.MI_INTR_REG |= 0x20;
   gfx.CheckInterrupts();
   rdp.halt = 1;
-#endif  
+#endif
 }
 
 // spnoop - no operation, always ignore
@@ -869,7 +869,7 @@ static void ys_memrect ()
 
   rdp.pc[rdp.pc_i] += 16;       // texrect is 196-bit
 
-  if (lr_y > rdp.scissor_o.lr_y) 
+  if (lr_y > rdp.scissor_o.lr_y)
     lr_y = rdp.scissor_o.lr_y;
   wxUint32 off_x = ((rdp.cmd2 & 0xFFFF0000) >> 16) >> 5;
   wxUint32 off_y = (rdp.cmd2 & 0x0000FFFF) >> 5;
@@ -935,7 +935,7 @@ static void DrawDepthBufferFog()
     return;
   FB_TO_SCREEN_INFO fb_info;
   fb_info.addr   = rdp.zimg;
-  fb_info.size   = 2;   
+  fb_info.size   = 2;
   fb_info.width  = rdp.zi_width;
   fb_info.height = rdp.ci_height;
   fb_info.ul_x = rdp.scissor_o.ul_x;
@@ -959,7 +959,7 @@ static void rdp_texrect()
     wxUint32 dwHalf1 = (((wxUint32*)gfx.RDRAM)[(a>>2)+0]) >> 24;
     if ((dwHalf1 != 0xF1)  && (dwHalf1 != 0xb3))
     {
-      rdp.pc[rdp.pc_i] += 16; 
+      rdp.pc[rdp.pc_i] += 16;
     }
     else
     {
@@ -1047,7 +1047,7 @@ static void rdp_texrect()
     lr_y = ul_y + 1.0f;
   }
 
-  //*   
+  //*
   if (rdp.tbuff_tex && (settings.frame_buffer & fb_optimize_texrect))
   {
     if (!rdp.tbuff_tex->drawn)
@@ -1083,14 +1083,14 @@ static void rdp_texrect()
     rdp.tri_n += 2;
     return;
   }
-  //*   
+  //*
   //hack for Banjo2. it removes black texrects under Banjo
   if (!fb_hwfbe_enabled && ((rdp.cycle1 << 16) | (rdp.cycle2 & 0xFFFF)) == 0xFFFFFFFF && (rdp.othermode_l & 0xFFFF0000) == 0x00500000)
   {
     rdp.tri_n += 2;
     return;
   }
-  //*/  
+  //*/
   //*
   //remove motion blur in night vision
   if ((settings.ucode == ucode_PerfectDark) && (rdp.maincimg[1].addr != rdp.maincimg[0].addr) && (rdp.timg.addr >= rdp.maincimg[1].addr) && (rdp.timg.addr < (rdp.maincimg[1].addr+rdp.ci_width*rdp.ci_height*rdp.ci_size)))
@@ -1104,7 +1104,7 @@ static void rdp_texrect()
         return;
       }
   }
-  //*/  
+  //*/
 
   int i;
 
@@ -1134,7 +1134,7 @@ static void rdp_texrect()
   rdp.texrecting = 0;
   rdp.allow_combine = 1;
 
-  if (!rdp.cur_cache[0]) 
+  if (!rdp.cur_cache[0])
   {
     rdp.cur_tile = prev_tile;
     rdp.tri_n += 2;
@@ -1218,7 +1218,7 @@ static void rdp_texrect()
       float t0_off_y = off_y;
       if (off_x + off_y < 0.1f)
       {
-        t0_off_x += rdp.tiles[0].ul_s; 
+        t0_off_x += rdp.tiles[0].ul_s;
         t0_off_y += rdp.tiles[0].ul_t;
       }
       t0_off_x += rdp.tbuff_tex->u_shift;// + rdp.tiles[0].ul_s; //commented for Paper Mario motion blur
@@ -1500,10 +1500,10 @@ static void rdp_texrect()
       if (rdp.fog_mode >= RDP::fog_blend)
       {
         float fog;
-        if (rdp.fog_mode == RDP::fog_blend) 
+        if (rdp.fog_mode == RDP::fog_blend)
           fog = 1.0f/max(1, rdp.fog_color&0xFF);
         else
-          float fog = 1.0f/max(1, (~rdp.fog_color)&0xFF);
+          fog = 1.0f/max(1, (~rdp.fog_color)&0xFF);
         for (i = 0; i < n_vertices; i++)
         {
           vptr[i].f = fog;
@@ -1850,7 +1850,7 @@ static void rdp_loadblock()
   if (ucode5_texshiftaddr)
   {
     if (ucode5_texshift % ((lr_s+1)<<3))
-    {                               
+    {
       rdp.timg.addr -= ucode5_texshift;
       ucode5_texshiftaddr = 0;
       ucode5_texshift = 0;
@@ -1899,22 +1899,21 @@ static void rdp_loadblock()
   if (addr+(lr_s<<3) > BMASK+1)
     lr_s = (wxUint16)((BMASK-addr)>>3);
 
-  //angrylion's advice to use ul_s in texture image offset and cnt calculations. 
+  //angrylion's advice to use ul_s in texture image offset and cnt calculations.
   //Helps to fix Vigilante 8 jpeg backgrounds and logos
   wxUint32 off = rdp.timg.addr + (ul_s << rdp.tiles[tile].size >> 1);
-  wxUint32 dst = (wxUint32)rdp.tmem+(rdp.tiles[tile].t_mem<<3);
+  wxUIntPtr dst = wxPtrToUInt(rdp.tmem)+(rdp.tiles[tile].t_mem<<3);
   wxUint32 cnt = lr_s-ul_s+1;
   if (rdp.tiles[tile].size == 3)
     cnt <<= 1;
-  wxUint32 start_line = 0;
 
   // Since it's not loading 32-bit textures as the N64 would, 32-bit textures need to
   //  be swapped by 64-bits, not 32.
-  wxUint32 SwapMethod = (rdp.tiles[tile].size==3)?(wxUint32)SwapBlock64:(wxUint32)SwapBlock32;
+  wxUIntPtr SwapMethod = (rdp.tiles[tile].size==3)?wxPtrToUInt(reinterpret_cast<void*>(SwapBlock64)):wxPtrToUInt(reinterpret_cast<void*>(SwapBlock32));
 
   rdp.timg.addr += cnt << 3;
 
-  asmLoadBlock((int)(gfx.RDRAM), dst, off, _dxt, cnt, SwapMethod);
+  asmLoadBlock(wxPtrToUInt(gfx.RDRAM), dst, off, _dxt, cnt, SwapMethod);
 
   rdp.update |= UPDATE_TEXTURE;
 
@@ -2005,18 +2004,16 @@ static void rdp_loadtile()
     return;
 
   // check if points to bad location
-  wxUint32 size = (width * height) << rdp.tiles[tile].size >> 1;
-
   if (offs + line_n*height > BMASK)
     height = (BMASK - offs) / line_n;
   if (height == 0)
     return;
 
-  wxUint32 SwapMethod = (rdp.tiles[tile].size==3)?(wxUint32)SwapBlock64:(wxUint32)SwapBlock32;
+  wxUIntPtr SwapMethod = (rdp.tiles[tile].size==3)?wxPtrToUInt(reinterpret_cast<void*>(SwapBlock64)):wxPtrToUInt(reinterpret_cast<void*>(SwapBlock32));
 
-  wxUint32 dst = (wxUint32)rdp.tmem+(rdp.tiles[tile].t_mem<<3);
-  wxUint32 end = (wxUint32)rdp.tmem+4096 - (wid_64<<3);
-  asmLoadTile((int)(gfx.RDRAM), dst, wid_64, height, line_n, offs, end, SwapMethod);
+  wxUIntPtr dst = wxPtrToUInt(rdp.tmem) + (rdp.tiles[tile].t_mem<<3);
+  wxUIntPtr end = wxPtrToUInt(rdp.tmem) + 4096 - (wid_64<<3);
+  asmLoadTile(wxPtrToUInt(gfx.RDRAM), dst, wid_64, height, line_n, offs, end, SwapMethod);
 
   FRDP("loadtile: tile: %d, ul_s: %d, ul_t: %d, lr_s: %d, lr_t: %d\n", tile,
     ul_s, ul_t, lr_s, lr_t);
@@ -2096,7 +2093,7 @@ static void rdp_fillrect()
           for (wxUint32 x = ul_x; x < lr_x; x++)
           {
             dst[x] = rdp.fill_color;
-          }     
+          }
           dst += zi_width_in_dwords;
         }
       }
@@ -2114,9 +2111,9 @@ static void rdp_fillrect()
   if (fullscreen)
     update_scissor ();
 
-  if (ul_x > lr_x) 
+  if (ul_x > lr_x)
     lr_x = ul_x+1;
-  if (ul_y > lr_y) 
+  if (ul_y > lr_y)
     lr_y = ul_y+1;
 
   if (rdp.cur_image && (rdp.cur_image->format != 0) && (rdp.cycle_mode == 3) && (rdp.cur_image->width == lr_x))
@@ -2197,7 +2194,7 @@ static void rdp_fillrect()
 
         if ((settings.hacks&hack_PMario) && rdp.frame_buffers[rdp.ci_count-1].status == ci_aux)
         {
-          //background of auxilary frame buffers must have zero alpha. 
+          //background of auxilary frame buffers must have zero alpha.
           //make it black, set 0 alpha to plack pixels on frame buffer read
           color = 0;
         }
@@ -2289,7 +2286,7 @@ static void rdp_fillrect()
       else
         rdp.tri_n += 2;
 
-      if (settings.fog && (rdp.flags & FOG_ENABLED)) 
+      if (settings.fog && (rdp.flags & FOG_ENABLED))
       {
         grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
       }
@@ -2351,13 +2348,13 @@ static void rdp_setenvcolor()
 
 static void rdp_setcombine()
 {
-  rdp.c_a0  = (wxUint8)((rdp.cmd0 >> 20) & 0xF); 
+  rdp.c_a0  = (wxUint8)((rdp.cmd0 >> 20) & 0xF);
   rdp.c_b0  = (wxUint8)((rdp.cmd1 >> 28) & 0xF);
   rdp.c_c0  = (wxUint8)((rdp.cmd0 >> 15) & 0x1F);
   rdp.c_d0  = (wxUint8)((rdp.cmd1 >> 15) & 0x7);
-  rdp.c_Aa0 = (wxUint8)((rdp.cmd0 >> 12) & 0x7); 
+  rdp.c_Aa0 = (wxUint8)((rdp.cmd0 >> 12) & 0x7);
   rdp.c_Ab0 = (wxUint8)((rdp.cmd1 >> 12) & 0x7);
-  rdp.c_Ac0 = (wxUint8)((rdp.cmd0 >> 9)  & 0x7); 
+  rdp.c_Ac0 = (wxUint8)((rdp.cmd0 >> 9)  & 0x7);
   rdp.c_Ad0 = (wxUint8)((rdp.cmd1 >> 9)  & 0x7);
 
   rdp.c_a1  = (wxUint8)((rdp.cmd0 >> 5)  & 0xF);
@@ -2369,9 +2366,9 @@ static void rdp_setcombine()
   rdp.c_Ac1 = (wxUint8)((rdp.cmd1 >> 18) & 0x7);
   rdp.c_Ad1 = (wxUint8)((rdp.cmd1 >> 0)  & 0x7);
 
-  rdp.cycle1 = (rdp.c_a0<<0)  | (rdp.c_b0<<4)  | (rdp.c_c0<<8)  | (rdp.c_d0<<13)| 
+  rdp.cycle1 = (rdp.c_a0<<0)  | (rdp.c_b0<<4)  | (rdp.c_c0<<8)  | (rdp.c_d0<<13)|
     (rdp.c_Aa0<<16)| (rdp.c_Ab0<<19)| (rdp.c_Ac0<<22)| (rdp.c_Ad0<<25);
-  rdp.cycle2 = (rdp.c_a1<<0)  | (rdp.c_b1<<4)  | (rdp.c_c1<<8)  | (rdp.c_d1<<13)| 
+  rdp.cycle2 = (rdp.c_a1<<0)  | (rdp.c_b1<<4)  | (rdp.c_c1<<8)  | (rdp.c_d1<<13)|
     (rdp.c_Aa1<<16)| (rdp.c_Ab1<<19)| (rdp.c_Ac1<<22)| (rdp.c_Ad1<<25);
 
   rdp.update |= UPDATE_COMBINE;
@@ -2411,10 +2408,10 @@ static void rdp_settextureimage()
       ucode5_texshiftcount = 0;
     }
   }
-  rdp.s2dex_tex_loaded = TRUE;  
+  rdp.s2dex_tex_loaded = TRUE;
   rdp.update |= UPDATE_TEXTURE;
 
-  if (rdp.frame_buffers[rdp.ci_count-1].status == ci_copy_self && (rdp.timg.addr >= rdp.cimg) && (rdp.timg.addr < rdp.ci_end)) 
+  if (rdp.frame_buffers[rdp.ci_count-1].status == ci_copy_self && (rdp.timg.addr >= rdp.cimg) && (rdp.timg.addr < rdp.ci_end))
   {
     if (!rdp.fb_drawn)
     {
@@ -2430,7 +2427,7 @@ static void rdp_settextureimage()
   {
     if (settings.hacks&hack_Zelda)
     {
-      if (rdp.timg.size == 2) 
+      if (rdp.timg.size == 2)
         FindTextureBuffer(rdp.timg.addr, rdp.timg.width);
     }
     else
@@ -2499,8 +2496,8 @@ static void rdp_setcolorimage()
           }
           if (!fb_hwfbe_enabled)
           {
-            if ((rdp.num_of_ci > 1) && 
-              (next_fb.status == ci_aux) && 
+            if ((rdp.num_of_ci > 1) &&
+              (next_fb.status == ci_aux) &&
               (next_fb.width >= cur_fb.width))
             {
               rdp.scale_x = 1.0f;
@@ -2519,14 +2516,14 @@ static void rdp_setcolorimage()
         }
         else if (fb_hwfbe_enabled && prev_fb.status == ci_aux)
         {
-          if (rdp.motionblur) 
+          if (rdp.motionblur)
           {
             rdp.cur_image = &(rdp.texbufs[rdp.cur_tex_buf].images[0]);
             grRenderBuffer( GR_BUFFER_TEXTUREBUFFER_EXT );
             grTextureBufferExt( rdp.cur_image->tmu, rdp.cur_image->tex_addr, rdp.cur_image->info.smallLodLog2, rdp.cur_image->info.largeLodLog2,
-              rdp.cur_image->info.aspectRatioLog2, rdp.cur_image->info.format, GR_MIPMAPLEVELMASK_BOTH ); 
+              rdp.cur_image->info.aspectRatioLog2, rdp.cur_image->info.format, GR_MIPMAPLEVELMASK_BOTH );
           }
-          else if (rdp.read_whole_frame) 
+          else if (rdp.read_whole_frame)
           {
             OpenTextureBuffer(rdp.frame_buffers[rdp.main_ci_index]);
           }
@@ -2543,7 +2540,7 @@ static void rdp_setcolorimage()
         {
           if (cur_fb.width == rdp.ci_width)
           {
-            if (CopyTextureBuffer(prev_fb, cur_fb)) 
+            if (CopyTextureBuffer(prev_fb, cur_fb))
             {
               //                      if (CloseTextureBuffer(TRUE))
               //*
@@ -2555,7 +2552,7 @@ static void rdp_setcolorimage()
               }
               //*/
             }
-            else 
+            else
             {
               if (!rdp.fb_drawn || prev_fb.status == ci_copy_self)
               {
@@ -2587,7 +2584,7 @@ static void rdp_setcolorimage()
           CopyFrameBuffer ();
           rdp.fb_drawn = TRUE;
         }
-        if (fb_hwfbe_enabled) 
+        if (fb_hwfbe_enabled)
           OpenTextureBuffer(cur_fb);
       }
       break;
@@ -2629,7 +2626,7 @@ static void rdp_setcolorimage()
           {
             if (cur_fb.format != 0)
               rdp.skip_drawing = TRUE;
-            if (rdp.ci_count == 0) 
+            if (rdp.ci_count == 0)
             {
               //           if (rdp.num_of_ci > 1)
               //           {
@@ -2637,7 +2634,7 @@ static void rdp_setcolorimage()
               rdp.scale_y = 1.0f;
               //           }
             }
-            else if (!fb_hwfbe_enabled && (prev_fb.status == ci_main) && 
+            else if (!fb_hwfbe_enabled && (prev_fb.status == ci_main) &&
               (prev_fb.width == cur_fb.width)) // for Pokemon Stadium
               CopyFrameBuffer ();
           }
@@ -2654,7 +2651,7 @@ static void rdp_setcolorimage()
           if (settings.scr_res_x > 1024)
             LOD = GR_LOD_LOG2_2048;
           grTextureAuxBufferExt( rdp.texbufs[0].tmu, rdp.texbufs[0].begin, LOD, LOD,
-            GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH ); 
+            GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH );
           grAuxBufferExt( GR_BUFFER_TEXTUREAUXBUFFER_EXT );
           RDP("rdp_setcolorimage - set texture depth buffer to TMU0\n");
         }
@@ -2775,7 +2772,7 @@ static void rdp_setcolorimage()
     rdp.ci_height = 32;
   else
     rdp.ci_height = rdp.scissor_o.lr_y;
-  if (rdp.zimg == rdp.cimg) 
+  if (rdp.zimg == rdp.cimg)
   {
     rdp.zi_width = rdp.ci_width;
     //    int zi_height = min((int)rdp.zi_width*3/4, (int)rdp.vi_height);
@@ -2836,7 +2833,7 @@ static void rdp_setcolorimage()
         {
           OpenTextureBuffer(rdp.frame_buffers[rdp.main_ci_index]);
         }
-      } 
+      }
     }
   }
 }
@@ -2957,7 +2954,7 @@ input:    addr          rdram address
 val                     val
 size            1 = wxUint8, 2 = wxUint16, 4 = wxUint32
 output:   none
-*******************************************************************/ 
+*******************************************************************/
 EXPORT void CALL FBRead(wxUint32 addr)
 {
   LOG ("FBRead ()\n");
@@ -3015,7 +3012,7 @@ frame buffer has been modified by CPU at the given address.
 input:    FrameBufferModifyEntry *plist
 size = size of the plist, max = 1024
 output:   none
-*******************************************************************/ 
+*******************************************************************/
 EXPORT void CALL FBWList(FrameBufferModifyEntry *plist, wxUint32 size)
 {
   LOG ("FBWList ()\n");
@@ -3031,7 +3028,7 @@ input:    addr          rdram address
 val                     val
 size            1 = wxUint8, 2 = wxUint16, 4 = wxUint32
 output:   none
-*******************************************************************/ 
+*******************************************************************/
 EXPORT void CALL FBWrite(wxUint32 addr, wxUint32 size)
 {
   LOG ("FBWrite ()\n");
@@ -3107,7 +3104,7 @@ EXPORT void CALL FBGetFrameBufferInfo(void *p)
     for (int i = 0; i < rdp.num_of_ci && info_index < 6; i++)
     {
       COLOR_IMAGE & cur_fb = rdp.frame_buffers[i];
-      if (cur_fb.status == ci_main || cur_fb.status == ci_copy_self || 
+      if (cur_fb.status == ci_main || cur_fb.status == ci_copy_self ||
         cur_fb.status == ci_old_copy)
       {
         pinfo[info_index].addr   = cur_fb.addr;
@@ -3139,13 +3136,12 @@ void DetectFrameBufferUsage ()
   RDP("DetectFrameBufferUsage\n");
 
   wxUint32 dlist_start = *(wxUint32*)(gfx.DMEM+0xFF0);
-  wxUint32 dlist_length = *(wxUint32*)(gfx.DMEM+0xFF4);
   wxUint32 a;
 
   int tidal = FALSE;
   if ((settings.hacks&hack_PMario) && (rdp.copy_ci_index || rdp.frame_buffers[rdp.copy_ci_index].status == ci_copy_self))
     tidal = TRUE;
-  wxUint32 ci = rdp.cimg, zi = rdp.zimg, ci_width = rdp.ci_width;
+  wxUint32 ci = rdp.cimg, zi = rdp.zimg;
   wxUint32 ci_height = rdp.frame_buffers[(rdp.ci_count > 0)?rdp.ci_count-1:0].height;
   rdp.main_ci = rdp.main_ci_end = rdp.main_ci_bg = rdp.ci_count = 0;
   rdp.main_ci_index = rdp.copy_ci_index = rdp.copy_zi_index = 0;
@@ -3182,7 +3178,7 @@ void DetectFrameBufferUsage ()
     // Go to the next instruction
     rdp.pc[rdp.pc_i] = (a+8) & BMASK;
 
-    if ((int)(gfx_instruction_lite[settings.ucode][rdp.cmd0>>24]))
+    if (wxPtrToUInt(reinterpret_cast<void*>(gfx_instruction_lite[settings.ucode][rdp.cmd0>>24])))
       gfx_instruction_lite[settings.ucode][rdp.cmd0>>24] ();
 
     // check DL counter
@@ -3202,7 +3198,7 @@ void DetectFrameBufferUsage ()
   SwapOK = TRUE;
   if (rdp.ci_count > NUMTEXBUF) //overflow
   {
-    rdp.cimg = ci; 
+    rdp.cimg = ci;
     rdp.zimg = zi;
     rdp.num_of_ci = rdp.ci_count;
     rdp.scale_x = rdp.scale_x_bak;
@@ -3258,7 +3254,7 @@ void DetectFrameBufferUsage ()
     FRDP("rdp.frame_buffers[%d].status = %s, addr: %08lx, height: %d\n", i, CIStatus[rdp.frame_buffers[i].status], rdp.frame_buffers[i].addr, rdp.frame_buffers[i].height);
   }
 
-  rdp.cimg = ci; 
+  rdp.cimg = ci;
   rdp.zimg = zi;
   rdp.num_of_ci = rdp.ci_count;
   if (rdp.read_previous_ci && previous_ci_was_read)
@@ -3317,7 +3313,7 @@ void DetectFrameBufferUsage ()
         {
           CopyFrameBuffer();
         }
-      } 
+      }
     }
   }
 
@@ -3542,7 +3538,7 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
     }
   }
   xleft += xleft_inc*j;  xright += xright_inc*j;
-  s += dsde*j;  t += dtde*j;  
+  s += dsde*j;  t += dtde*j;
   if (w + dwde*j) w += dwde*j;
   else w += dwde*(j-1);
   r += drde*j;  g += dgde*j;  b += dbde*j;  a += dade*j;
@@ -3731,7 +3727,7 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
       grDrawVertexArrayContiguous (GR_TRIANGLE_FAN, 4, vtxbuf, sizeof(VERTEX));
     else
       grDrawVertexArrayContiguous (GR_TRIANGLE_STRIP, nbVtxs-1, vtxbuf, sizeof(VERTEX));
-    if (_debugger.capture) 
+    if (_debugger.capture)
     {
       VERTEX vl[3];
       vl[0] = vtxbuf[0];
@@ -3917,7 +3913,7 @@ static void rdphalf_1()
 {
   wxUint32 cmd = rdp.cmd1 >> 24;
   if (cmd >= 0xc8 && cmd <=0xcf) //triangle command
-  { 
+  {
     RDP ("rdphalf_1 - lle triangle\n");
     rdp_cmd_ptr = 0;
     rdp_cmd_cur = 0;
@@ -3987,7 +3983,7 @@ Purpose:  This function is called when there is a Dlist to be
 processed. (Low level GFX list)
 input:    none
 output:   none
-*******************************************************************/ 
+*******************************************************************/
 void CALL ProcessRDPList(void)
 {
   LOG ("ProcessRDPList ()\n");
@@ -4002,7 +3998,7 @@ void CALL ProcessRDPList(void)
     *gfx.MI_INTR_REG |= 0x20;
     gfx.CheckInterrupts();
     return;
-  }  
+  }
 
   wxUint32 i;
   wxUint32 cmd, length, cmd_length;

@@ -37,14 +37,14 @@
 //
 //****************************************************************
 
-extern "C" void asmLoad32bRGBAas16bRGBA (int src, int dst, int wid_64, int height, int line, int ext);
-extern "C" void asmLoad32bRGBA (int src, int dst, int wid_64, int height, int line, int ext);
+extern "C" void asmLoad32bRGBAas16bRGBA (wxUIntPtr src, wxUIntPtr dst, int wid_64, int height, int line, int ext);
+extern "C" void asmLoad32bRGBA (wxUIntPtr src, wxUIntPtr dst, int wid_64, int height, int line, int ext);
 
 //****************************************************************
 // Size: 2, Format: 0
 //
 
-wxUint32 Load32bRGBAas16bRGBA (wxUint32 dst, wxUint32 src, int wid_64, int height, int line, int real_width, int tile)
+wxUint32 Load32bRGBAas16bRGBA (wxUIntPtr dst, wxUIntPtr src, int wid_64, int height, int line, int real_width, int tile)
 {
   if (wid_64 < 1) wid_64 = 1;
   if (height < 1) height = 1;
@@ -55,7 +55,7 @@ wxUint32 Load32bRGBAas16bRGBA (wxUint32 dst, wxUint32 src, int wid_64, int heigh
   return (1 << 16) | GR_TEXFMT_ARGB_4444;
 }
 
-wxUint32 Load32bRGBA (wxUint32 dst, wxUint32 src, int wid_64, int height, int line, int real_width, int tile)
+wxUint32 Load32bRGBA (wxUIntPtr dst, wxUIntPtr src, int wid_64, int height, int line, int real_width, int tile)
 {
   int id = tile - rdp.cur_tile;
   wxUint32 mod = (id == 0) ? cmb.mod_0 : cmb.mod_1;

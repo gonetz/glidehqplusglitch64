@@ -80,14 +80,14 @@ static int Calc_invw (int w) {
 				Result.W &= (0xFFC00000 >> (31 - count) );
 				count = 0;
 			}
-		}	
+		}
 		Result.W = 0x7FFFFFFF / Result.W;
 		for (count = 31; count > 0; count--) {
 			if ((Result.W & (1 << count))) {
 				Result.W &= (0xFFFF8000 >> (31 - count) );
 				count = 0;
 			}
-		}		
+		}
 		if (neg == TRUE) {
 			Result.W = ~Result.W;
 		}
@@ -249,8 +249,8 @@ static void uc9_mix ()
 static void uc9_fmlight ()
 {
   int mid = rdp.cmd0&0xFF;
-  rdp.num_lights = 1 + (rdp.cmd1>>12)&0xFF;
-  wxUint32 a = -1024 + rdp.cmd1&0xFFF;
+  rdp.num_lights = 1 + ((rdp.cmd1>>12)&0xFF);
+  wxUint32 a = -1024 + (rdp.cmd1&0xFFF);
   FRDP ("uc9:fmlight matrix: %d, num: %d, dmem: %04lx\n", mid, rdp.num_lights, a);
 
   M44 *m;
@@ -312,11 +312,11 @@ static void uc9_fmlight ()
 
 static void uc9_light ()
 {
-  wxUint32 csrs = -1024 + (rdp.cmd0>>12)&0xFFF;
-  wxUint32 nsrs = -1024 + rdp.cmd0&0xFFF;
-  wxUint32 num = 1 + (rdp.cmd1>>24)&0xFF;
-  wxUint32 cdest = -1024 + (rdp.cmd1>>12)&0xFFF;
-  wxUint32 tdest = -1024 + rdp.cmd1&0xFFF;
+  wxUint32 csrs = -1024 + ((rdp.cmd0>>12)&0xFFF);
+  wxUint32 nsrs = -1024 + (rdp.cmd0&0xFFF);
+  wxUint32 num = 1 + ((rdp.cmd1>>24)&0xFF);
+  wxUint32 cdest = -1024 + ((rdp.cmd1>>12)&0xFFF);
+  wxUint32 tdest = -1024 + (rdp.cmd1&0xFFF);
   int use_material = (csrs != 0x0ff0);
   tdest >>= 1;
   FRDP ("uc9:light n: %d, colsrs: %04lx, normales: %04lx, coldst: %04lx, texdst: %04lx\n", num, csrs, nsrs, cdest, tdest);
@@ -461,18 +461,18 @@ typedef struct  {
 
 static void uc9_mult_mpmtx ()
 {
-  int id = rdp.cmd0&0xFF;
-  int num = 1+ (rdp.cmd1>>24)&0xFF;
-  int src = -1024 + (rdp.cmd1>>12)&0xFFF;
-  int dst = -1024 + rdp.cmd1&0xFFF;
+  //int id = rdp.cmd0&0xFF;
+  int num = 1+ ((rdp.cmd1>>24)&0xFF);
+  int src = -1024 + ((rdp.cmd1>>12)&0xFFF);
+  int dst = -1024 + (rdp.cmd1&0xFFF);
   FRDP ("uc9:mult_mpmtx from: %04lx  to: %04lx n: %d\n", src, dst, num);
   short * saddr = (short*)(gfx.DMEM+src);
   zSortVDest * daddr = (zSortVDest*)(gfx.DMEM+dst);
   int idx = 0;
   zSortVDest v;
   memset(&v, 0, sizeof(zSortVDest));
-  float scale_x = 4.0f/rdp.scale_x;
-  float scale_y = 4.0f/rdp.scale_y;
+  //float scale_x = 4.0f/rdp.scale_x;
+  //float scale_y = 4.0f/rdp.scale_y;
   for (int i = 0; i < num; i++)
   {
     short sx   = saddr[(idx++)^1];
@@ -508,7 +508,7 @@ static void uc9_mult_mpmtx ()
     if (w < 0.1f) v.cc |= 0x04;
 
     daddr[i] = v;
-    //memcpy(gfx.DMEM+dst+sizeof(zSortVDest)*i, &v, sizeof(zSortVDest)); 
+    //memcpy(gfx.DMEM+dst+sizeof(zSortVDest)*i, &v, sizeof(zSortVDest));
 //    FRDP("v%d x: %d, y: %d, z: %d -> sx: %d, sy: %d, w: %d, xi: %d, yi: %d, wi: %d, fog: %d\n", i, sx, sy, sz, v.sx, v.sy, v.invw, v.xi, v.yi, v.wi, v.fog);
     FRDP("v%d x: %d, y: %d, z: %d -> sx: %04lx, sy: %04lx, invw: %08lx - %f, xi: %04lx, yi: %04lx, wi: %04lx, fog: %04lx\n", i, sx, sy, sz, v.sx, v.sy, v.invw, w, v.xi, v.yi, v.wi, v.fog);
   }
@@ -560,7 +560,7 @@ void uc9_movemem ()
       memcpy(gfx.RDRAM + addr, gfx.DMEM + dmem_addr, len);
     }
     break;
-  
+
   case 4:  // model matrix
   case 6:  // projection matrix
   case 8:  // combined matrix
@@ -630,7 +630,7 @@ void uc9_movemem ()
 
       rdp.update |= UPDATE_VIEWPORT;
 
-      rdp.mipmap_level = 0; 
+      rdp.mipmap_level = 0;
       rdp.cur_tile = 0;
       TILE *tmp_tile = &rdp.tiles[0];
       tmp_tile->on = 1;
@@ -673,7 +673,7 @@ static void uc9_setscissor()
     zSortRdp.scale_y = rdp.scale_y / 4.0f;
     rdp.update |= UPDATE_VIEWPORT;
 
-    rdp.mipmap_level = 0; 
+    rdp.mipmap_level = 0;
     rdp.cur_tile = 0;
     TILE *tmp_tile = &rdp.tiles[0];
     tmp_tile->on = 1;

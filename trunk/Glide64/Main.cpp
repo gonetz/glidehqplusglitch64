@@ -220,7 +220,7 @@ void _ChangeSize ()
   rdp.scale_1024 = settings.scr_res_x / 1024.0f;
   rdp.scale_768 = settings.scr_res_y / 768.0f;
 
-  float res_scl_x = (float)settings.res_x / 320.0f;
+//  float res_scl_x = (float)settings.res_x / 320.0f;
   float res_scl_y = (float)settings.res_y / 240.0f;
 
   wxUint32 scale_x = *gfx.VI_X_SCALE_REG & 0xFFF;
@@ -324,14 +324,14 @@ void ChangeSize ()
 static wxConfigBase * OpenIni()
 {
   wxConfigBase * ini = wxConfigBase::Get(false);
-  if (!ini) 
+  if (!ini)
   {
-    if (iniName.IsEmpty()) 
+    if (iniName.IsEmpty())
     {
       iniName = pluginPath;
       iniName.Append(_T("/Glide64.ini"));
     }
-    if (wxFileExists(iniName)) 
+    if (wxFileExists(iniName))
     {
       wxFileInputStream is(iniName);
       wxFileConfig * fcfg = new wxFileConfig(is);
@@ -954,7 +954,7 @@ int InitGfx (int evoodoo_using_window)
   {
     GRWINOPENEXT grSstWinOpenExt = (GRWINOPENEXT)grGetProcAddress("grSstWinOpenExt");
     if (grSstWinOpenExt)
-      gfx_context = grSstWinOpenExt ((FxU32)gfx.hWnd,
+      gfx_context = grSstWinOpenExt (wxPtrToUInt(gfx.hWnd),
       res_data,
       GR_REFRESH_60Hz,
       GR_COLORFORMAT_RGBA,
@@ -964,7 +964,7 @@ int InitGfx (int evoodoo_using_window)
       1);   // 1 auxillary buffer
   }
   if (!gfx_context)
-    gfx_context = grSstWinOpen ((FxU32)gfx.hWnd,
+    gfx_context = grSstWinOpen (wxPtrToUInt(gfx.hWnd),
     res_data,
     GR_REFRESH_60Hz,
     GR_COLORFORMAT_RGBA,
@@ -2289,6 +2289,7 @@ static Glide64Keys g64Keys;
   if (grKeyPressed)
     return grKeyPressed(g64Keys[key]);
 #endif
+  return 0;
 }
 
 

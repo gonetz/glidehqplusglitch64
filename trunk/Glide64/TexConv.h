@@ -37,12 +37,12 @@
 //
 //****************************************************************
 
-extern "C" void asmTexConv_ARGB1555_ARGB4444(int src, int dst, int size);
-extern "C" void asmTexConv_AI88_ARGB4444(int src, int dst, int size);
-extern "C" void asmTexConv_AI44_ARGB4444(int src, int dst, int size);
-extern "C" void asmTexConv_A8_ARGB4444(int src, int dst, int size);
+extern "C" void asmTexConv_ARGB1555_ARGB4444(wxUIntPtr src, wxUIntPtr dst, int size);
+extern "C" void asmTexConv_AI88_ARGB4444(wxUIntPtr src, wxUIntPtr dst, int size);
+extern "C" void asmTexConv_AI44_ARGB4444(wxUIntPtr src, wxUIntPtr dst, int size);
+extern "C" void asmTexConv_A8_ARGB4444(wxUIntPtr src, wxUIntPtr dst, int size);
 
-void TexConv_ARGB1555_ARGB4444 (wxUint32 src, wxUint32 dst, int width, int height)
+void TexConv_ARGB1555_ARGB4444 (wxUIntPtr src, wxUIntPtr dst, int width, int height)
 {
   int size = (width * height) >> 1;	// Hiroshi Morii <koolsmoky@users.sourceforge.net>
   // 2 pixels are converted in one loop
@@ -50,7 +50,7 @@ void TexConv_ARGB1555_ARGB4444 (wxUint32 src, wxUint32 dst, int width, int heigh
   asmTexConv_ARGB1555_ARGB4444(src, dst, size);
 }
 
-void TexConv_AI88_ARGB4444 (wxUint32 src, wxUint32 dst, int width, int height)
+void TexConv_AI88_ARGB4444 (wxUIntPtr src, wxUIntPtr dst, int width, int height)
 {
   int size = (width * height) >> 1;	// Hiroshi Morii <koolsmoky@users.sourceforge.net>
   // 2 pixels are converted in one loop
@@ -58,7 +58,7 @@ void TexConv_AI88_ARGB4444 (wxUint32 src, wxUint32 dst, int width, int height)
   asmTexConv_AI88_ARGB4444(src, dst, size);
 }
 
-void TexConv_AI44_ARGB4444 (wxUint32 src, wxUint32 dst, int width, int height)
+void TexConv_AI44_ARGB4444 (wxUIntPtr src, wxUIntPtr dst, int width, int height)
 {
   int size = (width * height) >> 2;	// Hiroshi Morii <koolsmoky@users.sourceforge.net>
   // 4 pixels are converted in one loop
@@ -66,7 +66,7 @@ void TexConv_AI44_ARGB4444 (wxUint32 src, wxUint32 dst, int width, int height)
   asmTexConv_AI44_ARGB4444(src, dst, size);
 }
 
-void TexConv_A8_ARGB4444 (wxUint32 src, wxUint32 dst, int width, int height)
+void TexConv_A8_ARGB4444 (wxUIntPtr src, wxUIntPtr dst, int width, int height)
 {
   int size = (width * height) >> 2;	// Hiroshi Morii <koolsmoky@users.sourceforge.net>
   // 4 pixels are converted in one loop

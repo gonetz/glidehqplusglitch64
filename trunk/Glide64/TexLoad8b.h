@@ -37,21 +37,21 @@
 //
 //****************************************************************
 
-extern "C" void asmLoad8bCI (int src, int dst, int wid_64, int height, int line, int ext, int pal);
-extern "C" void asmLoad8bIA8 (int src, int dst, int wid_64, int height, int line, int ext, int pal);
-extern "C" void asmLoad8bIA4 (int src, int dst, int wid_64, int height, int line, int ext);
-extern "C" void asmLoad8bI (int src, int dst, int wid_64, int height, int line, int ext);
+extern "C" void asmLoad8bCI (wxUIntPtr src, wxUIntPtr dst, int wid_64, int height, int line, int ext, wxUIntPtr pal);
+extern "C" void asmLoad8bIA8 (wxUIntPtr src, wxUIntPtr dst, int wid_64, int height, int line, int ext, wxUIntPtr pal);
+extern "C" void asmLoad8bIA4 (wxUIntPtr src, wxUIntPtr dst, int wid_64, int height, int line, int ext);
+extern "C" void asmLoad8bI (wxUIntPtr src, int dst, wxUIntPtr wid_64, int height, int line, int ext);
 
 //****************************************************************
 // Size: 1, Format: 2
 //
 
-wxUint32 Load8bCI (wxUint32 dst, wxUint32 src, int wid_64, int height, int line, int real_width, int tile)
+wxUint32 Load8bCI (wxUIntPtr dst, wxUIntPtr src, int wid_64, int height, int line, int real_width, int tile)
 {
   if (wid_64 < 1) wid_64 = 1;
   if (height < 1) height = 1;
   int ext = (real_width - (wid_64 << 3));
-  wxUint32 pal = (wxUint32)rdp.pal_8;
+  wxUIntPtr pal = wxPtrToUInt(rdp.pal_8);
 
   switch (rdp.tlut_mode) {
     case 0: //palette is not used
@@ -74,7 +74,7 @@ wxUint32 Load8bCI (wxUint32 dst, wxUint32 src, int wid_64, int height, int line,
 // Size: 1, Format: 3
 //
 
-wxUint32 Load8bIA (wxUint32 dst, wxUint32 src, int wid_64, int height, int line, int real_width, int tile)  
+wxUint32 Load8bIA (wxUIntPtr dst, wxUIntPtr src, int wid_64, int height, int line, int real_width, int tile)  
 { 
   if (rdp.tlut_mode != 0)
     return Load8bCI (dst, src, wid_64, height, line, real_width, tile);
@@ -90,7 +90,7 @@ wxUint32 Load8bIA (wxUint32 dst, wxUint32 src, int wid_64, int height, int line,
 // Size: 1, Format: 4
 //
 
-wxUint32 Load8bI (wxUint32 dst, wxUint32 src, int wid_64, int height, int line, int real_width, int tile)  
+wxUint32 Load8bI (wxUIntPtr dst, wxUIntPtr src, int wid_64, int height, int line, int real_width, int tile)  
 { 
   if (rdp.tlut_mode != 0)
     return Load8bCI (dst, src, wid_64, height, line, real_width, tile);
@@ -101,4 +101,3 @@ wxUint32 Load8bI (wxUint32 dst, wxUint32 src, int wid_64, int height, int line, 
   asmLoad8bI (src, dst, wid_64, height, line, ext);	
   return /*(0 << 16) | */GR_TEXFMT_ALPHA_8;  
 }
-
