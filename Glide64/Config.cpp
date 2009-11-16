@@ -393,7 +393,7 @@ void ConfigNotebook::OnClickTexEdit(wxCommandEvent &event)
     cbxHrsAltCRC->Enable(val);
     if (val)
       cbxHrsAltCRC->SetValue(settings.ghq_hirs_altcrc>0);
-    else 
+    else
       cbxHrsAltCRC->SetValue(false);
   }
   //    event.Skip();
@@ -462,10 +462,12 @@ void ConfigNotebook::set_properties()
   cbxVRAM->SetToolTip(wxT("Autodetect VRAM Size:\nSince OpenGL cannot do this reliably at the moment, the option to set this manually is available.\nIf checked, plugin will try to autodetect VRAM size.\nBut if this appears wrong, please uncheck and set it to correct value.\n[Recommended: On]"));
   spinVRAM->SetMinSize(wxSize(55, 21));
   cbxFBO->SetToolTip(wxT("Use Frame buffer objects:\nChanges the way FB effects are rendered - with or without usage of the OpenGL Frame Buffer Objects (FBO) extension.\nThe choice depends on game and your video card. FBO off is good for NVIDIA cards, while for ATI cards, it's usually best that FBOs are turned on.\nAlso, some FB effects works only with one of the methods, no matter, which card you have.\nOn the whole, with FBO off, compatibility/ accuracy is a bit better (which is the case for Resident Evil 2).\nHowever, with FBO on with some systems, it can actually be a bit faster in cases.\n[Recommended: Video card and game dependant]"));
-  GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress("grConfigWrapperExt");
+  char strConfigWrapperExt[] = "grConfigWrapperExt";
+  GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress(strConfigWrapperExt);
   if (grConfigWrapperExt)
   {
-    GRQUERYRESOLUTIONSEXT grQueryResolutionsExt = (GRQUERYRESOLUTIONSEXT)grGetProcAddress("grQueryResolutionsExt");
+    char strQueryResolutionsExt[] = "grQueryResolutionsExt";
+    GRQUERYRESOLUTIONSEXT grQueryResolutionsExt = (GRQUERYRESOLUTIONSEXT)grGetProcAddress(strQueryResolutionsExt);
     if (grQueryResolutionsExt)
     {
       FxI32 size = 0;
@@ -953,7 +955,7 @@ void ConfigNotebook::SaveSettings()
   {
     if (romopen)
     {
-      if (is_advanced_changed) 
+      if (is_advanced_changed)
       {
         wxMessageDialog dialog( this, _T("Current game emulation settings changed. Save the settings permanently?\nSelect 'No' to use the settings without save."),
           _T("Save settings"), wxNO_DEFAULT|wxYES_NO|wxICON_QUESTION);
@@ -1111,7 +1113,7 @@ Purpose:  This function is optional function that is provided
 to allow the user to configure the dll
 input:    a handle to the window that calls this function
 output:   none
-*******************************************************************/ 
+*******************************************************************/
 void CALL DllConfig ( HWND hParent )
 {
   LOG ("DllConfig ()\n");
@@ -1122,7 +1124,7 @@ void CALL DllConfig ( HWND hParent )
   if (romopen)
   {
 //    ReadSpecialSettings ((char*)rdp.RomName.c_str());
-    if (evoodoo)// && fullscreen && !ev_fullscreen) 
+    if (evoodoo)// && fullscreen && !ev_fullscreen)
     {
       ReleaseGfx ();
       rdp_reset ();
@@ -1136,7 +1138,7 @@ void CALL DllConfig ( HWND hParent )
 #endif
     //wxThread::Sleep(1000);
   }
-  else 
+  else
   {
     char name[21] = "DEFAULT";
     ReadSpecialSettings (name);
@@ -1172,9 +1174,9 @@ void CloseConfig()
     if (fb_depth_render_enabled)
       ZLUT_init();
     // re-init evoodoo graphics to resize window
-    if (evoodoo)// && !ev_fullscreen) 
+    if (evoodoo)// && !ev_fullscreen)
       InitGfx (TRUE);
-    else 
+    else
       rdp_reset ();
   }
 #ifdef __WINDOWS__
@@ -1314,7 +1316,7 @@ Purpose:  This function is optional function that is provided
 to give further information about the DLL.
 input:    a handle to the window that calls this function
 output:   none
-*******************************************************************/ 
+*******************************************************************/
 void CALL DllAbout ( HWND hParent )
 {
 #ifdef __WINDOWS__

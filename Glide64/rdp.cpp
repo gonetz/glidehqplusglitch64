@@ -53,6 +53,92 @@
 extern "C" void SwapBlock32 ();
 extern "C" void SwapBlock64 ();
 
+const int NumOfFormats = 3;
+SCREEN_SHOT_FORMAT ScreenShotFormats[NumOfFormats] = { {wxT("BMP"), wxT("bmp"), wxBITMAP_TYPE_BMP}, {wxT("PNG"), wxT("png"), wxBITMAP_TYPE_PNG}, {wxT("JPEG"), wxT("jpeg"), wxBITMAP_TYPE_JPEG} };
+
+const char *ACmp[] = { "NONE", "THRESHOLD", "UNKNOWN", "DITHER" };
+
+const char *Mode0[] = { "COMBINED",    "TEXEL0",
+            "TEXEL1",     "PRIMITIVE",
+            "SHADE",      "ENVIORNMENT",
+            "1",        "NOISE",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0" };
+
+const char *Mode1[] = { "COMBINED",    "TEXEL0",
+            "TEXEL1",     "PRIMITIVE",
+            "SHADE",      "ENVIORNMENT",
+            "CENTER",     "K4",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0" };
+
+const char *Mode2[] = { "COMBINED",    "TEXEL0",
+            "TEXEL1",     "PRIMITIVE",
+            "SHADE",      "ENVIORNMENT",
+            "SCALE",      "COMBINED_ALPHA",
+            "T0_ALPHA",     "T1_ALPHA",
+            "PRIM_ALPHA",   "SHADE_ALPHA",
+            "ENV_ALPHA",    "LOD_FRACTION",
+            "PRIM_LODFRAC",   "K5",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0",
+            "0",        "0" };
+
+const char *Mode3[] = { "COMBINED",    "TEXEL0",
+            "TEXEL1",     "PRIMITIVE",
+            "SHADE",      "ENVIORNMENT",
+            "1",        "0" };
+
+const char *Alpha0[] = { "COMBINED",   "TEXEL0",
+            "TEXEL1",     "PRIMITIVE",
+            "SHADE",      "ENVIORNMENT",
+            "1",        "0" };
+
+#define Alpha1 Alpha0
+const char *Alpha2[] = { "LOD_FRACTION", "TEXEL0",
+            "TEXEL1",     "PRIMITIVE",
+            "SHADE",      "ENVIORNMENT",
+            "PRIM_LODFRAC",   "0" };
+#define Alpha3 Alpha0
+
+const char *FBLa[] = { "G_BL_CLR_IN", "G_BL_CLR_MEM", "G_BL_CLR_BL", "G_BL_CLR_FOG" };
+const char *FBLb[] = { "G_BL_A_IN", "G_BL_A_FOG", "G_BL_A_SHADE", "G_BL_0" };
+const char *FBLc[] = { "G_BL_CLR_IN", "G_BL_CLR_MEM", "G_BL_CLR_BL", "G_BL_CLR_FOG"};
+const char *FBLd[] = { "G_BL_1MA", "G_BL_A_MEM", "G_BL_1", "G_BL_0" };
+
+const char *str_zs[] = { "G_ZS_PIXEL", "G_ZS_PRIM" };
+
+const char *str_yn[] = { "NO", "YES" };
+const char *str_offon[] = { "OFF", "ON" };
+
+const char *str_cull[] = { "DISABLE", "FRONT", "BACK", "BOTH" };
+
+// I=intensity probably
+const char *str_format[]   = { "RGBA", "YUV", "CI", "IA", "I", "?", "?", "?" };
+const char *str_size[]     = { "4bit", "8bit", "16bit", "32bit" };
+const char *str_cm[]       = { "WRAP/NO CLAMP", "MIRROR/NO CLAMP", "WRAP/CLAMP", "MIRROR/CLAMP" };
+const char *str_lod[]    = { "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048" };
+const char *str_aspect[] = { "1x8", "1x4", "1x2", "1x1", "2x1", "4x1", "8x1" };
+
+const char *str_filter[] = { "Point Sampled", "Average (box)", "Bilinear" };
+
+const char *str_tlut[]   = { "TT_NONE", "TT_UNKNOWN", "TT_RGBA_16", "TT_IA_16" };
+
+const char *CIStatus[] = { "ci_main", "ci_zimg", "ci_unknown",  "ci_useless",
+                            "ci_old_copy", "ci_copy", "ci_copy_self",
+                            "ci_zcopy", "ci_aux", "ci_aux_copy" };
+
+//static variables
+
 char out_buf[2048];
 
 wxUint32 frame_count;  // frame counter
@@ -319,6 +405,7 @@ void microcheck ()
   }
 }
 
+#ifdef __WINDOWS__
 static void GetClientSize(int * width, int * height)
 {
 #ifdef __WINDOWS__
@@ -330,6 +417,7 @@ static void GetClientSize(int * width, int * height)
   GFXWindow->GetClientSize(width, height);
 #endif
 }
+#endif
 
 void drawNoFullscreenMessage()
 {
@@ -1358,10 +1446,10 @@ static void rdp_texrect()
   }
 
   VERTEX vstd[4] = {
-    { s_ul_x, s_ul_y, Z, 1.0f, ul_u0, ul_v0, ul_u1, ul_v1, 0, 0, 0, 0, 255 },
-    { s_lr_x, s_ul_y, Z, 1.0f, lr_u0, ul_v0, lr_u1, ul_v1, 0, 0, 0, 0, 255 },
-    { s_ul_x, s_lr_y, Z, 1.0f, ul_u0, lr_v0, ul_u1, lr_v1, 0, 0, 0, 0, 255 },
-    { s_lr_x, s_lr_y, Z, 1.0f, lr_u0, lr_v0, lr_u1, lr_v1, 0, 0, 0, 0, 255 } };
+    { s_ul_x, s_ul_y, Z, 1.0f, ul_u0, ul_v0, ul_u1, ul_v1, {0, 0, 0, 0}, 255 },
+    { s_lr_x, s_ul_y, Z, 1.0f, lr_u0, ul_v0, lr_u1, ul_v1, {0, 0, 0, 0}, 255 },
+    { s_ul_x, s_lr_y, Z, 1.0f, ul_u0, lr_v0, ul_u1, lr_v1, {0, 0, 0, 0}, 255 },
+    { s_lr_x, s_lr_y, Z, 1.0f, lr_u0, lr_v0, lr_u1, lr_v1, {0, 0, 0, 0}, 255 } };
 
     if ( ((rdp.cmd0>>24)&0xFF) == 0xE5 ) //texrectflip
     {
@@ -1912,6 +2000,7 @@ static void rdp_loadblock()
   wxUIntPtr SwapMethod = (rdp.tiles[tile].size==3)?wxPtrToUInt(reinterpret_cast<void*>(SwapBlock64)):wxPtrToUInt(reinterpret_cast<void*>(SwapBlock32));
 
   rdp.timg.addr += cnt << 3;
+  rdp.tiles[tile].lr_t = ul_t + ((dxt*cnt)>>11);
 
   asmLoadBlock(wxPtrToUInt(gfx.RDRAM), dst, off, _dxt, cnt, SwapMethod);
 
@@ -2183,10 +2272,10 @@ static void rdp_fillrect()
 
     // Draw the rectangle
     VERTEX v[4] = {
-      { (float)s_ul_x, (float)s_ul_y, Z, 1.0f,  0,0,0,0,  0,0,0,0, 0,0, 0,0,0,0},
-      { (float)s_lr_x, (float)s_ul_y, Z, 1.0f,  0,0,0,0,  0,0,0,0, 0,0, 0,0,0,0},
-      { (float)s_ul_x, (float)s_lr_y, Z, 1.0f,  0,0,0,0,  0,0,0,0, 0,0, 0,0,0,0},
-      { (float)s_lr_x, (float)s_lr_y, Z, 1.0f,  0,0,0,0,  0,0,0,0, 0,0, 0,0,0,0} };
+      { (float)s_ul_x, (float)s_ul_y, Z, 1.0f,  0,0,0,0,  {0,0,0,0}, 0,0, 0,0,0,0},
+      { (float)s_lr_x, (float)s_ul_y, Z, 1.0f,  0,0,0,0,  {0,0,0,0}, 0,0, 0,0,0,0},
+      { (float)s_ul_x, (float)s_lr_y, Z, 1.0f,  0,0,0,0,  {0,0,0,0}, 0,0, 0,0,0,0},
+      { (float)s_lr_x, (float)s_lr_y, Z, 1.0f,  0,0,0,0,  {0,0,0,0}, 0,0, 0,0,0,0} };
 
       if (rdp.cycle_mode == 3)
       {
@@ -3076,7 +3165,7 @@ pinfo is pointed to a FrameBufferInfo structure which to be
 filled in by this function
 output:   Values are return in the FrameBufferInfo structure
 Plugin can return up to 6 frame buffer info
-/************************************************************************/
+************************************************************************/
 ///*
 typedef struct
 {
@@ -3347,10 +3436,10 @@ void DetectFrameBufferUsage ()
 }
 
 /*******************************************
-/*          ProcessRDPList                 *
-/*******************************************
-/*    based on sources of ziggy's z64      *
-********************************************/
+ *          ProcessRDPList                 *
+ *******************************************
+ *    based on sources of ziggy's z64      *
+ *******************************************/
 
 static wxUint32 rdp_cmd_ptr = 0;
 static wxUint32 rdp_cmd_cur = 0;
@@ -3363,9 +3452,7 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
   int j;
   int xleft, xright, xleft_inc, xright_inc;
   int r, g, b, a, z, s, t, w;
-  int dr, dg, db, da;
   int drdx = 0, dgdx = 0, dbdx = 0, dadx = 0, dzdx = 0, dsdx = 0, dtdx = 0, dwdx = 0;
-  int drdy = 0, dgdy = 0, dbdy = 0, dady = 0, dzdy = 0, dsdy = 0, dtdy = 0, dwdy = 0;
   int drde = 0, dgde = 0, dbde = 0, dade = 0, dzde = 0, dsde = 0, dtde = 0, dwde = 0;
   int flip = (w1 & 0x800000) ? 1 : 0;
 
@@ -3412,7 +3499,6 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
   yh &= ~3;
 
   r = 0xff; g = 0xff; b = 0xff; a = 0xff; z = 0xffff0000; s = 0;  t = 0;  w = 0x30000;
-  dr = 0; dg = 0; db = 0; da = 0;
 
   if (shade)
   {
@@ -3428,10 +3514,6 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
     dgde = ((shade_base[8 ] << 16) & 0xffff0000) | (shade_base[12] & 0x0000ffff);
     dbde = (shade_base[9 ] & 0xffff0000) | ((shade_base[13] >> 16) & 0x0000ffff);
     dade = ((shade_base[9 ] << 16) & 0xffff0000) | (shade_base[13] & 0x0000ffff);
-    drdy = (shade_base[10] & 0xffff0000) | ((shade_base[14] >> 16) & 0x0000ffff);
-    dgdy = ((shade_base[10] << 16) & 0xffff0000) | (shade_base[14] & 0x0000ffff);
-    dbdy = (shade_base[11] & 0xffff0000) | ((shade_base[15] >> 16) & 0x0000ffff);
-    dady = ((shade_base[11] << 16) & 0xffff0000) | (shade_base[15] & 0x0000ffff);
   }
   if (texture)
   {
@@ -3445,40 +3527,20 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
     dsde = (texture_base[8 ] & 0xffff0000) | ((texture_base[12] >> 16) & 0x0000ffff);
     dtde = ((texture_base[8 ] << 16) & 0xffff0000)      | (texture_base[12] & 0x0000ffff);
     dwde = (texture_base[9 ] & 0xffff0000) | ((texture_base[13] >> 16) & 0x0000ffff);
-    dsdy = (texture_base[10] & 0xffff0000) | ((texture_base[14] >> 16) & 0x0000ffff);
-    dtdy = ((texture_base[10] << 16) & 0xffff0000)      | (texture_base[14] & 0x0000ffff);
-    dwdy = (texture_base[11] & 0xffff0000) | ((texture_base[15] >> 16) & 0x0000ffff);
   }
   if (zbuffer)
   {
     z    = zbuffer_base[0];
     dzdx = zbuffer_base[1];
     dzde = zbuffer_base[2];
-    dzdy = zbuffer_base[3];
   }
 
   xh <<= 2;  xm <<= 2;  xl <<= 2;
   r <<= 2;  g <<= 2;  b <<= 2;  a <<= 2;
   dsde >>= 2;  dtde >>= 2;  dsdx >>= 2;  dtdx >>= 2;
-  dzdx >>= 2;  dzde >>= 2;  dzdy >>= 2;
-  dwdx >>= 2;  dwde >>= 2;  dwdy >>= 2;
+  dzdx >>= 2;  dzde >>= 2;
+  dwdx >>= 2;  dwde >>= 2;
 
-  xleft = xm;
-  xright = xh;
-  xleft_inc = dxmdy;
-  xright_inc = dxhdy;
-
-  while (yh<ym &&
-    !((!flip && xleft < xright+0x10000) ||
-    (flip && xleft > xright-0x10000))) {
-      xleft += xleft_inc;    xright += xright_inc;
-      s += dsde;    t += dtde;    w += dwde;
-      r += drde;    g += dgde;    b += dbde;    a += dade;
-      z += dzde;
-      yh++;
-  }
-
-  j = ym-yh;
 #define XSCALE(x) (float(x)/(1<<18))
 #define YSCALE(y) (float(y)/(1<<2))
 #define ZSCALE(z) ((rdp.zsrc == 1)? float(rdp.prim_depth) : float(wxUint32(z))/0xffff0000)
@@ -3495,6 +3557,23 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
   VERTEX vtxbuf[12];
   VERTEX * vtx = &vtxbuf[nbVtxs++];
 
+  xleft = xm;
+  xright = xh;
+  xleft_inc = dxmdy;
+  xright_inc = dxhdy;
+
+  while (yh<ym &&
+    !((!flip && xleft < xright+0x10000) ||
+    (flip && xleft > xright-0x10000))) {
+      xleft += xleft_inc;
+      xright += xright_inc;
+      s += dsde;    t += dtde;    w += dwde;
+      r += drde;    g += dgde;    b += dbde;    a += dade;
+      z += dzde;
+      yh++;
+  }
+
+  j = ym-yh;
   if (j > 0)
   {
     int dx = (xleft-xright)>>16;
@@ -3536,16 +3615,17 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
       vtx->w = WSCALE(w);
       vtx = &vtxbuf[nbVtxs++];
     }
+    xleft += xleft_inc*j;  xright += xright_inc*j;
+    s += dsde*j;  t += dtde*j;
+    if (w + dwde*j) w += dwde*j;
+    else w += dwde*(j-1);
+    r += drde*j;  g += dgde*j;  b += dbde*j;  a += dade*j;
+    z += dzde*j;
+    // render ...
   }
-  xleft += xleft_inc*j;  xright += xright_inc*j;
-  s += dsde*j;  t += dtde*j;
-  if (w + dwde*j) w += dwde*j;
-  else w += dwde*(j-1);
-  r += drde*j;  g += dgde*j;  b += dbde*j;  a += dade*j;
-  z += dzde*j;
-  // render ...
 
-  xleft = xl;
+  if (xl != xh)
+    xleft = xl;
 
   //if (yl-ym > 0)
   {
@@ -3656,11 +3736,6 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
   if (fullscreen)
   {
     update ();
-    if (settings.hacks&hack_KI)
-    {
-      vtxbuf[3].ou = -vtxbuf[2].ou;
-      vtxbuf[3].x = vtxbuf[0].x;
-    }
     for (int k = 0; k < nbVtxs-1; k++)
     {
       VERTEX * v = &vtxbuf[k];
@@ -3723,10 +3798,7 @@ void lle_triangle(wxUint32 w1, wxUint32 w2, int shade, int texture, int zbuffer,
     }
     ConvertCoordsConvert (vtxbuf, nbVtxs);
     grCullMode (GR_CULL_DISABLE);
-    if (settings.hacks&hack_KI)
-      grDrawVertexArrayContiguous (GR_TRIANGLE_FAN, 4, vtxbuf, sizeof(VERTEX));
-    else
-      grDrawVertexArrayContiguous (GR_TRIANGLE_STRIP, nbVtxs-1, vtxbuf, sizeof(VERTEX));
+    grDrawVertexArrayContiguous (GR_TRIANGLE_STRIP, nbVtxs-1, vtxbuf, sizeof(VERTEX));
     if (_debugger.capture)
     {
       VERTEX vl[3];

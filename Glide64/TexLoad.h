@@ -44,33 +44,33 @@
 
 wxUint32 LoadNone (wxUIntPtr dst, wxUIntPtr src, int wid_64, int height, int line, int real_width, int tile)
 {
-	memset (texture, 0xFF, sizeof(texture));
-	return GR_TEXFMT_ARGB_1555;
+	memset (texture, 0, 4096*4);
+	return (1 << 16) | GR_TEXFMT_ARGB_1555;
 }
 
 typedef wxUint32 (*texfunc)(wxUIntPtr, wxUIntPtr, int, int, int, int, int);
 texfunc load_table [4][5] = {	// [size][format]
-	Load4bSelect,
+{	Load4bSelect,
 	LoadNone,
 	Load4bCI,
 	Load4bIA,
-	Load4bI,
+	Load4bI  },
 
-	Load8bCI,
+{	Load8bCI,
 	LoadNone,
 	Load8bCI,
 	Load8bIA,
-	Load8bI,
+	Load8bI  },
 
-	Load16bRGBA,
+{	Load16bRGBA,
 	Load16bYUV,
 	LoadNone,
 	Load16bIA,
-	LoadNone,
+	LoadNone },
 
-	Load32bRGBA,
+{	Load32bRGBA,
 	LoadNone,
 	LoadNone,
 	LoadNone,
-	LoadNone
+	LoadNone }
 };

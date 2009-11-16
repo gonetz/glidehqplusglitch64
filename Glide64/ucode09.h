@@ -50,7 +50,7 @@ struct ZSORTRDP {
   float view_trans[2];
   float scale_x;
   float scale_y;
-} zSortRdp = {0};
+} zSortRdp = {{0, 0}, {0, 0}, 0, 0};
 
 //RSP command VRCPL
 static int Calc_invw (int w) {

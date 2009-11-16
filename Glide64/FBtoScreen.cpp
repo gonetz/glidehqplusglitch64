@@ -53,40 +53,40 @@ static int SetupFBtoScreenCombiner(wxUint32 texture_size, wxUint32 opaque)
   if (voodoo.tmem_ptr[GR_TMU0]+texture_size < voodoo.tex_max_addr[0])
   {
     tmu = GR_TMU0;
-    grTexCombine( GR_TMU1, 
-      GR_COMBINE_FUNCTION_NONE, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_NONE, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE ); 
-    grTexCombine( GR_TMU0, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE ); 
+    grTexCombine( GR_TMU1,
+      GR_COMBINE_FUNCTION_NONE,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_NONE,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXFALSE );
+    grTexCombine( GR_TMU0,
+      GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXFALSE );
   }
-  else 
+  else
   {
     if (voodoo.tmem_ptr[GR_TMU1]+texture_size >= voodoo.tex_max_addr[1])
       ClearCache ();
     tmu = GR_TMU1;
-    grTexCombine( GR_TMU1, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE ); 
-    grTexCombine( GR_TMU0, 
-      GR_COMBINE_FUNCTION_SCALE_OTHER, 
-      GR_COMBINE_FACTOR_ONE, 
-      GR_COMBINE_FUNCTION_SCALE_OTHER, 
-      GR_COMBINE_FACTOR_ONE, 
-      FXFALSE, 
-      FXFALSE ); 
+    grTexCombine( GR_TMU1,
+      GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXFALSE );
+    grTexCombine( GR_TMU0,
+      GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_ONE,
+      FXFALSE,
+      FXFALSE );
   }
   int filter = (rdp.filter_mode!=2)?GR_TEXTUREFILTER_POINT_SAMPLED:GR_TEXTUREFILTER_BILINEAR;
   grTexFilterMode (tmu, filter, filter);
@@ -108,17 +108,17 @@ static int SetupFBtoScreenCombiner(wxUint32 texture_size, wxUint32 opaque)
   if (opaque)
   {
     grAlphaTestFunction (GR_CMP_ALWAYS);
-    grAlphaBlendFunction( GR_BLEND_ONE, 
-      GR_BLEND_ZERO, 
-      GR_BLEND_ONE, 
-      GR_BLEND_ZERO); 
+    grAlphaBlendFunction( GR_BLEND_ONE,
+      GR_BLEND_ZERO,
+      GR_BLEND_ONE,
+      GR_BLEND_ZERO);
   }
   else
   {
-    grAlphaBlendFunction( GR_BLEND_SRC_ALPHA, 
-      GR_BLEND_ONE_MINUS_SRC_ALPHA, 
-      GR_BLEND_ONE, 
-      GR_BLEND_ZERO); 
+    grAlphaBlendFunction( GR_BLEND_SRC_ALPHA,
+      GR_BLEND_ONE_MINUS_SRC_ALPHA,
+      GR_BLEND_ONE,
+      GR_BLEND_ZERO);
   }
   grDepthBufferFunction (GR_CMP_ALWAYS);
   grCullMode(GR_CULL_DISABLE);
@@ -138,10 +138,10 @@ static void DrawRE2Video(FB_TO_SCREEN_INFO & fb_info, float scale)
   float lr_u = (fb_info.width - 1)*scale;
   float lr_v = (fb_info.height - 1)*scale;
   VERTEX v[4] = {
-    { ul_x, ul_y, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
-    { lr_x, ul_y, 1, 1, lr_u, 0.5f, lr_u, 0.5f, lr_u, 0.5f, lr_u, 0.5f},
-    { ul_x, lr_y, 1, 1, 0.5f, lr_v, 0.5f, lr_v, 0.5f, lr_v, 0.5f, lr_v},
-    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+    { ul_x, ul_y, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, {0.5f, 0.5f, 0.5f, 0.5f} },
+    { lr_x, ul_y, 1, 1, lr_u, 0.5f, lr_u, 0.5f, {lr_u, 0.5f, lr_u, 0.5f} },
+    { ul_x, lr_y, 1, 1, 0.5f, lr_v, 0.5f, lr_v, {0.5f, lr_v, 0.5f, lr_v} },
+    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
   };
   grDrawTriangle (&v[0], &v[2], &v[1]);
   grDrawTriangle (&v[2], &v[3], &v[1]);
@@ -282,10 +282,10 @@ static void DrawFrameBufferToScreen256(FB_TO_SCREEN_INFO & fb_info)
       float lr_v = (float)(cur_height-1);
       // Make the vertices
       VERTEX v[4] = {
-        { ul_x, ul_y, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
-        { lr_x, ul_y, 1, 1, lr_u, 0.5f, lr_u, 0.5f, lr_u, 0.5f, lr_u, 0.5f},
-        { ul_x, lr_y, 1, 1, 0.5f, lr_v, 0.5f, lr_v, 0.5f, lr_v, 0.5f, lr_v},
-        { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+        { ul_x, ul_y, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, {0.5f, 0.5f, 0.5f, 0.5f} },
+        { lr_x, ul_y, 1, 1, lr_u, 0.5f, lr_u, 0.5f, {lr_u, 0.5f, lr_u, 0.5f} },
+        { ul_x, lr_y, 1, 1, 0.5f, lr_v, 0.5f, lr_v, {0.5f, lr_v, 0.5f, lr_v} },
+        { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
       };
       grDrawTriangle (&v[0], &v[2], &v[1]);
       grDrawTriangle (&v[2], &v[3], &v[1]);
@@ -363,7 +363,7 @@ bool DrawFrameBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     t_info.format = GR_TEXFMT_ARGB_1555;
     t_info.data = tex;
   }
-  else 
+  else
   {
     wxUint32 * tex = (wxUint32*)texture_buffer;
     wxUint32 * dst = tex;
@@ -406,10 +406,10 @@ bool DrawFrameBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     float lr_v = (height-1)*scale;
     // Make the vertices
     VERTEX v[4] = {
-      { ul_x, ul_y, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
-      { lr_x, ul_y, 1, 1, lr_u, 0.5f, lr_u, 0.5f, lr_u, 0.5f, lr_u, 0.5f},
-      { ul_x, lr_y, 1, 1, 0.5f, lr_v, 0.5f, lr_v, 0.5f, lr_v, 0.5f, lr_v},
-      { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+      { ul_x, ul_y, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, {0.5f, 0.5f, 0.5f, 0.5f} },
+      { lr_x, ul_y, 1, 1, lr_u, 0.5f, lr_u, 0.5f, {lr_u, 0.5f, lr_u, 0.5f} },
+      { ul_x, lr_y, 1, 1, 0.5f, lr_v, 0.5f, lr_v, {0.5f, lr_v, 0.5f, lr_v} },
+      { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
     };
     grDrawTriangle (&v[0], &v[2], &v[1]);
     grDrawTriangle (&v[2], &v[3], &v[1]);
@@ -478,10 +478,10 @@ static void DrawDepthBufferToScreen256(FB_TO_SCREEN_INFO & fb_info)
       float lr_v = (float)(cur_height-1);
       // Make the vertices
       VERTEX v[4] = {
-        { ul_x, ul_y, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f },
-        { lr_x, ul_y, 1, 1, lr_u, 0.5f, lr_u, 0.5f, lr_u, 0.5f, lr_u, 0.5f},
-        { ul_x, lr_y, 1, 1, 0.5f, lr_v, 0.5f, lr_v, 0.5f, lr_v, 0.5f, lr_v},
-        { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+        { ul_x, ul_y, 1, 1, 0.5f, 0.5f, 0.5f, 0.5f, {0.5f, 0.5f, 0.5f, 0.5f} },
+        { lr_x, ul_y, 1, 1, lr_u, 0.5f, lr_u, 0.5f, {lr_u, 0.5f, lr_u, 0.5f} },
+        { ul_x, lr_y, 1, 1, 0.5f, lr_v, 0.5f, lr_v, {0.5f, lr_v, 0.5f, lr_v} },
+        { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
       };
       grDrawTriangle (&v[0], &v[2], &v[1]);
       grDrawTriangle (&v[2], &v[3], &v[1]);
@@ -514,27 +514,27 @@ static void DrawHiresDepthBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     GR_COMBINE_LOCAL_NONE,
     GR_COMBINE_OTHER_TEXTURE,
     FXFALSE);
-  grAlphaBlendFunction( GR_BLEND_SRC_ALPHA, 
-    GR_BLEND_ONE_MINUS_SRC_ALPHA, 
-    GR_BLEND_ONE, 
-    GR_BLEND_ZERO); 
+  grAlphaBlendFunction( GR_BLEND_SRC_ALPHA,
+    GR_BLEND_ONE_MINUS_SRC_ALPHA,
+    GR_BLEND_ONE,
+    GR_BLEND_ZERO);
   grDepthBufferFunction (GR_CMP_ALWAYS);
   grDepthMask (FXFALSE);
   grCullMode (GR_CULL_DISABLE);
-  grTexCombine( GR_TMU1, 
-    GR_COMBINE_FUNCTION_NONE, 
-    GR_COMBINE_FACTOR_NONE, 
-    GR_COMBINE_FUNCTION_NONE, 
-    GR_COMBINE_FACTOR_NONE, 
-    FXFALSE, 
-    FXFALSE ); 
-  grTexCombine( GR_TMU0, 
-    GR_COMBINE_FUNCTION_LOCAL, 
-    GR_COMBINE_FACTOR_NONE, 
-    GR_COMBINE_FUNCTION_LOCAL, 
-    GR_COMBINE_FACTOR_NONE, 
-    FXFALSE, 
-    FXFALSE); 
+  grTexCombine( GR_TMU1,
+    GR_COMBINE_FUNCTION_NONE,
+    GR_COMBINE_FACTOR_NONE,
+    GR_COMBINE_FUNCTION_NONE,
+    GR_COMBINE_FACTOR_NONE,
+    FXFALSE,
+    FXFALSE );
+  grTexCombine( GR_TMU0,
+    GR_COMBINE_FUNCTION_LOCAL,
+    GR_COMBINE_FACTOR_NONE,
+    GR_COMBINE_FUNCTION_LOCAL,
+    GR_COMBINE_FACTOR_NONE,
+    FXFALSE,
+    FXFALSE);
 //  grAuxBufferExt( GR_BUFFER_AUXBUFFER );
   grTexSource( rdp.texbufs[0].tmu, rdp.texbufs[0].begin, GR_MIPMAPLEVELMASK_BOTH, &(t_info) );
   float ul_x = (float)rdp.scissor.ul_x;
@@ -547,10 +547,10 @@ static void DrawHiresDepthBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
   float lr_v = (float)rdp.scissor.lr_y * scale;
   // Make the vertices
   VERTEX v[4] = {
-    { ul_x, ul_y, 1, 1, ul_u, ul_v, ul_u, ul_v, ul_u, ul_v, ul_u, ul_v },
-    { lr_x, ul_y, 1, 1, lr_u, ul_v, lr_u, ul_v, lr_u, ul_v, lr_u, ul_v },
-    { ul_x, lr_y, 1, 1, ul_u, lr_v, ul_u, lr_v, ul_u, lr_v, ul_u, lr_v },
-    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v } 
+    { ul_x, ul_y, 1, 1, ul_u, ul_v, ul_u, ul_v, {ul_u, ul_v, ul_u, ul_v} },
+    { lr_x, ul_y, 1, 1, lr_u, ul_v, lr_u, ul_v, {lr_u, ul_v, lr_u, ul_v} },
+    { ul_x, lr_y, 1, 1, ul_u, lr_v, ul_u, lr_v, {ul_u, lr_v, ul_u, lr_v} },
+    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
   };
   grDrawTriangle (&v[0], &v[2], &v[1]);
   grDrawTriangle (&v[2], &v[3], &v[1]);
@@ -646,10 +646,10 @@ void DrawDepthBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
   float zero = scale*0.5f;
   // Make the vertices
   VERTEX v[4] = {
-    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, zero, zero, zero, zero },
-    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, lr_u, zero, lr_u, zero},
-    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, zero, lr_v, zero, lr_v},
-    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, {zero, zero, zero, zero} },
+    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, {lr_u, zero, lr_u, zero} },
+    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, {zero, lr_v, zero, lr_v} },
+    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
   };
   grDrawTriangle (&v[0], &v[2], &v[1]);
   grDrawTriangle (&v[2], &v[3], &v[1]);

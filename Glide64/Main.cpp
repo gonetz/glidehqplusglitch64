@@ -882,7 +882,8 @@ int InitGfx (int evoodoo_using_window)
 
   debugging = FALSE;
 
-  GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress("grConfigWrapperExt");
+  char strConfigWrapperExt[] = "grConfigWrapperExt";
+  GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress(strConfigWrapperExt);
   if (grConfigWrapperExt)
   {
     grConfigWrapperExt(settings.wrpResolution, settings.wrpVRAM * 1024 * 1024, settings.wrpFBO, settings.wrpAnisotropic);
@@ -952,7 +953,8 @@ int InitGfx (int evoodoo_using_window)
 
   if (fb_hwfbe_enabled)
   {
-    GRWINOPENEXT grSstWinOpenExt = (GRWINOPENEXT)grGetProcAddress("grSstWinOpenExt");
+    char strSstWinOpenExt[] ="grSstWinOpenExt";
+    GRWINOPENEXT grSstWinOpenExt = (GRWINOPENEXT)grGetProcAddress(strSstWinOpenExt);
     if (grSstWinOpenExt)
       gfx_context = grSstWinOpenExt (wxPtrToUInt(gfx.hWnd),
       res_data,
@@ -1018,9 +1020,12 @@ int InitGfx (int evoodoo_using_window)
     {
       if (!strncmp(extstr, "TEXTUREBUFFER", 13))
       {
-        grTextureBufferExt = (GRTEXBUFFEREXT) grGetProcAddress("grTextureBufferExt");
-        grTextureAuxBufferExt = (GRTEXBUFFEREXT) grGetProcAddress("grTextureAuxBufferExt");
-        grAuxBufferExt = (GRAUXBUFFEREXT) grGetProcAddress("grAuxBufferExt");
+        char strTextureBufferExt[] = "grTextureBufferExt";
+        grTextureBufferExt = (GRTEXBUFFEREXT) grGetProcAddress(strTextureBufferExt);
+        char strTextureAuxBufferExt[] = "grTextureAuxBufferExt";
+        grTextureAuxBufferExt = (GRTEXBUFFEREXT) grGetProcAddress(strTextureAuxBufferExt);
+        char strAuxBufferExt[] = "grAuxBufferExt";
+        grAuxBufferExt = (GRAUXBUFFEREXT) grGetProcAddress(strAuxBufferExt);
       }
     }
     else
@@ -1046,7 +1051,8 @@ int InitGfx (int evoodoo_using_window)
   if (grStipplePatternExt)
     grStipplePatternExt(settings.stipple_pattern);
 
-  grKeyPressed = (FxBool (FX_CALL *)(FxU32))grGetProcAddress ("grKeyPressedExt");
+  char strKeyPressedExt[] = "grKeyPressedExt";
+  grKeyPressed = (FxBool (FX_CALL *)(FxU32))grGetProcAddress (strKeyPressedExt);
 
   InitCombine();
 
@@ -1374,6 +1380,7 @@ EXPORT void CALL ChangeWindow (void)
 
   if (evoodoo)
   {
+    char strWrapperFullScreenResolutionExt[] = "grWrapperFullScreenResolutionExt";
     if (!ev_fullscreen)
     {
       to_fullscreen = TRUE;
@@ -1383,7 +1390,7 @@ EXPORT void CALL ChangeWindow (void)
       ShowCursor( FALSE );
 #endif
       GRWRAPPERFULLSCREENRESOLUTIONEXT grWrapperFullScreenResolutionExt =
-        (GRWRAPPERFULLSCREENRESOLUTIONEXT)grGetProcAddress("grWrapperFullScreenResolutionExt");
+        (GRWRAPPERFULLSCREENRESOLUTIONEXT)grGetProcAddress(strWrapperFullScreenResolutionExt);
       if (grWrapperFullScreenResolutionExt) {
         wxUint32 _width, _height = 0;
         settings.res_data_org = settings.res_data;
@@ -1396,7 +1403,7 @@ EXPORT void CALL ChangeWindow (void)
     {
       ReleaseGfx ();
       GRWRAPPERFULLSCREENRESOLUTIONEXT grWrapperFullScreenResolutionExt =
-        (GRWRAPPERFULLSCREENRESOLUTIONEXT)grGetProcAddress("grWrapperFullScreenResolutionExt");
+        (GRWRAPPERFULLSCREENRESOLUTIONEXT)grGetProcAddress(strWrapperFullScreenResolutionExt);
       if (grWrapperFullScreenResolutionExt != NULL)
       {
         settings.res_data = settings.res_data_org;
@@ -1710,8 +1717,9 @@ void CALL RomOpen (void)
 
   if (strstr (extensions, "ROMNAME"))
   {
+    char strSetRomName[] = "grSetRomName";
     void (FX_CALL *grSetRomName)(char*);
-    grSetRomName = (void (FX_CALL *)(char*))grGetProcAddress ("grSetRomName");
+    grSetRomName = (void (FX_CALL *)(char*))grGetProcAddress (strSetRomName);
     grSetRomName (name);
   }
   // **

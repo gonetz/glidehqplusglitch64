@@ -1667,16 +1667,6 @@ void uc6_sprite2d ()
   DRAWIMAGE d;
 
   d.imagePtr	= segoffset(((wxUint32*)gfx.RDRAM)[(addr+0)>>1]);	// 0,1
-  wxUint32 tlut		= ((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1];	// 2, 3
-  if (tlut) 
-  {
-    rdp.tlut_mode = 2;
-    load_palette (segoffset(tlut), 0, 256);
-  }
-  else
-  {
-    rdp.tlut_mode = 0;
-  }
   wxUint16 stride = (((wxUint16 *)gfx.RDRAM)[(addr+4)^1]);	// 4
   d.imageW	= (((wxUint16 *)gfx.RDRAM)[(addr+5)^1]);	// 5
   d.imageH	= (((wxUint16 *)gfx.RDRAM)[(addr+6)^1]);	// 6
@@ -1685,6 +1675,25 @@ void uc6_sprite2d ()
   d.imagePal	= 0;
   d.imageX	= (((wxUint16 *)gfx.RDRAM)[(addr+8)^1]);	// 8
   d.imageY	= (((wxUint16 *)gfx.RDRAM)[(addr+9)^1]);	// 9
+  wxUint32 tlut		= ((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1];	// 2, 3
+  //low-level implementation of sprite2d apparently calls setothermode command to set tlut mode
+  //However, description of sprite2d microcode just says that 
+  //TlutPointer should be Null when CI images will not be used.
+  //HLE implementation sets rdp.tlut_mode=2 if TlutPointer is not null, and rdp.tlut_mode=0 otherwise
+  //Alas, it is not sufficient, since WCW Nitro uses non-Null TlutPointer for rgba textures.
+  //So, additional check added.
+  if (tlut) 
+  {
+    load_palette (segoffset(tlut), 0, 256);
+    if (d.imageFmt > 0)
+      rdp.tlut_mode = 2;
+    else
+      rdp.tlut_mode = 0;
+  }
+  else
+  {
+    rdp.tlut_mode = 0;
+  }
 
   if (d.imageW == 0)
     return;//	  d.imageW = stride;

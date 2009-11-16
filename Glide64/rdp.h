@@ -179,12 +179,14 @@ typedef struct {
 } LOAD_TILE_INFO;
 #endif
 
-static int NumOfFormats = 3;
-static struct {
+typedef struct {
   const wxChar * format;
   const wxChar * extension;
   wxBitmapType type;
-} ScreenShotFormats[] = { {wxT("BMP"), wxT("bmp"), wxBITMAP_TYPE_BMP}, {wxT("PNG"), wxT("png"), wxBITMAP_TYPE_PNG}, {wxT("JPEG"), wxT("jpeg"), wxBITMAP_TYPE_JPEG} };
+} SCREEN_SHOT_FORMAT;
+
+extern const int NumOfFormats;
+extern SCREEN_SHOT_FORMAT ScreenShotFormats[];
 
 typedef struct {
   int card_id;
@@ -762,93 +764,42 @@ extern VOODOO voodoo;
 
 extern GrTexInfo  fontTex;
 extern GrTexInfo  cursorTex;
-extern wxUint32    offset_font;
-extern wxUint32    offset_cursor;
-extern wxUint32    offset_textures;
-extern wxUint32    offset_texbuf1;
+extern wxUint32   offset_font;
+extern wxUint32   offset_cursor;
+extern wxUint32   offset_textures;
+extern wxUint32   offset_texbuf1;
 
-extern int		ucode_error_report;
+extern int	ucode_error_report;
 
 // RDP functions
 void rdp_reset ();
 
-static const char *ACmp[] = { "NONE", "THRESHOLD", "UNKNOWN", "DITHER" };
-
-static const char *Mode0[] = { "COMBINED",    "TEXEL0",
-            "TEXEL1",     "PRIMITIVE",
-            "SHADE",      "ENVIORNMENT",
-            "1",        "NOISE",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0" };
-static const char *Mode1[] = { "COMBINED",    "TEXEL0",
-            "TEXEL1",     "PRIMITIVE",
-            "SHADE",      "ENVIORNMENT",
-            "CENTER",     "K4",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0" };
-static const char *Mode2[] = { "COMBINED",    "TEXEL0",
-            "TEXEL1",     "PRIMITIVE",
-            "SHADE",      "ENVIORNMENT",
-            "SCALE",      "COMBINED_ALPHA",
-            "T0_ALPHA",     "T1_ALPHA",
-            "PRIM_ALPHA",   "SHADE_ALPHA",
-            "ENV_ALPHA",    "LOD_FRACTION",
-            "PRIM_LODFRAC",   "K5",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0",
-            "0",        "0" };
-static const char *Mode3[] = { "COMBINED",    "TEXEL0",
-            "TEXEL1",     "PRIMITIVE",
-            "SHADE",      "ENVIORNMENT",
-            "1",        "0" };
-
-static const char *Alpha0[] = { "COMBINED",   "TEXEL0",
-            "TEXEL1",     "PRIMITIVE",
-            "SHADE",      "ENVIORNMENT",
-            "1",        "0" };
+extern const char *ACmp[];
+extern const char *Mode0[];
+extern const char *Mode1[];
+extern const char *Mode2[];
+extern const char *Mode3[];
+extern const char *Alpha0[];
 #define Alpha1 Alpha0
-static const char *Alpha2[] = { "LOD_FRACTION", "TEXEL0",
-            "TEXEL1",     "PRIMITIVE",
-            "SHADE",      "ENVIORNMENT",
-            "PRIM_LODFRAC",   "0" };
+extern const char *Alpha2[];
 #define Alpha3 Alpha0
-
-static const char *FBLa[] = { "G_BL_CLR_IN", "G_BL_CLR_MEM", "G_BL_CLR_BL", "G_BL_CLR_FOG" };
-static const char *FBLb[] = { "G_BL_A_IN", "G_BL_A_FOG", "G_BL_A_SHADE", "G_BL_0" };
-static const char *FBLc[] = { "G_BL_CLR_IN", "G_BL_CLR_MEM", "G_BL_CLR_BL", "G_BL_CLR_FOG"};
-static const char *FBLd[] = { "G_BL_1MA", "G_BL_A_MEM", "G_BL_1", "G_BL_0" };
-
-static const char *str_zs[] = { "G_ZS_PIXEL", "G_ZS_PRIM" };
-
-static const char *str_yn[] = { "NO", "YES" };
-static const char *str_offon[] = { "OFF", "ON" };
-
-static const char *str_cull[] = { "DISABLE", "FRONT", "BACK", "BOTH" };
-
+extern const char *FBLa[];
+extern const char *FBLb[];
+extern const char *FBLc[];
+extern const char *FBLd[];
+extern const char *str_zs[];
+extern const char *str_yn[];
+extern const char *str_offon[];
+extern const char *str_cull[];
 // I=intensity probably
-static const char *str_format[]   = { "RGBA", "YUV", "CI", "IA", "I", "?", "?", "?" };
-static const char *str_size[]     = { "4bit", "8bit", "16bit", "32bit" };
-static const char *str_cm[]       = { "WRAP/NO CLAMP", "MIRROR/NO CLAMP", "WRAP/CLAMP", "MIRROR/CLAMP" };
-
-static const char *str_lod[]    = { "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048" };
-static const char *str_aspect[] = { "1x8", "1x4", "1x2", "1x1", "2x1", "4x1", "8x1" };
-
-static const char *str_filter[] = { "Point Sampled", "Average (box)", "Bilinear" };
-
-static const char *str_tlut[]   = { "TT_NONE", "TT_UNKNOWN", "TT_RGBA_16", "TT_IA_16" };
-
-static const char *CIStatus[] = { "ci_main", "ci_zimg", "ci_unknown",  "ci_useless",
-                            "ci_old_copy", "ci_copy", "ci_copy_self",
-                            "ci_zcopy", "ci_aux", "ci_aux_copy" };
+extern const char *str_format[];
+extern const char *str_size[];
+extern const char *str_cm[];
+extern const char *str_lod[];
+extern const char *str_aspect[];
+extern const char *str_filter[];
+extern const char *str_tlut[];
+extern const char *CIStatus[];
 
 #define FBL_D_1 2
 #define FBL_D_0 3
