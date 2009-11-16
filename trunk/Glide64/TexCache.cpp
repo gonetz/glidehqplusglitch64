@@ -326,8 +326,9 @@ void GetTexInfo (int id, int tile)
   }
 
   line = rdp.tiles[tile].line;
-  if (rdp.tiles[tile].size == 3) line <<= 1;
-  wxUint32 crc;
+  if (rdp.tiles[tile].size == 3) 
+    line <<= 1;
+  wxUint32 crc = 0;
   if (settings.fast_crc)
   {
     line = (line - wid_64) << 3;

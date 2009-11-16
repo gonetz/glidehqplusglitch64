@@ -77,11 +77,11 @@ typedef struct TRI_INFO_t
 	TEX_INFO t[2];
 
 	// colors
-	wxUint32 fog_color; 
-	wxUint32 fill_color; 
-	wxUint32 prim_color; 
-	wxUint32 blend_color; 
-	wxUint32 env_color; 
+	wxUint32 fog_color;
+	wxUint32 fill_color;
+	wxUint32 prim_color;
+	wxUint32 blend_color;
+	wxUint32 env_color;
 	wxUint32 prim_lodmin, prim_lodfrac;
 
 	TRI_INFO_t	*pNext;
@@ -126,8 +126,6 @@ typedef struct DEBUGGER_t
 #define TRI_TEXRECT		1
 #define TRI_FILLRECT	2
 #define TRI_BACKGROUND	3
-
-static const char *tri_type[4] = { "TRIANGLE", "TEXRECT", "FILLRECT", "BACKGROUND" };
 
 extern GLIDE64_DEBUGGER _debugger;
 

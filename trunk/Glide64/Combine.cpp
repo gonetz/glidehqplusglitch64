@@ -728,16 +728,16 @@ COMBINE cmb;
 }
 //Added by Gonetz
 #define MULSHADE_PRIMSUBENV() { \
-  rdp.col[0] *= (float)( ((rdp.prim_color & 0xFF000000) >> 24) - ((rdp.env_color & 0xFF000000) >> 24) )/255.0f; \
-  rdp.col[1] *= (float)( ((rdp.prim_color & 0x00FF0000) >> 16) - ((rdp.env_color & 0x00FF0000) >> 16) )/255.0f; \
-  rdp.col[2] *= (float)( ((rdp.prim_color & 0x0000FF00) >> 8)  - ((rdp.env_color & 0x0000FF00) >> 8) )/255.0f; \
+  rdp.col[0] *= (float)( ((int)(rdp.prim_color & 0xFF000000) >> 24) - (int)((rdp.env_color & 0xFF000000) >> 24) )/255.0f; \
+  rdp.col[1] *= (float)( ((int)(rdp.prim_color & 0x00FF0000) >> 16) - (int)((rdp.env_color & 0x00FF0000) >> 16) )/255.0f; \
+  rdp.col[2] *= (float)( ((int)(rdp.prim_color & 0x0000FF00) >> 8)  - (int)((rdp.env_color & 0x0000FF00) >> 8) )/255.0f; \
   rdp.cmb_flags |= CMB_MULT; \
 }
 //Added by Gonetz
 #define MULSHADE_ENVSUBPRIM() { \
-  rdp.col[0] *= (float)( ((rdp.env_color & 0xFF000000) >> 24) - ((rdp.prim_color & 0xFF000000) >> 24) )/255.0f; \
-  rdp.col[1] *= (float)( ((rdp.env_color & 0x00FF0000) >> 16) - ((rdp.prim_color & 0x00FF0000) >> 16) )/255.0f; \
-  rdp.col[2] *= (float)( ((rdp.env_color & 0x0000FF00) >> 8) - ((rdp.prim_color & 0x0000FF00) >> 8) )/255.0f; \
+  rdp.col[0] *= (float)( ((int)(rdp.env_color & 0xFF000000) >> 24) - (int)((rdp.prim_color & 0xFF000000) >> 24) )/255.0f; \
+  rdp.col[1] *= (float)( ((int)(rdp.env_color & 0x00FF0000) >> 16) - (int)((rdp.prim_color & 0x00FF0000) >> 16) )/255.0f; \
+  rdp.col[2] *= (float)( ((int)(rdp.env_color & 0x0000FF00) >> 8) - (int)((rdp.prim_color & 0x0000FF00) >> 8) )/255.0f; \
   rdp.cmb_flags |= CMB_MULT; \
 }
 //Added by Gonetz
@@ -769,9 +769,9 @@ COMBINE cmb;
   rdp.cmb_flags |= CMB_SUB; \
 }
 #define SUBSHADE_PRIMSUBENV() { \
-  rdp.coladd[0] *= (float)( ((rdp.prim_color & 0xFF000000) >> 24) - ((rdp.env_color & 0xFF000000) >> 24) )/255.0f; \
-  rdp.coladd[1] *= (float)( ((rdp.prim_color & 0x00FF0000) >> 16) - ((rdp.env_color & 0x00FF0000) >> 16) )/255.0f; \
-  rdp.coladd[2] *= (float)( ((rdp.prim_color & 0x0000FF00) >> 8) - ((rdp.env_color & 0x0000FF00) >> 8) )/255.0f; \
+  rdp.coladd[0] *= (float)( ((int)(rdp.prim_color & 0xFF000000) >> 24) - (int)((rdp.env_color & 0xFF000000) >> 24) )/255.0f; \
+  rdp.coladd[1] *= (float)( ((int)(rdp.prim_color & 0x00FF0000) >> 16) - (int)((rdp.env_color & 0x00FF0000) >> 16) )/255.0f; \
+  rdp.coladd[2] *= (float)( ((int)(rdp.prim_color & 0x0000FF00) >> 8) - (int)((rdp.env_color & 0x0000FF00) >> 8) )/255.0f; \
   rdp.cmb_flags |= CMB_SUB; \
 }
 #define SUBSHADE_PRIMMULENV() { \
@@ -793,9 +793,9 @@ COMBINE cmb;
   rdp.cmb_flags |= CMB_ADD; \
 }
 #define ADDSHADE_PRIMSUBENV() { \
-  rdp.coladd[0] *= (float)( ((rdp.prim_color & 0xFF000000) >> 24) - ((rdp.env_color & 0xFF000000) >> 24) )/255.0f; \
-  rdp.coladd[1] *= (float)( ((rdp.prim_color & 0x00FF0000) >> 16) - ((rdp.env_color & 0x00FF0000) >> 16) )/255.0f; \
-  rdp.coladd[2] *= (float)( ((rdp.prim_color & 0x0000FF00) >> 8) - ((rdp.env_color & 0x0000FF00) >> 8) )/255.0f; \
+  rdp.coladd[0] *= (float)( ((int)(rdp.prim_color & 0xFF000000) >> 24) - (int)((rdp.env_color & 0xFF000000) >> 24) )/255.0f; \
+  rdp.coladd[1] *= (float)( ((int)(rdp.prim_color & 0x00FF0000) >> 16) - (int)((rdp.env_color & 0x00FF0000) >> 16) )/255.0f; \
+  rdp.coladd[2] *= (float)( ((int)(rdp.prim_color & 0x0000FF00) >> 8) - (int)((rdp.env_color & 0x0000FF00) >> 8) )/255.0f; \
   rdp.cmb_flags |= CMB_ADD; \
 }
 #define COLSUBSHADE_PRIM() { \
@@ -804,7 +804,6 @@ COMBINE cmb;
   rdp.coladd[2] *= (float)((rdp.prim_color & 0x0000FF00) >> 8) / 255.0f; \
   rdp.cmb_flags |= CMB_COL_SUB_OWN; \
 }
-
 
 #define SETSHADE_PRIM() { \
   rdp.col[0] *= (float)((rdp.prim_color & 0xFF000000) >> 24) / 255.0f; \
@@ -843,15 +842,15 @@ COMBINE cmb;
   rdp.cmb_flags = CMB_SET; \
 }
 #define SETSHADE_PRIMSUBENV() { \
-  rdp.col[0] *= (float)( ((rdp.prim_color & 0xFF000000) >> 24) - ((rdp.env_color & 0xFF000000) >> 24) )/255.0f; \
-  rdp.col[1] *= (float)( ((rdp.prim_color & 0x00FF0000) >> 16) - ((rdp.env_color & 0x00FF0000) >> 16) )/255.0f; \
-  rdp.col[2] *= (float)( ((rdp.prim_color & 0x0000FF00) >> 8) - ((rdp.env_color & 0x0000FF00) >> 8) )/255.0f; \
+  rdp.col[0] *= (float)( ((int)(rdp.prim_color & 0xFF000000) >> 24) - (int)((rdp.env_color & 0xFF000000) >> 24) )/255.0f; \
+  rdp.col[1] *= (float)( ((int)(rdp.prim_color & 0x00FF0000) >> 16) - (int)((rdp.env_color & 0x00FF0000) >> 16) )/255.0f; \
+  rdp.col[2] *= (float)( ((int)(rdp.prim_color & 0x0000FF00) >> 8) - (int)((rdp.env_color & 0x0000FF00) >> 8) )/255.0f; \
   rdp.cmb_flags = CMB_SET; \
 }
 #define SETSHADE_ENVSUBPRIM() { \
-  rdp.col[0] *= (float)( ((rdp.env_color & 0xFF000000) >> 24) - ((rdp.prim_color & 0xFF000000) >> 24) )/255.0f; \
-  rdp.col[1] *= (float)( ((rdp.env_color & 0x00FF0000) >> 16) - ((rdp.prim_color & 0x00FF0000) >> 16) )/255.0f; \
-  rdp.col[2] *= (float)( ((rdp.env_color & 0x0000FF00) >> 8) - ((rdp.prim_color & 0x0000FF00) >> 8) )/255.0f; \
+  rdp.col[0] *= (float)( ((int)(rdp.env_color & 0xFF000000) >> 24) - (int)((rdp.prim_color & 0xFF000000) >> 24) )/255.0f; \
+  rdp.col[1] *= (float)( ((int)(rdp.env_color & 0x00FF0000) >> 16) - (int)((rdp.prim_color & 0x00FF0000) >> 16) )/255.0f; \
+  rdp.col[2] *= (float)( ((int)(rdp.env_color & 0x0000FF00) >> 8) - (int)((rdp.prim_color & 0x0000FF00) >> 8) )/255.0f; \
   rdp.cmb_flags = CMB_SET; \
 }
 #define SETSHADE_PRIMLOD() { \
@@ -905,12 +904,12 @@ COMBINE cmb;
 }
 //Added by Gonetz
 #define MULSHADE_A_PRIMSUBENV() { \
-  rdp.col[3] *= (float)( (rdp.prim_color & 0xFF) - (rdp.env_color & 0xFF) ) / 255.0f; \
+  rdp.col[3] *= (float)( (int)(rdp.prim_color & 0xFF) - (int)(rdp.env_color & 0xFF) ) / 255.0f; \
   rdp.cmb_flags |= CMB_A_MULT; \
 }
 //Added by Gonetz
 #define MULSHADE_A_ENVSUBPRIM() { \
-  rdp.col[3] *= (float)( (rdp.env_color & 0xFF) - (rdp.prim_color & 0xFF) ) / 255.0f; \
+  rdp.col[3] *= (float)( (int)(rdp.env_color & 0xFF) - (int)(rdp.prim_color & 0xFF) ) / 255.0f; \
   rdp.cmb_flags |= CMB_A_MULT; \
 }
 
@@ -4915,20 +4914,27 @@ static void cc__prim_sub_env_mul_t0_add_env__mul_k5 ()
 
 static void cc_prim_sub_env_mul_t1_add_env ()
 {
+  if ((settings.hacks&hack_KI))
+  {
+    TILE & tile0 = rdp.tiles[rdp.cur_tile];
+    wxUint32 tmem0 = tile0.t_mem << 3;
+    wxUint32 tmem1 = rdp.tiles[rdp.cur_tile+1].t_mem << 3;
+    if ((rdp.cur_tile == 7) ||
+        (tmem1 >= tmem0 && tmem1 < tmem0 + (((tile0.lr_s - tile0.ul_s + 1)*(tile0.lr_t - tile0.ul_t + 1))<<tile0.size>>1)))
+    {
+      //t1 is inside t0, so t1 must be zero for correct work
+      cc_env();
+      return;
+    }
+  }
+
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL_ADD_LOCAL,
     GR_COMBINE_FACTOR_TEXTURE_RGB,
     GR_COMBINE_LOCAL_ITERATED,
     GR_COMBINE_OTHER_CONSTANT);
   CC_PRIM ();
   SETSHADE_ENV ();
-  if (rdp.cycle_mode == 0) //wrong! || (rdp.cycle2 & 0xFFFF) == 0x1FFF)
-  {
-    USE_T0 ();
-  }
-  else
-  {
-    USE_T1 ();
-  }
+  USE_T1 ();
 }
 
 static void cc_prim_sub_env_mul_t1_add_env_mul_t0 ()
@@ -5230,16 +5236,29 @@ static void cc_prim_sub_env_mul_prima_add_t0 ()
 {
   if (rdp.prim_color != 0x000000ff)
   {
-    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
-      GR_COMBINE_FACTOR_ONE,
-      GR_COMBINE_LOCAL_ITERATED,
-      GR_COMBINE_OTHER_TEXTURE);
-    SETSHADE_PRIMSUBENV ();
-    SETSHADE_PRIMA ();
+    if (cmb.combine_ext)
+    {
+      CCMBEXT(GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_X,
+        GR_CMBX_ITRGB, GR_FUNC_MODE_NEGATIVE_X,
+        GR_CMBX_CONSTANT_ALPHA, 0,
+        GR_CMBX_TEXTURE_RGB, 0);
+      CC_PRIM ();
+      SETSHADE_ENV ();
+    }
+    else
+    {
+      CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+        GR_COMBINE_FACTOR_ONE,
+        GR_COMBINE_LOCAL_ITERATED,
+        GR_COMBINE_OTHER_TEXTURE);
+      SETSHADE_PRIMSUBENV ();
+      SETSHADE_PRIMA ();
+    }
   }
   else if ((rdp.prim_color&0xFFFFFF00) - (rdp.env_color&0xFFFFFF00) == 0)
   {
     cc_t0 ();
+    return;
   }
   else
   {
@@ -5250,7 +5269,6 @@ static void cc_prim_sub_env_mul_prima_add_t0 ()
     CC_ENV ();
   }
   USE_T0 ();
-
 }
 
 //Added by Gonetz
@@ -13636,11 +13654,16 @@ void InitCombine ()
   if (const char * extstr = strstr(extensions, "COMBINE")) {
     if (!strncmp(extstr, "COMBINE", 7)) {
       LOG ("extensions ");
-      cmb.grColorCombineExt = (GRCOLORCOMBINEEXT) grGetProcAddress("grColorCombineExt");
-      cmb.grAlphaCombineExt = (GRCOLORCOMBINEEXT) grGetProcAddress("grAlphaCombineExt");
-      cmb.grTexColorCombineExt = (GRTEXCOLORCOMBINEEXT) grGetProcAddress("grTexColorCombineExt");
-      cmb.grTexAlphaCombineExt = (GRTEXCOLORCOMBINEEXT) grGetProcAddress("grTexAlphaCombineExt");
-      cmb.grConstantColorValueExt = (GRCONSTANTCOLORVALUEEXT) grGetProcAddress("grConstantColorValueExt");
+      char strColorCombineExt[] = "grColorCombineExt";
+      cmb.grColorCombineExt = (GRCOLORCOMBINEEXT) grGetProcAddress(strColorCombineExt);
+      char strAlphaCombineExt[] = "grAlphaCombineExt";
+      cmb.grAlphaCombineExt = (GRCOLORCOMBINEEXT) grGetProcAddress(strAlphaCombineExt);
+      char strTexColorCombineExt[] = "grTexColorCombineExt";
+      cmb.grTexColorCombineExt = (GRTEXCOLORCOMBINEEXT) grGetProcAddress(strTexColorCombineExt);
+      char strTexAlphaCombineExt[] = "grTexAlphaCombineExt";
+      cmb.grTexAlphaCombineExt = (GRTEXCOLORCOMBINEEXT) grGetProcAddress(strTexAlphaCombineExt);
+      char strConstantColorValueExt[] = "grConstantColorValueExt";
+      cmb.grConstantColorValueExt = (GRCONSTANTCOLORVALUEEXT) grGetProcAddress(strConstantColorValueExt);
       if (cmb.grColorCombineExt && cmb.grAlphaCombineExt &&
         cmb.grTexColorCombineExt && cmb.grTexAlphaCombineExt)
       {

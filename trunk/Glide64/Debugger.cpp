@@ -67,6 +67,7 @@ GLIDE64_DEBUGGER _debugger;
 #define COL_GRID    0xFFFFFF80
 
 int  grid = 0;
+static const char *tri_type[4] = { "TRIANGLE", "TEXRECT", "FILLRECT", "BACKGROUND" };
 
 //Platform-specific stuff
 #ifndef __WINDOWS__
@@ -208,11 +209,12 @@ void debug_cacheviewer ()
       CACHE_LUT * cache = voodoo.tex_UMA?rdp.cache[0]:rdp.cache[_debugger.tmu];
 
       VERTEX v[4] = {
-          { SX(x*64.0f), SY(512+64.0f*i), 1, 1,       0, 0, 0, 0, 0, 0, 0 },
-          { SX(x*64.0f+64.0f*cache[x+y*16].scale_x), SY(512+64.0f*i), 1, 1,    255*cache[x+y*16].scale_x, 0, 0, 0, 0, 0, 0 },
-          { SX(x*64.0f), SY(512+64.0f*i+64.0f*cache[x+y*16].scale_y), 1, 1,    0, 255*cache[x+y*16].scale_y, 0, 0, 0, 0, 0 },
-          { SX(x*64.0f+64.0f*cache[x+y*16].scale_x), SY(512+64.0f*i+64.0f*cache[x+y*16].scale_y), 1, 1, 255*cache[x+y*16].scale_x, 255*cache[x+y*16].scale_y, 0, 0, 0, 0, 0 } };
-      for 
+          { SX(x*64.0f), SY(512+64.0f*i), 1, 1,       0, 0, 0, 0, {0, 0, 0, 0} },
+          { SX(x*64.0f+64.0f*cache[x+y*16].scale_x), SY(512+64.0f*i), 1, 1,    255*cache[x+y*16].scale_x, 0, 0, 0, {0, 0, 0, 0} },
+          { SX(x*64.0f), SY(512+64.0f*i+64.0f*cache[x+y*16].scale_y), 1, 1,    0, 255*cache[x+y*16].scale_y, 0, 0, {0, 0, 0, 0} },
+          { SX(x*64.0f+64.0f*cache[x+y*16].scale_x), SY(512+64.0f*i+64.0f*cache[x+y*16].scale_y), 1, 1, 255*cache[x+y*16].scale_x, 255*cache[x+y*16].scale_y, 0, 0, {0, 0, 0, 0} }
+          };
+      for
       (int i=0; i<4; i++)
       {
         v[i].u1 = v[i].u0;
@@ -371,10 +373,11 @@ void debug_capture ()
       float scy = cache[_debugger.tex_sel].scale_y;
 #endif
       VERTEX v[4] = {
-              { SX(704.0f), SY(221.0f), 1, 1, 0, 0,  0, 0, 0, 0, 0 },
-              { SX(704.0f+256.0f*scx), SY(221.0f), 1, 1, 255*scx, 0, 255*scx, 0, 0, 0, 0 },
-              { SX(704.0f), SY(221.0f+256.0f*scy), 1, 1, 0, 255*scy, 0, 255*scy, 0, 0, 0 },
-              { SX(704.0f+256.0f*scx), SY(221.0f+256.0f*scy), 1, 1, 255*scx, 255*scy, 255*scx, 255*scy, 0, 0, 0 } };
+              { SX(704.0f), SY(221.0f), 1, 1, 0, 0,  0, 0, {0, 0, 0, 0} },
+              { SX(704.0f+256.0f*scx), SY(221.0f), 1, 1, 255*scx, 0, 255*scx, 0, {0, 0, 0, 0} },
+              { SX(704.0f), SY(221.0f+256.0f*scy), 1, 1, 0, 255*scy, 0, 255*scy, {0, 0, 0, 0} },
+              { SX(704.0f+256.0f*scx), SY(221.0f+256.0f*scy), 1, 1, 255*scx, 255*scy, 255*scx, 255*scy, {0, 0, 0, 0} }
+              };
       ConvertCoordsConvert (v, 4);
       VERTEX *varr[4] = { &v[0], &v[1], &v[2], &v[3] };
       grDrawVertexArray (GR_TRIANGLE_STRIP, 4, varr);
@@ -768,7 +771,7 @@ void debug_capture ()
       i-=16;
       output(800,(float)i,1,"crc: %08lx", cache[_debugger.tex_sel].crc);
       i-=16;
-#ifdef TEXTURE_FILTER 
+#ifdef TEXTURE_FILTER
       output(800,(float)i,1,"RiceCrc: %08lx", (wxUint32)(rdp.cache[_debugger.tmu][_debugger.tex_sel].ricecrc&0xFFFFFFFF));
       i-=16;
       output(800,(float)i,1,"RicePalCrc: %08lx", (wxUint32)(rdp.cache[_debugger.tmu][_debugger.tex_sel].ricecrc>>32));
@@ -857,10 +860,11 @@ void debug_mouse ()
   float cy = (float)pt.y;
 
   VERTEX v[4] = {
-    { cx, cy, 1, 1,     0, 0, 0, 0, 0, 0, 0 },
-    { cx+32, cy, 1, 1,    255, 0, 0, 0, 0, 0, 0 },
-    { cx, cy+32, 1, 1,    0, 255, 0, 0, 0, 0, 0 },
-    { cx+32, cy+32, 1, 1, 255, 255, 0, 0, 0, 0, 0 } };
+    { cx,       cy, 1, 1,   0,   0,   0, 0, {0, 0, 0, 0} },
+    { cx+32,    cy, 1, 1, 255,   0,   0, 0, {0, 0, 0, 0} },
+    { cx,    cy+32, 1, 1,   0, 255,   0, 0, {0, 0, 0, 0} },
+    { cx+32, cy+32, 1, 1, 255, 255,   0, 0, {0, 0, 0, 0} }
+    };
 
   ConvertCoordsKeep (v, 4);
 
@@ -1001,10 +1005,11 @@ void output (float x, float y, int scale, const char *fmt, ...)
   {
     c = ((out_buf[i]-32) & 0x1F) * 8;//<< 3;
     r = (((out_buf[i]-32) & 0xE0) >> 5) * 16;//<< 4;
-    VERTEX v[4] = { { SX(x), SY(768-y), 1, 1,   (float)c, r+16.0f, 0, 0, 0, 0, 0 },
-      { SX(x+8), SY(768-y), 1, 1,   c+8.0f, r+16.0f, 0, 0, 0, 0, 0 },
-      { SX(x), SY(768-y-16), 1, 1,  (float)c, (float)r, 0, 0, 0, 0, 0 },
-      { SX(x+8), SY(768-y-16), 1, 1,  c+8.0f, (float)r, 0, 0, 0, 0, 0 } };
+    VERTEX v[4] = { { SX(x), SY(768-y), 1, 1,   (float)c, r+16.0f, 0, 0, {0, 0, 0, 0} },
+      { SX(x+8), SY(768-y), 1, 1,   c+8.0f, r+16.0f, 0, 0, {0, 0, 0, 0} },
+      { SX(x), SY(768-y-16), 1, 1,  (float)c, (float)r, 0, 0, {0, 0, 0, 0} },
+      { SX(x+8), SY(768-y-16), 1, 1,  c+8.0f, (float)r, 0, 0, {0, 0, 0, 0} }
+      };
     if (!scale)
     {
       v[0].x = x;

@@ -55,13 +55,13 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.format = (wxUint16)cimage.format;
   texbuf.scr_width = min(cimage.width * rdp.scale_x, settings.scr_res_x);
   float height = min(rdp.vi_height,cimage.height);
-  if (cimage.status == ci_copy_self || (cimage.status == ci_copy && cimage.width == rdp.frame_buffers[rdp.main_ci_index].width)) 
+  if (cimage.status == ci_copy_self || (cimage.status == ci_copy && cimage.width == rdp.frame_buffers[rdp.main_ci_index].width))
     height = rdp.vi_height;
   texbuf.scr_height = height * rdp.scale_y;
 //  texbuf.scr_height = texbuf.height * rdp.scale_y;
-  
+
   wxUint16 max_size = max((wxUint16)texbuf.scr_width, (wxUint16)texbuf.scr_height);
-  if (max_size > voodoo.max_tex_size) //texture size is too large 
+  if (max_size > voodoo.max_tex_size) //texture size is too large
     return 0;
   wxUint32 tex_size;
   //calculate LOD
@@ -135,7 +135,7 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
     texbuf.info.format = GR_TEXFMT_ALPHA_INTENSITY_88;
   else
     texbuf.info.format = GR_TEXFMT_RGB_565;
-  
+
   texbuf.lr_u = 256.0f * texbuf.scr_width / (float)tex_size;// + 1.0f;
   texbuf.lr_v = 256.0f * texbuf.scr_height / (float)tex_size;// + 1.0f;
   texbuf.tile = 0;
@@ -147,10 +147,10 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.u_scale = texbuf.lr_u / (float)(texbuf.width);
   texbuf.v_scale = texbuf.lr_v / (float)(texbuf.height);
   texbuf.cache = 0;
-  
+
   FRDP("\nAllocateTextureBuffer. width: %d, height: %d, scr_width: %f, scr_height: %f, vi_width: %f, vi_height:%f, scale_x: %f, scale_y: %f, lr_u: %f, lr_v: %f, u_scale: %f, v_scale: %f\n", texbuf.width, texbuf.height, texbuf.scr_width, texbuf.scr_height, rdp.vi_width, rdp.vi_height, rdp.scale_x, rdp.scale_y, texbuf.lr_u, texbuf.lr_v, texbuf.u_scale, texbuf.v_scale);
-  
-  wxUint32 required = grTexCalcMemRequired(texbuf.info.smallLodLog2, texbuf.info.largeLodLog2, 
+
+  wxUint32 required = grTexCalcMemRequired(texbuf.info.smallLodLog2, texbuf.info.largeLodLog2,
     texbuf.info.aspectRatioLog2, texbuf.info.format);
   //find free space
   for (int i = 0; i < voodoo.num_tmu; i++)
@@ -175,7 +175,7 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
         top = t.tex_addr + t.tex_width * t.tex_height * 2;
       available	 = rdp.texbufs[i].end - top;
     }
-    else 
+    else
     {
       available	 = rdp.texbufs[i].end - rdp.texbufs[i].begin;
       top = rdp.texbufs[i].begin;
@@ -201,20 +201,20 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.tex_addr = rdp.texbufs[rdp.cur_tex_buf].begin;
   rdp.texbufs[rdp.cur_tex_buf].images[0] = texbuf;
   return &(rdp.texbufs[rdp.cur_tex_buf].images[0]);
-} 
+}
 
 int OpenTextureBuffer(COLOR_IMAGE & cimage)
 {
   FRDP("OpenTextureBuffer. cur_tex_buf: %d, addr: %08lx, width: %d, height: %d", rdp.cur_tex_buf, cimage.addr, cimage.width, cimage.height);
   if (!fullscreen) return FALSE;
-  
+
   int found = FALSE, search = TRUE;
   TBUFF_COLOR_IMAGE *texbuf = 0;
   wxUint32 addr = cimage.addr;
   if ((settings.hacks&hack_Banjo2) && cimage.status == ci_copy_self)
     addr = rdp.frame_buffers[rdp.copy_ci_index].addr;
   wxUint32 end_addr = addr + cimage.width*cimage.height*cimage.size;
-  if (rdp.motionblur) 
+  if (rdp.motionblur)
   {
 //    if (cimage.format != 0)
 //      return FALSE;
@@ -255,7 +255,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   if (search)
   {
     for (int i = 0; (i < voodoo.num_tmu) && !found; i++)
-    {  
+    {
       for (int j = 0; (j < rdp.texbufs[i].count) && !found; j++)
       {
         texbuf = &(rdp.texbufs[i].images[j]);
@@ -279,7 +279,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
           {
             grRenderBuffer( GR_BUFFER_TEXTUREBUFFER_EXT );
             grTextureBufferExt( texbuf->tmu, texbuf->tex_addr, texbuf->info.smallLodLog2, texbuf->info.largeLodLog2,
-              texbuf->info.aspectRatioLog2, texbuf->info.format, GR_MIPMAPLEVELMASK_BOTH ); 
+              texbuf->info.aspectRatioLog2, texbuf->info.format, GR_MIPMAPLEVELMASK_BOTH );
             grDepthMask (FXFALSE);
             grBufferClear (0, 0, 0xFFFF);
             grDepthMask (FXTRUE);
@@ -296,7 +296,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   {
     RDP ("  not searched");
   }
-  
+
   if (!found)
   {
     RDP ("  not found");
@@ -306,18 +306,18 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   {
     RDP ("  found");
   }
-  
+
   if (!texbuf)
   {
     RDP("  KO\n");
     return FALSE;
   }
-  
+
   rdp.acc_tex_buf = rdp.cur_tex_buf;
   rdp.cur_image = texbuf;
   grRenderBuffer( GR_BUFFER_TEXTUREBUFFER_EXT );
   grTextureBufferExt( rdp.cur_image->tmu, rdp.cur_image->tex_addr, rdp.cur_image->info.smallLodLog2, rdp.cur_image->info.largeLodLog2,
-    rdp.cur_image->info.aspectRatioLog2, rdp.cur_image->info.format, GR_MIPMAPLEVELMASK_BOTH ); 
+    rdp.cur_image->info.aspectRatioLog2, rdp.cur_image->info.format, GR_MIPMAPLEVELMASK_BOTH );
   ///*
   if (rdp.cur_image->clear && (settings.frame_buffer&fb_hwfbe_buf_clear) && cimage.changed)
   {
@@ -329,12 +329,12 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   //*/
   //  memset(gfx.RDRAM+cimage.addr, 0, cimage.width*cimage.height*cimage.size);
   FRDP("  texaddr: %08lx, tex_width: %d, tex_height: %d, cur_tex_buf: %d, texformat: %d, motionblur: %d\n", rdp.cur_image->tex_addr, rdp.cur_image->tex_width, rdp.cur_image->tex_height, rdp.cur_tex_buf, rdp.cur_image->info.format, rdp.motionblur);
-  if (!rdp.offset_x_bak) 
+  if (!rdp.offset_x_bak)
   {
     rdp.offset_x_bak = rdp.offset_x;
     rdp.offset_x = 0;
   }
-  if (!rdp.offset_y_bak) 
+  if (!rdp.offset_y_bak)
   {
     rdp.offset_y_bak = rdp.offset_y;
     rdp.offset_y = 0;
@@ -345,12 +345,12 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
 
 static GrTextureFormat_t TexBufSetupCombiner(int force_rgb = FALSE)
 {
-  grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER, 
-    GR_COMBINE_FACTOR_ONE, 
-    GR_COMBINE_LOCAL_NONE, 
-    GR_COMBINE_OTHER_TEXTURE, 
+  grColorCombine( GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_ONE,
+    GR_COMBINE_LOCAL_NONE,
+    GR_COMBINE_OTHER_TEXTURE,
 //    GR_COMBINE_OTHER_CONSTANT,
-    FXFALSE); 
+    FXFALSE);
   grAlphaCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
     GR_COMBINE_FACTOR_ONE,
     GR_COMBINE_LOCAL_NONE,
@@ -368,51 +368,51 @@ static GrTextureFormat_t TexBufSetupCombiner(int force_rgb = FALSE)
   grFogMode (GR_FOG_DISABLE);
   GrTextureFormat_t buf_format = (rdp.tbuff_tex) ? rdp.tbuff_tex->info.format : GR_TEXFMT_RGB_565;
   GrCombineFunction_t color_source = GR_COMBINE_FUNCTION_LOCAL;
-  if  (!force_rgb && rdp.black_ci_index > 0 && rdp.black_ci_index <= rdp.copy_ci_index)  
+  if  (!force_rgb && rdp.black_ci_index > 0 && rdp.black_ci_index <= rdp.copy_ci_index)
   {
     color_source = GR_COMBINE_FUNCTION_LOCAL_ALPHA;
     buf_format = GR_TEXFMT_ALPHA_INTENSITY_88;
   }
   if (rdp.tbuff_tex->tmu == GR_TMU0)
   {
-    grTexCombine( GR_TMU1, 
-      GR_COMBINE_FUNCTION_NONE, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_NONE, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE ); 
-    grTexCombine( GR_TMU0, 
-      color_source, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_ZERO, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXTRUE ); 
+    grTexCombine( GR_TMU1,
+      GR_COMBINE_FUNCTION_NONE,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_NONE,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXFALSE );
+    grTexCombine( GR_TMU0,
+      color_source,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_ZERO,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXTRUE );
   }
   else
   {
-    grTexCombine( GR_TMU1, 
-      color_source, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_ZERO, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXTRUE ); 
-    grTexCombine( GR_TMU0, 
-      GR_COMBINE_FUNCTION_SCALE_OTHER, 
-      GR_COMBINE_FACTOR_ONE, 
-      GR_COMBINE_FUNCTION_SCALE_OTHER, 
-      GR_COMBINE_FACTOR_ONE, 
-      FXFALSE, 
-      FXFALSE ); 
+    grTexCombine( GR_TMU1,
+      color_source,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_ZERO,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXTRUE );
+    grTexCombine( GR_TMU0,
+      GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_ONE,
+      FXFALSE,
+      FXFALSE );
   }
   return buf_format;
 }
 
 int CloseTextureBuffer(int draw)
 {
-  if (!fullscreen || !rdp.cur_image) 
+  if (!fullscreen || !rdp.cur_image)
   {
     RDP("CloseTextureBuffer KO\n");
     return FALSE;
@@ -428,7 +428,7 @@ int CloseTextureBuffer(int draw)
     rdp.cur_image = 0;
     return TRUE;
   }
-  
+
   rdp.tbuff_tex = rdp.cur_image;
   rdp.cur_image = 0;
   GrTextureFormat_t buf_format = rdp.tbuff_tex->info.format;
@@ -441,16 +441,16 @@ int CloseTextureBuffer(int draw)
   float lr_u = rdp.tbuff_tex->lr_u;
   float lr_v = rdp.tbuff_tex->lr_v;
   FRDP("lr_x: %f, lr_y: %f, lr_u: %f, lr_v: %f\n", lr_x, lr_y, lr_u, lr_v);
-  
-  
+
+
   // Make the vertices
   VERTEX v[4] = {
-    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, zero, zero, zero, zero },
-    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, lr_u, zero, lr_u, zero},
-    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, zero, lr_v, zero, lr_v},
-    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, {zero, zero, zero, zero} },
+    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, {lr_u, zero, lr_u, zero} },
+    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, {zero, lr_v, zero, lr_v} },
+    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
   };
-  
+
   grTexSource( rdp.tbuff_tex->tmu, rdp.tbuff_tex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(rdp.tbuff_tex->info) );
   grClipWindow (0, 0, settings.res_x, settings.res_y);
   grDrawTriangle (&v[0], &v[2], &v[1]);
@@ -468,7 +468,7 @@ int CloseTextureBuffer(int draw)
 
 int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
 {
-  if (!fullscreen) 
+  if (!fullscreen)
     return FALSE;
   RDP("CopyTextureBuffer. ");
   if (rdp.cur_image)
@@ -498,14 +498,14 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
   float lr_u = rdp.tbuff_tex->lr_u;
   float lr_v = rdp.tbuff_tex->lr_v;
   FRDP("lr_x: %f, lr_y: %f\n", lr_x, lr_y);
-  
-  
+
+
   // Make the vertices
   VERTEX v[4] = {
-    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, zero, zero, zero, zero },
-    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, lr_u, zero, lr_u, zero},
-    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, zero, lr_v, zero, lr_v},
-    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, {zero, zero, zero, zero} },
+    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, {lr_u, zero, lr_u, zero} },
+    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, {zero, lr_v, zero, lr_v} },
+    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
   };
 
   grTexSource( rdp.tbuff_tex->tmu, rdp.tbuff_tex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(rdp.tbuff_tex->info) );
@@ -520,7 +520,7 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
   grDrawTriangle (&v[0], &v[2], &v[1]);
   grDrawTriangle (&v[2], &v[3], &v[1]);
   rdp.tbuff_tex->info.format = buf_format;
-  
+
   rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE | UPDATE_TEXTURE | UPDATE_ALPHA_COMPARE;
   rdp.update |= UPDATE_VIEWPORT | UPDATE_SCISSOR;
   if (settings.fog && (rdp.flags & FOG_ENABLED))
@@ -533,7 +533,7 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
 
 int CopyDepthBuffer()
 {
-  if (!fullscreen) 
+  if (!fullscreen)
     return FALSE;
   RDP("CopyDepthBuffer. ");
   float bound = 1024.0f;
@@ -557,28 +557,28 @@ int CopyDepthBuffer()
   float lr_u = 255.5f;
   float lr_v = 255.5f;
   FRDP("lr_x: %f, lr_y: %f\n", lr_x, lr_y);
-  
-  
+
+
   // Make the vertices
   VERTEX v[4] = {
-    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, zero, zero, zero, zero },
-    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, lr_u, zero, lr_u, zero},
-    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, zero, lr_v, zero, lr_v},
-    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, {zero, zero, zero, zero} },
+    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, {lr_u, zero, lr_u, zero} },
+    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, {zero, lr_v, zero, lr_v} },
+    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
   };
-  
+
   grAuxBufferExt( GR_BUFFER_AUXBUFFER );
   grTexSource( rdp.texbufs[0].tmu, rdp.texbufs[0].begin, GR_MIPMAPLEVELMASK_BOTH, &(rdp.tbuff_tex->info) );
   grRenderBuffer( GR_BUFFER_TEXTUREBUFFER_EXT );
   grTextureBufferExt( rdp.texbufs[1].tmu, rdp.texbufs[1].begin, LOD, LOD,
-    GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH ); 
+    GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH );
   grDrawTriangle (&v[0], &v[2], &v[1]);
   grDrawTriangle (&v[2], &v[3], &v[1]);
   grRenderBuffer( GR_BUFFER_BACKBUFFER );
   grTextureAuxBufferExt( rdp.texbufs[1].tmu, rdp.texbufs[1].begin, LOD, LOD,
-    GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH ); 
+    GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH );
   grAuxBufferExt( GR_BUFFER_TEXTUREAUXBUFFER_EXT );
-  
+
   rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE | UPDATE_TEXTURE | UPDATE_ALPHA_COMPARE;
   if (settings.fog && (rdp.flags & FOG_ENABLED))
     grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
@@ -589,7 +589,7 @@ int CopyDepthBuffer()
 
 int SwapTextureBuffer()
 {
-  if (!fullscreen || !rdp.tbuff_tex) 
+  if (!fullscreen || !rdp.tbuff_tex)
     return FALSE;
   RDP("SwapTextureBuffer.");
   COLOR_IMAGE ci;
@@ -607,7 +607,7 @@ int SwapTextureBuffer()
     return FALSE;
   }
   TexBufSetupCombiner();
-  
+
   float ul_x = 0.0f;
   float ul_y = 0.0f;
   float lr_x = (float)rdp.tbuff_tex->scr_width;
@@ -615,22 +615,22 @@ int SwapTextureBuffer()
   float zero = 0.0f;
   float lr_u = rdp.tbuff_tex->lr_u;
   float lr_v = rdp.tbuff_tex->lr_v;
-  
+
   // Make the vertices
   VERTEX v[4] = {
-    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, zero, zero, zero, zero },
-    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, lr_u, zero, lr_u, zero},
-    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, zero, lr_v, zero, lr_v},
-    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v, lr_u, lr_v} 
+    { ul_x, ul_y, 1, 1, zero, zero, zero, zero, {zero, zero, zero, zero} },
+    { lr_x, ul_y, 1, 1, lr_u, zero, lr_u, zero, {lr_u, zero, lr_u, zero} },
+    { ul_x, lr_y, 1, 1, zero, lr_v, zero, lr_v, {zero, lr_v, zero, lr_v} },
+    { lr_x, lr_y, 1, 1, lr_u, lr_v, lr_u, lr_v, {lr_u, lr_v, lr_u, lr_v} }
   };
-  
+
   grTexSource( rdp.tbuff_tex->tmu, rdp.tbuff_tex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(rdp.tbuff_tex->info) );
   texbuf->tile_uls = rdp.tbuff_tex->tile_uls;
   texbuf->tile_ult = rdp.tbuff_tex->tile_ult;
   texbuf->v_shift = rdp.tbuff_tex->v_shift;
   grRenderBuffer( GR_BUFFER_TEXTUREBUFFER_EXT );
   grTextureBufferExt( texbuf->tmu, texbuf->tex_addr, texbuf->info.smallLodLog2, texbuf->info.largeLodLog2,
-    texbuf->info.aspectRatioLog2, texbuf->info.format, GR_MIPMAPLEVELMASK_BOTH ); 
+    texbuf->info.aspectRatioLog2, texbuf->info.format, GR_MIPMAPLEVELMASK_BOTH );
   grDrawTriangle (&v[0], &v[2], &v[1]);
   grDrawTriangle (&v[2], &v[3], &v[1]);
   rdp.texbufs[rdp.tbuff_tex->tmu].clear_allowed = TRUE;
@@ -643,7 +643,7 @@ int SwapTextureBuffer()
   if (rdp.cur_image)
   {
     grTextureBufferExt( rdp.cur_image->tmu, rdp.cur_image->tex_addr, rdp.cur_image->info.smallLodLog2, rdp.cur_image->info.largeLodLog2,
-    rdp.cur_image->info.aspectRatioLog2, rdp.cur_image->info.format, GR_MIPMAPLEVELMASK_BOTH ); 
+    rdp.cur_image->info.aspectRatioLog2, rdp.cur_image->info.format, GR_MIPMAPLEVELMASK_BOTH );
   }
   else
   {
@@ -652,7 +652,7 @@ int SwapTextureBuffer()
     rdp.offset_y = rdp.offset_y_bak;
     rdp.offset_x_bak = rdp.offset_y_bak = 0;
     rdp.update |= UPDATE_VIEWPORT | UPDATE_SCISSOR;
-  }  
+  }
   rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE | UPDATE_TEXTURE | UPDATE_ALPHA_COMPARE;
   if (settings.fog && (rdp.flags & FOG_ENABLED))
   {
@@ -670,7 +670,7 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
   int found = FALSE;
   wxUint32 shift = 0;
   for (int i = 0; i < voodoo.num_tmu && !found; i++)
-  {  
+  {
     wxUint8 index = rdp.cur_tex_buf^i;
     for (int j = 0; j < rdp.texbufs[index].count && !found; j++)
     {
