@@ -955,8 +955,6 @@ static void ys_memrect ()
   wxUint32 ul_x = (wxUint16)((rdp.cmd1 & 0x00FFF000) >> 14);
   wxUint32 ul_y = (wxUint16)((rdp.cmd1 & 0x00000FFF) >> 2);
 
-  rdp.pc[rdp.pc_i] += 16;       // texrect is 196-bit
-
   if (lr_y > rdp.scissor_o.lr_y)
     lr_y = rdp.scissor_o.lr_y;
   wxUint32 off_x = ((rdp.cmd2 & 0xFFFF0000) >> 16) >> 5;
@@ -1036,34 +1034,34 @@ static void DrawDepthBufferFog()
 
 static void rdp_texrect()
 {
-  wxUint32 a = rdp.pc[rdp.pc_i];
   if (!rdp.LLE)
   {
-    rdp.cmd2 = ((wxUint32*)gfx.RDRAM)[(a>>2)+1];
-    rdp.cmd3 = ((wxUint32*)gfx.RDRAM)[(a>>2)+3];
-  }
-  if (settings.hacks&hack_ASB) //modified Rice's hack for All-Star Baseball games
-  {
-    wxUint32 dwHalf1 = (((wxUint32*)gfx.RDRAM)[(a>>2)+0]) >> 24;
-    if ((dwHalf1 != 0xF1)  && (dwHalf1 != 0xb3))
+    wxUint32 a = rdp.pc[rdp.pc_i];
+    wxUint8 cmdHalf1 = gfx.RDRAM[a+3];
+    wxUint8 cmdHalf2 = gfx.RDRAM[a+11];
+    a >>= 2;
+    if ((cmdHalf1 == 0xE1 && cmdHalf2 == 0xF1) || (cmdHalf1 == 0xB4 && cmdHalf2 == 0xB3) || (cmdHalf1 == 0xB3 && cmdHalf2 == 0xB2))
     {
+      //gSPTextureRectangle
+      rdp.cmd2 = ((wxUint32*)gfx.RDRAM)[a+1];
+      rdp.cmd3 = ((wxUint32*)gfx.RDRAM)[a+3];
       rdp.pc[rdp.pc_i] += 16;
     }
     else
     {
+      //gDPTextureRectangle
+      if (settings.hacks&hack_ASB)
+        rdp.cmd2 = 0;
+      else
+        rdp.cmd2 = ((wxUint32*)gfx.RDRAM)[a+0];
+      rdp.cmd3 = ((wxUint32*)gfx.RDRAM)[a+1];
       rdp.pc[rdp.pc_i] += 8;
-      rdp.cmd3 = rdp.cmd2;
-      rdp.cmd2 = 0;
     }
   }
-  else if ((settings.hacks&hack_Yoshi) && settings.ucode == ucode_S2DEX)
+  if ((settings.hacks&hack_Yoshi) && settings.ucode == ucode_S2DEX)
   {
     ys_memrect();
     return;
-  }
-  else if (!rdp.LLE)
-  {
-    rdp.pc[rdp.pc_i] += 16; // texrect is 196-bit
   }
 
   if (rdp.skip_drawing || (!fb_emulation_enabled && (rdp.cimg == rdp.zimg)))
@@ -1230,13 +1228,21 @@ static void rdp_texrect()
   }
   // ****
   // ** Texrect offset by Gugaman **
-  float off_x = (float)((short)((rdp.cmd2 & 0xFFFF0000) >> 16)) / 32.0f;
-  if ((int(off_x) == 512) && (rdp.timg.width < 512)) off_x = 0.0f;
-  float off_y = (float)((short)(rdp.cmd2 & 0x0000FFFF)) / 32.0f;
+  //
+  //integer representation of texture coordinate. 
+  //needed to detect and avoid overflow after shifting
+  wxInt32 off_x_i = (rdp.cmd2 >> 16) & 0xFFFF;
+  wxInt32 off_y_i = rdp.cmd2 & 0xFFFF;
   float dsdx = (float)((short)((rdp.cmd3 & 0xFFFF0000) >> 16)) / 1024.0f;
   float dtdy = (float)((short)(rdp.cmd3 & 0x0000FFFF)) / 1024.0f;
+  if (off_x_i & 0x8000) //check for sign bit
+    off_x_i |= ~0xffff; //make it negative
+  //the same as for off_x_i
+  if (off_y_i & 0x8000)
+    off_y_i |= ~0xffff;
 
-  if (rdp.cycle_mode == 2) dsdx /= 4.0f;
+  if (rdp.cycle_mode == 2) 
+    dsdx /= 4.0f;
 
   float s_ul_x = ul_x * rdp.scale_x + rdp.offset_x;
   float s_lr_x = lr_x * rdp.scale_x + rdp.offset_x;
@@ -1245,7 +1251,7 @@ static void rdp_texrect()
 
   FRDP("texrect (%.2f, %.2f, %.2f, %.2f), tile: %d, #%d, #%d\n", ul_x, ul_y, lr_x, lr_y, tile, rdp.tri_n, rdp.tri_n+1);
   FRDP ("(%f, %f) -> (%f, %f), s: (%d, %d) -> (%d, %d)\n", s_ul_x, s_ul_y, s_lr_x, s_lr_y, rdp.scissor.ul_x, rdp.scissor.ul_y, rdp.scissor.lr_x, rdp.scissor.lr_y);
-  FRDP("\toff_x: %f, off_y: %f, dsdx: %f, dtdy: %f\n", off_x, off_y, dsdx, dtdy);
+  FRDP("\toff_x: %f, off_y: %f, dsdx: %f, dtdy: %f\n", off_x_i/32.0f, off_y_i/32.0f, dsdx, dtdy);
 
   float off_size_x;
   float off_size_y;
@@ -1281,128 +1287,102 @@ static void rdp_texrect()
     }
   }
 
-  float lr_u0, lr_v0, ul_u0, ul_v0, lr_u1, lr_v1, ul_u1, ul_v1;
-
-  if (rdp.cur_cache[0] && (rdp.tex & 1))
+  struct {
+    float ul_u, ul_v, lr_u, lr_v;
+  } texUV[2]; //struct for texture coordinates
+  //angrylion's macro, helps to cut overflowed values.
+  #define SIGN16(x) (((x) & 0x8000) ? ((x) | ~0xffff) : ((x) & 0xffff))
+  //calculate texture coordinates
+  for (int i = 0; i < 2; i++)
   {
-    float sx=1, sy=1;
-    if (rdp.tiles[rdp.cur_tile].shift_s)
+    if (rdp.cur_cache[i] && (rdp.tex & (i+1)))
     {
-      if (rdp.tiles[rdp.cur_tile].shift_s > 10)
-        sx = (float)(1 << (16 - rdp.tiles[rdp.cur_tile].shift_s));
-      else
-        sx = (float)1.0f/(1 << rdp.tiles[rdp.cur_tile].shift_s);
-    }
-    if (rdp.tiles[rdp.cur_tile].shift_t)
-    {
-      if (rdp.tiles[rdp.cur_tile].shift_t > 10)
-        sy = (float)(1 << (16 - rdp.tiles[rdp.cur_tile].shift_t));
-      else
-        sy = (float)1.0f/(1 << rdp.tiles[rdp.cur_tile].shift_t);
-    }
-    if (rdp.tbuff_tex && rdp.tbuff_tex->tile == 0)
-    {
-      float t0_off_x = off_x;
-      float t0_off_y = off_y;
-      if (off_x + off_y < 0.1f)
+      float sx = 1, sy = 1;
+      int x_i = off_x_i, y_i = off_y_i;
+      TILE & tile = rdp.tiles[rdp.cur_tile + i];
+      //shifting
+      if (tile.shift_s)
       {
-        t0_off_x += rdp.tiles[0].ul_s;
-        t0_off_y += rdp.tiles[0].ul_t;
+        if (tile.shift_s > 10) 
+        {
+          wxUint8 iShift = (16 - tile.shift_s);
+          x_i <<= iShift;
+          sx = (float)(1 << iShift);
+        }
+        else 
+        {
+          wxUint8 iShift = tile.shift_s;
+          x_i >>= iShift;
+          sx = 1.0f/(float)(1 << iShift);
+        }
       }
-      t0_off_x += rdp.tbuff_tex->u_shift;// + rdp.tiles[0].ul_s; //commented for Paper Mario motion blur
-      t0_off_y += rdp.tbuff_tex->v_shift;// + rdp.tiles[0].ul_t;
-      FRDP("tbuff_tex ul_s: %d, ul_t: %d, off_x: %f, off_y: %f\n", rdp.tiles[0].ul_s, rdp.tiles[0].ul_t, off_x, off_y);
-      ul_u0 = t0_off_x * sx;
-      ul_v0 = t0_off_y * sy;
+      if (tile.shift_t)
+      {
+        if (tile.shift_t > 10)
+        {
+          wxUint8 iShift = (16 - tile.shift_t);
+          y_i <<= iShift;
+          sy = (float)(1 << iShift);
+        }
+        else
+        {
+          wxUint8 iShift = tile.shift_t;
+          y_i >>= iShift;
+          sy = 1.0f/(float)(1 << iShift);
+        }
+      }
+      
+      if (rdp.tbuff_tex && rdp.tbuff_tex->tile == i) //hwfbe texture
+      {
+        float t0_off_x; 
+        float t0_off_y; 
+        if (off_x_i + off_y_i == 0)
+        {
+          t0_off_x = tile.ul_s;
+          t0_off_y = tile.ul_t;
+        }
+        else
+        {
+          t0_off_x = off_x_i/32.0f;
+          t0_off_y = off_y_i/32.0f;
+        }
+        t0_off_x += rdp.tbuff_tex->u_shift;// + tile.ul_s; //commented for Paper Mario motion blur
+        t0_off_y += rdp.tbuff_tex->v_shift;// + tile.ul_t;
+        texUV[i].ul_u = t0_off_x * sx;
+        texUV[i].ul_v = t0_off_y * sy;
 
-      lr_u0 = ul_u0 + off_size_x * sx;
-      lr_v0 = ul_v0 + off_size_y * sy;
+        texUV[i].lr_u = texUV[i].ul_u + off_size_x * sx;
+        texUV[i].lr_v = texUV[i].ul_v + off_size_y * sy;
 
-      ul_u0 *= rdp.tbuff_tex->u_scale;
-      ul_v0 *= rdp.tbuff_tex->v_scale;
-      lr_u0 *= rdp.tbuff_tex->u_scale;
-      lr_v0 *= rdp.tbuff_tex->v_scale;
-      FRDP("tbuff_tex ul_u0: %f, ul_v0: %f, lr_u0: %f, lr_v0: %f\n", ul_u0, ul_v0, lr_u0, lr_v0);
+        texUV[i].ul_u *= rdp.tbuff_tex->u_scale;
+        texUV[i].ul_v *= rdp.tbuff_tex->v_scale;
+        texUV[i].lr_u *= rdp.tbuff_tex->u_scale;
+        texUV[i].lr_v *= rdp.tbuff_tex->v_scale;
+        FRDP("tbuff_tex[%d] ul_u: %f, ul_v: %f, lr_u: %f, lr_v: %f\n", 
+          i, texUV[i].ul_u, texUV[i].ul_v, texUV[i].lr_u, texUV[i].lr_v);
+      }
+      else //common case
+      {
+        //kill 10.5 format overflow by SIGN16 macro
+        texUV[i].ul_u = SIGN16(x_i) / 32.0f;
+        texUV[i].ul_v = SIGN16(y_i) / 32.0f;
+
+        texUV[i].ul_u -= tile.f_ul_s;
+        texUV[i].ul_v -= tile.f_ul_t;
+
+        texUV[i].lr_u = texUV[i].ul_u + off_size_x * sx;
+        texUV[i].lr_v = texUV[i].ul_v + off_size_y * sy;
+
+        texUV[i].ul_u = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_x * texUV[i].ul_u;
+        texUV[i].lr_u = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_x * texUV[i].lr_u;
+        texUV[i].ul_v = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_y * texUV[i].ul_v;
+        texUV[i].lr_v = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_y * texUV[i].lr_v;
+      }
     }
     else
     {
-      ul_u0 = off_x * sx;
-      ul_v0 = off_y * sy;
-
-      ul_u0 -= rdp.tiles[rdp.cur_tile].f_ul_s;
-      ul_v0 -= rdp.tiles[rdp.cur_tile].f_ul_t;
-
-      lr_u0 = ul_u0 + off_size_x * sx;
-      lr_v0 = ul_v0 + off_size_y * sy;
-
-      ul_u0 = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_x * ul_u0;
-      lr_u0 = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_x * lr_u0;
-      ul_v0 = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_y * ul_v0;
-      lr_v0 = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_y * lr_v0;
+      texUV[i].ul_u = texUV[i].ul_v = texUV[i].lr_u = texUV[i].lr_v = 0;
     }
-  }
-  else
-  {
-    ul_u0 = ul_v0 = lr_u0 = lr_v0 = 0;
-  }
-  if (rdp.cur_cache[1] && (rdp.tex & 2))
-  {
-    float sx=1, sy=1;
-
-    if (rdp.tiles[rdp.cur_tile+1].shift_s)
-    {
-      if (rdp.tiles[rdp.cur_tile+1].shift_s > 10)
-        sx = (float)(1 << (16 - rdp.tiles[rdp.cur_tile+1].shift_s));
-      else
-        sx = (float)1.0f/(1 << rdp.tiles[rdp.cur_tile+1].shift_s);
-    }
-    if (rdp.tiles[rdp.cur_tile+1].shift_t)
-    {
-      if (rdp.tiles[rdp.cur_tile+1].shift_t > 10)
-        sy = 1;//(float)(1 << (16 - rdp.tiles[rdp.cur_tile+1].shift_t));
-      else
-        sy = (float)1.0f/(1 << rdp.tiles[rdp.cur_tile+1].shift_t);
-    }
-
-    if (rdp.tbuff_tex && rdp.tbuff_tex->tile == 1)
-    {
-      float t1_off_x = off_x;
-      float t1_off_y = off_y;
-      t1_off_x += rdp.tbuff_tex->u_shift;// + rdp.tiles[0].ul_s; //commented for Paper Mario motion blur
-      t1_off_y += rdp.tbuff_tex->v_shift;// + rdp.tiles[0].ul_t;
-      FRDP("tbuff_tex ul_s: %d, ul_t: %d, off_x: %f, off_y: %f\n", rdp.tiles[0].ul_s, rdp.tiles[0].ul_t, off_x, off_y);
-      ul_u1 = t1_off_x * sx;
-      ul_v1 = t1_off_y * sy;
-
-      lr_u1 = ul_u1 + off_size_x * sx;
-      lr_v1 = ul_v1 + off_size_y * sy;
-
-      ul_u1 *= rdp.tbuff_tex->u_scale;
-      ul_v1 *= rdp.tbuff_tex->v_scale;
-      lr_u1 *= rdp.tbuff_tex->u_scale;
-      lr_v1 *= rdp.tbuff_tex->v_scale;
-      FRDP("tbuff_tex ul_u1: %f, ul_v1: %f, lr_u1: %f, lr_v1: %f\n", ul_u0, ul_v0, lr_u0, lr_v0);
-    }
-    else
-    {
-      ul_u1 = off_x * sx;
-      ul_v1 = off_y * sy;
-
-      ul_u1 -= rdp.tiles[rdp.cur_tile+1].f_ul_s;
-      ul_v1 -= rdp.tiles[rdp.cur_tile+1].f_ul_t;
-
-      lr_u1 = ul_u1 + off_size_x * sx;
-      lr_v1 = ul_v1 + off_size_y * sy;
-
-      ul_u1 = rdp.cur_cache[1]->c_off + rdp.cur_cache[1]->c_scl_x * ul_u1;
-      lr_u1 = rdp.cur_cache[1]->c_off + rdp.cur_cache[1]->c_scl_x * lr_u1;
-      ul_v1 = rdp.cur_cache[1]->c_off + rdp.cur_cache[1]->c_scl_y * ul_v1;
-      lr_v1 = rdp.cur_cache[1]->c_off + rdp.cur_cache[1]->c_scl_y * lr_v1;
-    }
-  }
-  else
-  {
-    ul_u1 = ul_v1 = lr_u1 = lr_v1 = 0;
   }
   rdp.cur_tile = prev_tile;
 
@@ -1410,8 +1390,8 @@ static void rdp_texrect()
 
   FRDP ("  scissor: (%d, %d) -> (%d, %d)\n", rdp.scissor.ul_x, rdp.scissor.ul_y, rdp.scissor.lr_x, rdp.scissor.lr_y);
 
-  CCLIP2 (s_ul_x, s_lr_x, ul_u0, lr_u0, ul_u1, lr_u1, (float)rdp.scissor.ul_x, (float)rdp.scissor.lr_x);
-  CCLIP2 (s_ul_y, s_lr_y, ul_v0, lr_v0, ul_v1, lr_v1, (float)rdp.scissor.ul_y, (float)rdp.scissor.lr_y);
+  CCLIP2 (s_ul_x, s_lr_x, texUV[0].ul_u, texUV[0].lr_u, texUV[1].ul_u, texUV[1].lr_u, (float)rdp.scissor.ul_x, (float)rdp.scissor.lr_x);
+  CCLIP2 (s_ul_y, s_lr_y, texUV[0].ul_v, texUV[0].lr_v, texUV[1].ul_v, texUV[1].lr_v, (float)rdp.scissor.ul_y, (float)rdp.scissor.lr_y);
 
   FRDP ("  draw at: (%f, %f) -> (%f, %f)\n", s_ul_x, s_ul_y, s_lr_x, s_lr_y);
 
@@ -1446,22 +1426,22 @@ static void rdp_texrect()
   }
 
   VERTEX vstd[4] = {
-    { s_ul_x, s_ul_y, Z, 1.0f, ul_u0, ul_v0, ul_u1, ul_v1, {0, 0, 0, 0}, 255 },
-    { s_lr_x, s_ul_y, Z, 1.0f, lr_u0, ul_v0, lr_u1, ul_v1, {0, 0, 0, 0}, 255 },
-    { s_ul_x, s_lr_y, Z, 1.0f, ul_u0, lr_v0, ul_u1, lr_v1, {0, 0, 0, 0}, 255 },
-    { s_lr_x, s_lr_y, Z, 1.0f, lr_u0, lr_v0, lr_u1, lr_v1, {0, 0, 0, 0}, 255 } };
+    { s_ul_x, s_ul_y, Z, 1.0f, texUV[0].ul_u, texUV[0].ul_v, texUV[1].ul_u, texUV[1].ul_v, {0, 0, 0, 0}, 255 },
+    { s_lr_x, s_ul_y, Z, 1.0f, texUV[0].lr_u, texUV[0].ul_v, texUV[1].lr_u, texUV[1].ul_v, {0, 0, 0, 0}, 255 },
+    { s_ul_x, s_lr_y, Z, 1.0f, texUV[0].ul_u, texUV[0].lr_v, texUV[1].ul_u, texUV[1].lr_v, {0, 0, 0, 0}, 255 },
+    { s_lr_x, s_lr_y, Z, 1.0f, texUV[0].lr_u, texUV[0].lr_v, texUV[1].lr_u, texUV[1].lr_v, {0, 0, 0, 0}, 255 } };
 
     if ( ((rdp.cmd0>>24)&0xFF) == 0xE5 ) //texrectflip
     {
-      vstd[1].u0 = ul_u0;
-      vstd[1].v0 = lr_v0;
-      vstd[1].u1 = ul_u1;
-      vstd[1].v1 = lr_v1;
+      vstd[1].u0 = texUV[0].ul_u;
+      vstd[1].v0 = texUV[0].lr_v;
+      vstd[1].u1 = texUV[1].ul_u;
+      vstd[1].v1 = texUV[1].lr_v;
 
-      vstd[2].u0 = lr_u0;
-      vstd[2].v0 = ul_v0;
-      vstd[2].u1 = lr_u1;
-      vstd[2].v1 = ul_v1;
+      vstd[2].u0 = texUV[0].lr_u;
+      vstd[2].v0 = texUV[0].ul_v;
+      vstd[2].u1 = texUV[1].lr_u;
+      vstd[2].v1 = texUV[1].ul_v;
     }
 
     VERTEX *vptr = vstd;
