@@ -708,6 +708,7 @@ typedef struct
   int allow_combine; // allow combine updating?
 
   int s2dex_tex_loaded;
+  wxUint16 bg_image_height;
 
   // Debug stuff
   wxUint32 rm; // use othermode_l instead, this just as a check for changes
