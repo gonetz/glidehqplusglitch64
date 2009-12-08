@@ -50,9 +50,17 @@ wxUint32 Load4bCI (wxUIntPtr dst, wxUIntPtr src, int wid_64, int height, int lin
   if (wid_64 < 1) wid_64 = 1;
   if (height < 1) height = 1;
   int ext = (real_width - (wid_64 << 4)) << 1;
-  wxUIntPtr pal = wxPtrToUInt(rdp.pal_8 + (rdp.tiles[tile].palette << 4));
 
-  if (rdp.tlut_mode != 3)
+  if (rdp.tlut_mode == 0) 
+  {
+    //in tlut DISABLE mode load CI texture as plain intensity texture instead of palette dereference. 
+    //Thanks to angrylion for the advice
+    asmLoad4bI (src, dst, wid_64, height, line, ext);	
+    return /*(0 << 16) | */GR_TEXFMT_ALPHA_INTENSITY_44;
+  }
+
+  wxUIntPtr pal = wxPtrToUInt(rdp.pal_8 + (rdp.tiles[tile].palette << 4));
+  if (rdp.tlut_mode == 2) 
   {
     asmLoad4bCI (src, dst, wid_64, height, line, ext, pal);
     return (1 << 16) | GR_TEXFMT_ARGB_1555;
