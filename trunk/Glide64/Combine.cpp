@@ -10498,7 +10498,7 @@ static COMBINER color_cmb_list[] = {
   {0x61356135, cc_env_sub_prim_mul_t0_add_prim},
   // Mission Impossible. Added by Gonetz
   // (env-prim)*t0+prim, (shade-0)*cmb+0  ** INC **
-  {0x6135e0f4, cc_t0_mul_shade},
+  {0x6135e0f4, cc__prim_inter_env_using_t0__mul_shade},
   // crashing other vehicle, Monster truck madness [Raziel64]. Added by Gonetz
   // (env-prim)*t0+prim, (cmb-0)*t0+0  ** INC **
   {0x6135e1f0, cc_env_sub_prim_mul_t0_add_prim},
