@@ -779,6 +779,7 @@ EXPORT void CALL ProcessDList(void)
   rdp.maincimg[1] = rdp.maincimg[0];
   rdp.skip_drawing = FALSE;
   rdp.s2dex_tex_loaded = FALSE;
+  rdp.bg_image_height = 0xFFFF;
   fbreads_front = fbreads_back = 0;
   rdp.fog_multiplier = rdp.fog_offset = 0;
   rdp.zsrc = 0;
@@ -1121,7 +1122,11 @@ static void rdp_texrect()
     lr_y = max(0.0f, ((short)(rdp.cmd0 & 0x00000FFF)) / 4.0f);
   }
 
-  if (ul_x >= lr_x) return;
+  if (ul_x >= lr_x) 
+  {
+    FRDP("Wrong Texrect: ul_x: %f, lr_x: %f\n", ul_x, lr_x);
+    return;
+  }
 
   if (rdp.cycle_mode > 1 || settings.increase_texrect_edge)
   {
@@ -1373,10 +1378,10 @@ static void rdp_texrect()
         texUV[i].lr_u = texUV[i].ul_u + off_size_x * sx;
         texUV[i].lr_v = texUV[i].ul_v + off_size_y * sy;
 
-        texUV[i].ul_u = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_x * texUV[i].ul_u;
-        texUV[i].lr_u = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_x * texUV[i].lr_u;
-        texUV[i].ul_v = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_y * texUV[i].ul_v;
-        texUV[i].lr_v = rdp.cur_cache[0]->c_off + rdp.cur_cache[0]->c_scl_y * texUV[i].lr_v;
+        texUV[i].ul_u = rdp.cur_cache[i]->c_off + rdp.cur_cache[i]->c_scl_x * texUV[i].ul_u;
+        texUV[i].lr_u = rdp.cur_cache[i]->c_off + rdp.cur_cache[i]->c_scl_x * texUV[i].lr_u;
+        texUV[i].ul_v = rdp.cur_cache[i]->c_off + rdp.cur_cache[i]->c_scl_y * texUV[i].ul_v;
+        texUV[i].lr_v = rdp.cur_cache[i]->c_off + rdp.cur_cache[i]->c_scl_y * texUV[i].lr_v;
       }
     }
     else
