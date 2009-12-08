@@ -633,6 +633,11 @@ static void uc2_moveword ()
       rdp.fog_multiplier = (short)(rdp.cmd1 >> 16);
       rdp.fog_offset = (short)(rdp.cmd1 & 0x0000FFFF);
       FRDP ("fog: multiplier: %f, offset: %f\n", rdp.fog_multiplier, rdp.fog_offset);
+
+      //offset must be 0 for move_fog, but it can be non zero in Nushi Zuri 64 - Shiokaze ni Notte
+      //low-level display list has setothermode commands in this place, so this is obviously not move_fog.
+      if (offset == 0x04)
+        rdp.tlut_mode = (data == 0xffffffff) ? 0 : 2; 
     }
     break;
 
