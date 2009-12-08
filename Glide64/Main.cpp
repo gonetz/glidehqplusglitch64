@@ -334,7 +334,7 @@ static wxConfigBase * OpenIni()
     if (wxFileExists(iniName))
     {
       wxFileInputStream is(iniName);
-      wxFileConfig * fcfg = new wxFileConfig(is);
+      wxFileConfig * fcfg = new wxFileConfig(is, wxConvISO8859_1);
       wxConfigBase::Set(fcfg);
       ini = fcfg;
     }
