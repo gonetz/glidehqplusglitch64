@@ -1304,7 +1304,10 @@ void LoadTex (int id, int tmu)
       if (info.tex_size > rdp.tiles[td].size)
         tile_width <<= info.tex_size - rdp.tiles[td].size;
 
-      tile_height = info.tile_height;
+      if (rdp.tiles[td].lr_t > rdp.bg_image_height)
+        tile_height = rdp.bg_image_height - rdp.tiles[td].ul_t;
+      else
+        tile_height = info.tile_height;
     }
     else
     {

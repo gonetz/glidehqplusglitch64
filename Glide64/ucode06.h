@@ -425,6 +425,7 @@ void DrawImage (DRAWIMAGE *d)
   cb_v = ((cur_v-1)<<y_shift);
   while (cb_v >= d->imageH) cb_v -= d->imageH;
   tb_v = cb_v;
+  rdp.bg_image_height = d->imageH;
 
   while (1)
   {
@@ -491,10 +492,8 @@ void DrawImage (DRAWIMAGE *d)
             apply_shade_mods (&(v[s]));
           ConvertCoordsConvert (v, 4);
 
-          if (fullscreen)// && /*hack for Zelda MM. Gonetz*/rdp.cur_cache[0]->addr > 0xffff && rdp.cur_cache[0]->crc != 0)
-          {
+          if (fullscreen)
             grDrawVertexArrayContiguous (GR_TRIANGLE_STRIP, 4, v, sizeof(VERTEX));
-          }
 
           if (_debugger.capture)
           {
@@ -545,6 +544,7 @@ void DrawImage (DRAWIMAGE *d)
   }
 
   rdp.allow_combine = 1;
+  rdp.bg_image_height = 0xFFFF;
 
   rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE | UPDATE_TEXTURE | UPDATE_ALPHA_COMPARE
     | UPDATE_SCISSOR;
