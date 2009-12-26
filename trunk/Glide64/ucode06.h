@@ -255,10 +255,7 @@ void DrawImage (DRAWIMAGE *d)
 
   if ((settings.hacks&hack_PPL))
   {
-    if (d->imageW%2 == 1) d->imageW -= 1;
-    if (d->imageH%2 == 1) d->imageH -= 1;
     if (d->imageY > d->imageH) d->imageY = (d->imageY%d->imageH);
-    //	if (d->imageX > d->imageW) d->imageX = (d->imageX%d->imageW);
   }
   else
   {
@@ -309,7 +306,7 @@ void DrawImage (DRAWIMAGE *d)
   rdp.timg.format = d->imageFmt;	// RGBA
   rdp.timg.size = d->imageSiz;		// 16-bit
   rdp.timg.addr = d->imagePtr;
-  rdp.timg.width = d->imageW;
+  rdp.timg.width = (d->imageW%2)?d->imageW-1:d->imageW;
   rdp.timg.set_by = 0;
 
   // SetTile ()
