@@ -1636,14 +1636,17 @@ void CALL RomClosed (void)
 
 static void CheckDRAMSize()
 {
+  wxUint32 test;
   GLIDE64_TRY
   {
-    wxUint8 test = gfx.RDRAM[5000000];
+    test = gfx.RDRAM[0x00700000] + 1;
   }
   GLIDE64_CATCH
   {
-    BMASK = WMASK;
+    test = 0;
   }
+  if (!test)
+    BMASK = WMASK;
 }
 
 /******************************************************************
