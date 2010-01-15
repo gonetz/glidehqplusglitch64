@@ -303,7 +303,7 @@ typedef struct {
   #define  hack_BAR         (1<<2)   //Beetle Adventure Racing
   #define  hack_Chopper     (1<<3)   //Chopper Attack
   #define  hack_Diddy       (1<<4)   //diddy kong racing
-  #define  hack_Doraemon2   (1<<5)   //Doraemon 2
+  //#define  hack_Doraemon2   (1<<5)   //Doraemon 2
   #define  hack_Fifa98      (1<<6)   //FIFA - Road to World Cup 98
   #define  hack_Fzero       (1<<7)   //F-Zero
   #define  hack_Hyperbike   (1<<8)   //Top Gear Hyper Bike
@@ -318,7 +318,6 @@ typedef struct {
   #define  hack_Ogre64      (1<<17)  //Ogre Battle 64
   #define  hack_Pilotwings  (1<<18)  //Pilotwings
   #define  hack_PMario      (1<<19)  //Paper Mario
-//  #define  hack_Powerpuff   (1<<19)  //Powerpuff Girls, The - Chemical X-traction
   #define  hack_PPL         (1<<20)  //pokemon puzzle league requires many special fixes
   #define  hack_RE2         (1<<21)  //Resident Evil 2
   #define  hack_Supercross  (1<<22)  //Supercross 2000

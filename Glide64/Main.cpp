@@ -438,8 +438,6 @@ void ReadSpecialSettings (const char * name)
     settings.hacks |= hack_Tonic;
   else if (strstr(name, (const char *)"All") && strstr(name, (const char *)"Star") && strstr(name, (const char *)"Baseball"))
     settings.hacks |= hack_ASB;
-  else if (strstr(name, (const char *)"ÄÞ×´ÓÝ2 Ë¶ØÉ¼ÝÃÞÝ"))
-    settings.hacks |= hack_Doraemon2;
   else if (strstr(name, (const char *)"Beetle") || strstr(name, (const char *)"BEETLE") || strstr(name, (const char *)"HSV"))
   {
     settings.hacks |= hack_BAR;
@@ -1639,7 +1637,7 @@ static void CheckDRAMSize()
   wxUint32 test;
   GLIDE64_TRY
   {
-    test = gfx.RDRAM[0x00700000] + 1;
+    test = gfx.RDRAM[0x007FFFFF] + 1;
   }
   GLIDE64_CATCH
   {
@@ -1750,8 +1748,11 @@ void drawViRegBG()
   FB_TO_SCREEN_INFO fb_info;
   fb_info.width  = VIwidth;
   fb_info.height = (wxUint32)rdp.vi_height;
-  if (fb_info.height == 0)
+  if (fb_info.height == 0) 
+  {
+    RDP("Image height = 0 - skipping\n");
     return;
+  }
   fb_info.ul_x = 0;
 
   fb_info.lr_x = VIwidth - 1;
@@ -1763,15 +1764,23 @@ void drawViRegBG()
   {
     fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<2);
     fb_info.size   = 3;
-    update_screen_count = 0;
+  }
+  else if (rdp.ci_size > 1) 
+  {
+    fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<(rdp.ci_size-1));
+    fb_info.size   = rdp.ci_size;
   }
   else
   {
     fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<1);
     fb_info.size   = 2;
   }
-  if (fb_info.addr + ((fb_info.width*fb_info.height)<<fb_info.size>>1) > BMASK)
+  wxUint32 image_end_addr = fb_info.addr + ((fb_info.width*fb_info.height)<<fb_info.size>>1);
+  if (image_end_addr > BMASK+1)
+  {
+    FRDP("Image is out of RDRAM bounds: %d\n", image_end_addr);
     return;
+  }
   rdp.last_bg = fb_info.addr;
 
   bool drawn = DrawFrameBufferToScreen(fb_info);
@@ -1858,7 +1867,7 @@ void CALL UpdateScreen (void)
   }
 #endif
   //*
-  wxUint32 limit = (settings.hacks&hack_Lego) ? 15 : 50;
+  wxUint32 limit = (settings.hacks&hack_Lego) ? 15 : 30;
   if ((settings.frame_buffer&fb_cpu_write_hack) && (update_screen_count > limit) && (rdp.last_bg == 0))
   {
     RDP("DirectCPUWrite hack!\n");
