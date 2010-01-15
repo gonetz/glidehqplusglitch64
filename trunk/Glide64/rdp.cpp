@@ -297,6 +297,7 @@ void rdp_reset ()
   rdp.ocimg = 0;
   rdp.zimg = 0;
   rdp.ci_width = 0;
+  rdp.ci_size = 0;
   rdp.cycle_mode = 2;
   rdp.persp_supported = FALSE;
   rdp.force_wrap = FALSE;
@@ -783,7 +784,8 @@ EXPORT void CALL ProcessDList(void)
   fbreads_front = fbreads_back = 0;
   rdp.fog_multiplier = rdp.fog_offset = 0;
   rdp.zsrc = 0;
-  rdp.tlut_mode = 0; //is it correct?
+  if (rdp.vi_org_reg != *gfx.VI_ORIGIN_REG)
+    rdp.tlut_mode = 0; //is it correct?
   rdp.scissor_set = FALSE;
   ucode5_texshiftaddr = ucode5_texshiftcount = 0;
   cpu_fb_write = FALSE;
@@ -902,6 +904,7 @@ EXPORT void CALL ProcessDList(void)
       exception = TRUE;
     else
       to_fullscreen = TRUE;
+    return;
   }
 #endif
 
