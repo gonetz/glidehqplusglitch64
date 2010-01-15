@@ -363,11 +363,12 @@ void DrawImage (DRAWIMAGE *d)
 
     if (rdp.ci_width == 512 && !no_dlist)
       grClipWindow (0, 0, settings.scr_res_x, settings.scr_res_y);
-    else
+    else if (d->scaleX == 1.0f && d->scaleY == 1.0f)
       grClipWindow (rdp.scissor.ul_x, rdp.scissor.ul_y, rdp.scissor.lr_x, rdp.scissor.lr_y);
+    else
+      grClipWindow (rdp.scissor.ul_x, rdp.scissor.ul_y, min(rdp.scissor.lr_x, (wxUint32)((d->frameX+d->imageW/d->scaleX)*rdp.scale_x+0.1f)), min(rdp.scissor.lr_y, (wxUint32)((d->frameY+d->imageH/d->scaleY)*rdp.scale_y+0.1f)));
 
     grCullMode (GR_CULL_DISABLE);
-    //		if (!settings.hack_PPL)
     if (rdp.cycle_mode == 2)
     {
       rdp.allow_combine = 0;
@@ -479,7 +480,7 @@ void DrawImage (DRAWIMAGE *d)
 
       if ((flr_x <= rdp.scissor.lr_x) || (ful_x < rdp.scissor.lr_x))
       {
-        VERTEX v[4] = {
+          VERTEX v[4] = {
           { ful_x, ful_y, Z, 1.0f, ful_u, ful_v },
           { flr_x, ful_y, Z, 1.0f, flr_u, ful_v },
           { ful_x, flr_y, Z, 1.0f, ful_u, flr_v },
@@ -764,13 +765,6 @@ static void uc6_bg_1cyc ()
 
   d.scaleX	= ((short *)gfx.RDRAM)[(addr+14)^1] / 1024.0f;	// 14
   d.scaleY	= ((short *)gfx.RDRAM)[(addr+15)^1] / 1024.0f;	// 15
-  if (settings.hacks&hack_Doraemon2) //Doraemon 2 scale fix
-  {
-    if (d.frameW == d.imageW)
-      d.scaleX	= 1.0f;
-    if (d.frameH == d.imageH)
-      d.scaleY	= 1.0f;
-  }
   d.flipY 	= 0;
   int imageYorig= ((int *)gfx.RDRAM)[(addr+16)>>1] >> 5;
   rdp.last_bg = d.imagePtr;
@@ -1705,11 +1699,12 @@ void uc6_sprite2d ()
 
       d.scaleX	= ((cmd1>>16)&0xFFFF)/1024.0f;
       d.scaleY	= (cmd1&0xFFFF)/1024.0f;
-      if( (cmd1&0xFFFF) < 0x100 )
-        d.scaleY = d.scaleX;
+      //the code below causes wrong background height in super robot spirit, so it is disabled.
+      //need to find, for which game this hack was made
+      //if( (cmd1&0xFFFF) < 0x100 )
+      //  d.scaleY = d.scaleX; 
       d.flipX = (wxUint8)((cmd0>>8)&0xFF);
       d.flipY = (wxUint8)(cmd0&0xFF);
-
 
       a = rdp.pc[rdp.pc_i] & BMASK;
       rdp.pc[rdp.pc_i] = (a+8) & BMASK;
@@ -1750,6 +1745,7 @@ void uc6_sprite2d ()
 
     if (texsize > 4096)
     {
+      d.scaleX *= (float)stride/(float)d.imageW;
       d.imageW	= stride;
       d.imageH	+= d.imageY;
       DrawImage (&d);
@@ -1907,5 +1903,3 @@ void uc6_sprite2d ()
       return;
   }
 }
-
-
