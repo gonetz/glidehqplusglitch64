@@ -3553,6 +3553,16 @@ static void cc__t0_inter_t1_using_enva__sub_shade_mul_prim ()
   T0_INTER_T1_USING_FACTOR (factor);
 }
 
+static void cc_t0_sub_shade_mul_shadea ()  //Aded by Gonetz
+{
+  // * not guaranteed to work if another iterated alpha is set
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
+    GR_COMBINE_FACTOR_LOCAL_ALPHA,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_TEXTURE);
+  USE_T0 ();
+}
+
 static void cc_one_sub_t0_mul_prim () //Added by Gonetz
 {
   CCMB (GR_COMBINE_FUNCTION_BLEND_LOCAL,
@@ -3623,6 +3633,16 @@ static void cc_shade_sub_env_mul__t0_inter_t1_using_primlod () //Aded by Gonetz
   T0_INTER_T1_USING_FACTOR (lod_frac);
 }
 
+static void cc_shade_sub_env_mul_prim () //Aded by Gonetz
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_LOCAL,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  CC_PRIM();
+  SUBSHADE_ENV ();
+}
+
 static void cc_shade_sub__prim_mul_prima () //Aded by Gonetz
 {
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
@@ -3689,6 +3709,16 @@ static void cc_one_sub_env_mul__t0_inter_t1_using_primlod () //Aded by Gonetz
     GR_COMBINE_OTHER_TEXTURE);
   CC_ENV ();
   T0_INTER_T1_USING_FACTOR (lod_frac);
+}
+
+static void cc_one_sub_env_mul_prim () //Aded by Gonetz
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_ONE_MINUS_LOCAL,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  CC_ENV ();
+  SETSHADE_PRIM ();
 }
 
 static void cc_one_sub_env_mul_shade () //Aded by Gonetz
@@ -10228,6 +10258,9 @@ static COMBINER color_cmb_list[] = {
   // super bowling
   // (0-0)*k5+t0
   {0x2fff2fff, cc_t0},
+  //C&C shadows
+  //(1-env)*0+t0
+  {0x3f563f56, cc_t0},
   // RARE logo, blast corps. Added by Gonetz
   // (t0-0)*0+t0
   {0x3ff13ff1, cc_t0},
@@ -11432,6 +11465,12 @@ static COMBINER color_cmb_list[] = {
   // lens of truth, zelda 2 [Ogy]. Added by Gonetz
   // (1-t0)*prim+0
   {0xe316e316, cc_one_sub_t0_mul_prim},
+  //C&C pointer
+  //(shade-env)*prim+0
+  {0xe354e354, cc_shade_sub_env_mul_prim},
+  //C&C shadows
+  //(1-env)*prim+0
+  {0xe356e356, cc_one_sub_env_mul_prim},
   // Magnitude, pokemon stadium 2
   // (t0-0)*prim+0, (t0-0)*env+cmb
   {0xe3f105f1, cc_t0_mul__prim_add_env},
@@ -11878,6 +11917,9 @@ static COMBINER color_cmb_list[] = {
   // background, killer instinct gold
   // (t0-prim)*shade_a+0
   {0xeb31eb31, cc_t0_sub_prim_mul_shadea},
+  // ground, C&C
+  // (t0-shade)*shade_a+0
+  {0xeb41eb41, cc_t0_sub_shade_mul_shadea},
   // Wreslters, WWF No Mercy, [CpUMasteR]
   // (t0-0)*shade_alpha+0, (env-cmb)*prim+cmb
   {0xebf10305, cc_t0_mul_one_sub_prim_mul_shadea_add_prim_mul_env},
