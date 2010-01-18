@@ -9184,6 +9184,17 @@ static void ac_one_sub_prim_mul_t0_add__prim_mul_env ()
   A_USE_T0 ();
 }
 
+static void ac_shade_sub_env_mul_t0_add_prim ()
+{
+  ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+    GR_COMBINE_FACTOR_TEXTURE_ALPHA,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  SUBSHADE_A_ENV ();
+  CA_PRIM ();
+  A_USE_T0 ();
+}
+
 // ** A inter B using C **
 static void ac_t0_inter_t1_using_prima ()
 {
@@ -12856,6 +12867,9 @@ static COMBINER alpha_cmb_list[] = {
   // castlevania 2 [Ogy]. Added by Gonetz
   // (1-shade)*t0+0
   {0x0e660e66, ac_one_sub_shade_mul_t0},
+  // GoldenEye: Helicopter rotors
+  // (shade-env)*t0+0, (1-0)*prim+cmb
+  {0x0e6c00fe, ac_shade_sub_env_mul_t0_add_prim},
   // background, level3-4, Kirby64, [Raziel64]
   // (shade-env)*t0+0
   {0x0e6c0e6c, ac_shade_sub_env_mul_t0},
