@@ -86,3 +86,4 @@
 #define grViewport _grViewport
 #define guFogGenerateLinear _guFogGenerateLinear
 #define guFogTableIndexToW _guFogTableIndexToW
+#define guGammaCorrectionRGB _guGammaCorrectionRGB
