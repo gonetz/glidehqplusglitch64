@@ -2681,7 +2681,13 @@ grTexMultibaseAddress( GrChipID_t       tmu,
 FX_ENTRY void FX_CALL
 grLoadGammaTable( FxU32 nentries, FxU32 *red, FxU32 *green, FxU32 *blue)
 {
-  display_warning("grLoadGammaTable");
+  LOG("grLoadGammaTable\r\n");
+}
+
+FX_ENTRY void FX_CALL
+guGammaCorrectionRGB( FxFloat red, FxFloat green, FxFloat blue )
+{
+  LOG("guGammaCorrectionRGB()\r\n");
 }
 
 FX_ENTRY void FX_CALL
