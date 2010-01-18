@@ -1012,6 +1012,8 @@ int InitGfx (int evoodoo_using_window)
   else
     voodoo.sup_32bit_tex = FALSE;
 
+  voodoo.gamma = 0;
+
   if (fb_hwfbe_enabled)
   {
     if (char * extstr = (char*)strstr(extensions, "TEXTUREBUFFER"))
@@ -2193,6 +2195,22 @@ void newSwapBuffers()
       LOG ("BUFFER SWAPPED\n");
       grBufferSwap (settings.vsync);
       fps_count ++;
+      if (*gfx.VI_STATUS_REG&0x08) //gamma correction is used
+      {
+        if (!voodoo.gamma) 
+        {
+          guGammaCorrectionRGB(2.0f, 2.0f, 2.0f); //with gamma=2.0 gamma table is the same, as in N64
+          voodoo.gamma = 1;
+        }
+      } 
+      else
+      {
+        if (voodoo.gamma) 
+        {
+          guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop 
+          voodoo.gamma = 0;
+        }
+      }
     }
 
     if (_debugger.capture)

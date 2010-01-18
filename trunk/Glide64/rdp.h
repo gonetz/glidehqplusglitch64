@@ -352,6 +352,7 @@ typedef struct
   int sup_32bit_tex;
   int has_2mb_tex_boundary;
   int tex_UMA;
+  int gamma;
   wxUint32 tmem_ptr[MAX_TMU];
   wxUint32 tex_min_addr[MAX_TMU];
   wxUint32 tex_max_addr[MAX_TMU];
