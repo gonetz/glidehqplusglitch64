@@ -1,5 +1,7 @@
 #summary Compiling the project on Windows
 
+Note: you need at least Visual Studio 2005 to compile all the libraries.
+
 =1. Download latest Glide64 sources=
 
 From SVN:
