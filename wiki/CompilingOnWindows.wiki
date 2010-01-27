@@ -1,0 +1,18 @@
+#summary Compiling Glide64 on Windows
+
+Glide64 uses wxWidgets library. It is large and you must install it manually. Other libs necessary to build the project are included. 
+
+1. Download wxWidgets from http://www.wxwidgets.org You may find compiled builds, or build them from sources. Building from sources is quite simple: 
+Unpack the sources somewhere, e.g. to C:\wxWidgets\ 
+Make sure that path to VisualC bin folder is included to system environment path variable. Try to type in console nmake. If system can’t find it, locate the path to VC98\Bin\ folder and add it to path variable, e.g.: 
+set path=%path%;C:\MSVC\VC98\Bin\ 
+Go to C:\wxWidgets\build\msw\ folder and type:
+nmake.exe makefile.vc
+it will build everything. Just wait until it finished. 
+2. Create new environment variable WXDIR (my computer/properties/advanced/environment variables/create), and set path to wxWidgets folder as its value, e.g. C:\wxWidgets
+
+3. Download Glide64 sources. You need subversion svn client for this. Type
+svn checkout http://glidehqplusglitch64.googlecode.com/svn/trunk/
+and you will get all project’s sources.
+
+4. Now you may build the project. Open VisualStudio and load n64Glide.sln solution file. Select debug/release and build the projects you need.
