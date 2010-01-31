@@ -11,6 +11,7 @@
 #endif // _WIN32
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "glide.h"
 #include "g3ext.h"
 #include "main.h"
@@ -1443,6 +1444,8 @@ grGetProcAddress( char *procName )
     return (GrProc)grKeyPressedExt;
   if(!strcmp(procName, "grQueryResolutionsExt"))
     return (GrProc)grQueryResolutionsExt;
+  if(!strcmp(procName, "grGetGammaTableExt"))
+    return (GrProc)grGetGammaTableExt;
   display_warning("grGetProcAddress : %s", procName);
   return 0;
 }
@@ -1513,8 +1516,14 @@ grGet( FxU32 pname, FxU32 plength, FxI32 *params )
     return 4;
     break;
   case GR_BITS_GAMMA:
+    if (plength < 4 || params == NULL) return 0;
+    params[0] = 8;
+    return 4;
+    break;
   case GR_GAMMA_TABLE_ENTRIES:
-    return 0;
+    if (plength < 4 || params == NULL) return 0;
+    params[0] = 256;
+    return 4;
     break;
   case GR_FOG_TABLE_ENTRIES:
     if (plength < 4 || params == NULL) return 0;
@@ -1567,7 +1576,11 @@ grGetString( FxU32 pname )
   {
   case GR_EXTENSION:
     {
+#ifdef _WIN32
+      static char extension[] = "CHROMARANGE TEXCHROMA TEXMIRROR PALETTE6666 FOGCOORD EVOODOO TEXTUREBUFFER TEXUMA TEXFMT COMBINE GETGAMMA";
+#else
       static char extension[] = "CHROMARANGE TEXCHROMA TEXMIRROR PALETTE6666 FOGCOORD EVOODOO TEXTUREBUFFER TEXUMA TEXFMT COMBINE";
+#endif
       return extension;
     }
     break;
@@ -2678,16 +2691,75 @@ grTexMultibaseAddress( GrChipID_t       tmu,
   display_warning("grTexMultibaseAddress");
 }
 
+#ifdef _WIN32
+static void CorrectGamma(LPVOID apGammaRamp)
+{
+  HDC hdc = GetDC(NULL);
+  if (hdc != NULL)
+  {
+    SetDeviceGammaRamp(hdc, apGammaRamp);
+    ReleaseDC(NULL, hdc);
+  }
+}
+#endif
+
 FX_ENTRY void FX_CALL
 grLoadGammaTable( FxU32 nentries, FxU32 *red, FxU32 *green, FxU32 *blue)
 {
   LOG("grLoadGammaTable\r\n");
+#ifdef _WIN32
+  if (!fullscreen)
+    return;
+  WORD aGammaRamp[3][256];
+  for (int i = 0; i < 256; i++) 
+  {
+    aGammaRamp[0][i] = (WORD)((red[i] << 8) & 0xFFFF);
+    aGammaRamp[1][i] = (WORD)((green[i] << 8) & 0xFFFF);
+    aGammaRamp[2][i] = (WORD)((blue[i] << 8) & 0xFFFF);
+  }
+  CorrectGamma(aGammaRamp);
+#endif
 }
 
 FX_ENTRY void FX_CALL
-guGammaCorrectionRGB( FxFloat red, FxFloat green, FxFloat blue )
+grGetGammaTableExt(FxU32 nentries, FxU32 *red, FxU32 *green, FxU32 *blue)
+{
+  LOG("grGetGammaTableExt()\r\n");
+#ifdef _WIN32
+  HDC hdc = GetDC(NULL);
+  if (hdc != NULL)
+  {
+    WORD aGammaRamp[3][256];
+    if (GetDeviceGammaRamp(hdc, aGammaRamp) == TRUE) 
+    {
+      for (int i = 0; i < 256; i++) 
+      {
+        red[i] = aGammaRamp[0][i] >> 8;
+        green[i] = aGammaRamp[1][i] >> 8;
+        blue[i] = aGammaRamp[2][i] >> 8;
+      }
+    }
+    ReleaseDC(NULL, hdc);
+  }
+#endif
+}
+
+FX_ENTRY void FX_CALL
+guGammaCorrectionRGB( FxFloat gammaR, FxFloat gammaG, FxFloat gammaB )
 {
   LOG("guGammaCorrectionRGB()\r\n");
+#ifdef _WIN32
+  if (!fullscreen)
+    return;
+  WORD aGammaRamp[3][256];
+  for (int i = 0; i < 256; i++) 
+  {
+    aGammaRamp[0][i] = (((WORD)((pow(i/255.0F, 1.0F/gammaR)) * 255.0F + 0.5F)) << 8) & 0xFFFF;
+    aGammaRamp[1][i] = (((WORD)((pow(i/255.0F, 1.0F/gammaG)) * 255.0F + 0.5F)) << 8) & 0xFFFF;
+    aGammaRamp[2][i] = (((WORD)((pow(i/255.0F, 1.0F/gammaB)) * 255.0F + 0.5F)) << 8) & 0xFFFF;
+  }
+  CorrectGamma(aGammaRamp);
+#endif
 }
 
 FX_ENTRY void FX_CALL
