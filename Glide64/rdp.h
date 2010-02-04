@@ -303,9 +303,9 @@ typedef struct {
   #define  hack_BAR         (1<<2)   //Beetle Adventure Racing
   #define  hack_Chopper     (1<<3)   //Chopper Attack
   #define  hack_Diddy       (1<<4)   //diddy kong racing
-  //#define  hack_Doraemon2   (1<<5)   //Doraemon 2
-  #define  hack_Fifa98      (1<<6)   //FIFA - Road to World Cup 98
-  #define  hack_Fzero       (1<<7)   //F-Zero
+  #define  hack_Fifa98      (1<<5)   //FIFA - Road to World Cup 98
+  #define  hack_Fzero       (1<<6)   //F-Zero
+  #define  hack_GoldenEye   (1<<7)   //Golden Eye
   #define  hack_Hyperbike   (1<<8)   //Top Gear Hyper Bike
   #define  hack_ISS64       (1<<9)   //International Superstar Soccer 64
   #define  hack_KI          (1<<10)  //Killer Instinct
@@ -352,7 +352,11 @@ typedef struct
   int sup_32bit_tex;
   int has_2mb_tex_boundary;
   int tex_UMA;
-  int gamma;
+  int gamma_correction;
+  FxI32 gamma_table_size;
+  FxU32 *gamma_table_r;
+  FxU32 *gamma_table_g;
+  FxU32 *gamma_table_b;
   wxUint32 tmem_ptr[MAX_TMU];
   wxUint32 tex_min_addr[MAX_TMU];
   wxUint32 tex_max_addr[MAX_TMU];
