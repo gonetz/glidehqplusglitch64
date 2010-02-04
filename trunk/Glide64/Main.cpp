@@ -166,7 +166,10 @@ SETTINGS settings = { FALSE, 640, 480, GR_RESOLUTION_640x480, 0 };
 
 HOTKEY_INFO hotkey_info;
 
-VOODOO voodoo;
+VOODOO voodoo = {0, 0, 0, 0, 
+                 0, 0, 0, 0,
+                 0, 0, 0, 0
+                };
 
 GrTexInfo fontTex;
 GrTexInfo cursorTex;
@@ -476,8 +479,6 @@ void ReadSpecialSettings (const char * name)
     settings.hacks |= hack_Lego;
   else if (strstr(name, (const char *)"OgreBattle64"))
     settings.hacks |= hack_Ogre64;
-  //  else if (strstr(name, (const char *)"PPG CHEMICAL X"))
-  //    settings.hacks |= hack_Powerpuff;
   else if (strstr(name, (const char *)"Pilot Wings64"))
     settings.hacks |= hack_Pilotwings;
   else if (strstr(name, (const char *)"Supercross"))
@@ -490,6 +491,8 @@ void ReadSpecialSettings (const char * name)
     settings.hacks |= hack_Megaman;
   else if (strstr(name, (const char *)"MISCHIEF MAKERS") || strstr(name, (const char *)"TROUBLE MAKERS"))
     settings.hacks |= hack_Makers;
+  else if (strstr(name, (const char *)"GOLDENEYE"))
+    settings.hacks |= hack_GoldenEye;
 
   wxString groupName = wxT("/");
   groupName += wxString::FromAscii(name);
@@ -1012,7 +1015,9 @@ int InitGfx (int evoodoo_using_window)
   else
     voodoo.sup_32bit_tex = FALSE;
 
-  voodoo.gamma = 0;
+  voodoo.gamma_correction = 0;
+  if (char * extstr = (char*)strstr(extensions, "GETGAMMA"))
+    grGet(GR_GAMMA_TABLE_ENTRIES, sizeof(voodoo.gamma_table_size), &voodoo.gamma_table_size);
 
   if (fb_hwfbe_enabled)
   {
@@ -1191,6 +1196,17 @@ int InitGfx (int evoodoo_using_window)
 void ReleaseGfx ()
 {
   LOG("ReleaseGfx ()\n");
+
+  // Restore gamma settings
+  if (voodoo.gamma_correction) 
+  {
+    if (voodoo.gamma_table_r)
+      grLoadGammaTable(voodoo.gamma_table_size, voodoo.gamma_table_r, voodoo.gamma_table_g, voodoo.gamma_table_b);
+    else
+      guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop 
+    voodoo.gamma_correction = 0;
+  }
+
   // Release graphics
   grSstWinClose (gfx_context);
 
@@ -1486,6 +1502,12 @@ void CALL CloseDLL (void)
     ReleaseGfx ();
   ZLUT_release();
   ClearCache ();
+  delete[] voodoo.gamma_table_r;
+  voodoo.gamma_table_r = 0;
+  delete[] voodoo.gamma_table_g;
+  voodoo.gamma_table_g = 0;
+  delete[] voodoo.gamma_table_b;
+  voodoo.gamma_table_b = 0;
 }
 
 /******************************************************************
@@ -1647,6 +1669,10 @@ static void CheckDRAMSize()
   }
   if (!test)
     BMASK = WMASK;
+#ifdef LOGGING
+  sprintf (out_buf, "Detected RDRAM size: %08lx\n", BMASK);
+  LOG (out_buf);
+#endif
 }
 
 /******************************************************************
@@ -1924,6 +1950,20 @@ static void DrawWholeFrameBufferToScreen()
     memset(gfx.RDRAM+rdp.cimg, 0, (rdp.ci_width*rdp.ci_height)<<rdp.ci_size>>1);
 }
 
+static void GetGammaTable()
+{
+  char strGetGammaTableExt[] = "grGetGammaTableExt";
+  void (FX_CALL *grGetGammaTableExt)(FxU32, FxU32*, FxU32*, FxU32*) = 
+    (void (FX_CALL *)(FxU32, FxU32*, FxU32*, FxU32*))grGetProcAddress(strGetGammaTableExt);
+  if (grGetGammaTableExt)
+  {
+    voodoo.gamma_table_r = new FxU32[voodoo.gamma_table_size];
+    voodoo.gamma_table_g = new FxU32[voodoo.gamma_table_size];
+    voodoo.gamma_table_b = new FxU32[voodoo.gamma_table_size];
+    grGetGammaTableExt(voodoo.gamma_table_size, voodoo.gamma_table_r, voodoo.gamma_table_g, voodoo.gamma_table_b);
+  }
+}
+
 wxUint32 curframe = 0;
 void newSwapBuffers()
 {
@@ -2197,18 +2237,23 @@ void newSwapBuffers()
       fps_count ++;
       if (*gfx.VI_STATUS_REG&0x08) //gamma correction is used
       {
-        if (!voodoo.gamma) 
+        if (!voodoo.gamma_correction) 
         {
+          if (voodoo.gamma_table_size && !voodoo.gamma_table_r)
+            GetGammaTable(); //save initial gamma tables
           guGammaCorrectionRGB(2.0f, 2.0f, 2.0f); //with gamma=2.0 gamma table is the same, as in N64
-          voodoo.gamma = 1;
+          voodoo.gamma_correction = 1;
         }
       } 
       else
       {
-        if (voodoo.gamma) 
+        if (voodoo.gamma_correction) 
         {
-          guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop 
-          voodoo.gamma = 0;
+          if (voodoo.gamma_table_r)
+            grLoadGammaTable(voodoo.gamma_table_size, voodoo.gamma_table_r, voodoo.gamma_table_g, voodoo.gamma_table_b);
+          else
+            guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop 
+          voodoo.gamma_correction = 0;
         }
       }
     }
