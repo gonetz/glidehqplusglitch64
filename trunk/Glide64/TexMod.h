@@ -397,22 +397,21 @@ static void mod_col_mul_texa_add_tex (wxUint16 *dst, int size, wxUint32 color)
 
 static void mod_tex_sub_col (wxUint16 *dst, int size, wxUint32 color)
 {
-	wxUint32 cr, cg, cb, ca;
+	int cr, cg, cb, ca;
 	wxUint16 col;
 	wxUint8 a, r, g, b;
 
 	cr = (color >> 12) & 0xF;
 	cg = (color >> 8) & 0xF;
 	cb = (color >> 4) & 0xF;
-	ca = color & 0xF;
 
 	for (int i=0; i<size; i++)
 	{
 		col = *dst;
-		a = (wxUint8)(((col >> 12) & 0xF) - ca);
-		r = (wxUint8)(((col >> 8) & 0xF) - cr);
-		g = (wxUint8)(((col >> 4) & 0xF) - cg);
-		b = (wxUint8)((col & 0xF) - cb);
+		a = col & 0xF000;
+		r = (wxUint8)max((((col >> 8) & 0xF) - cr), 0);
+		g = (wxUint8)max((((col >> 4) & 0xF) - cg), 0);
+		b = (wxUint8)max(((col & 0xF) - cb), 0);
 		*(dst++) = (a << 12) | (r << 8) | (g << 4) | b;
 	}
 }
