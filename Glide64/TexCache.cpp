@@ -1033,7 +1033,7 @@ void LoadTex (int id, int tmu)
 
   //!Hackalert
   //GoldenEye water texture. It has CI format in fact, but the game set it to RGBA
-  if (rdp.tiles[td].format == 0 && rdp.tlut_mode == 2 && rdp.tiles[td].size == 2)
+  if ((settings.hacks&hack_GoldenEye) && rdp.tiles[td].format == 0 && rdp.tlut_mode == 2 && rdp.tiles[td].size == 2)
   {
     rdp.tiles[td].format = 2;
     rdp.tiles[td].size = 1;
