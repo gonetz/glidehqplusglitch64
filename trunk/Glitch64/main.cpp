@@ -2718,6 +2718,7 @@ grLoadGammaTable( FxU32 nentries, FxU32 *red, FxU32 *green, FxU32 *blue)
     aGammaRamp[2][i] = (WORD)((blue[i] << 8) & 0xFFFF);
   }
   CorrectGamma(aGammaRamp);
+  Sleep(1000); //workaround for Mupen64
 #endif
 }
 
