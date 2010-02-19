@@ -366,7 +366,7 @@ void DrawImage (DRAWIMAGE *d)
     else if (d->scaleX == 1.0f && d->scaleY == 1.0f)
       grClipWindow (rdp.scissor.ul_x, rdp.scissor.ul_y, rdp.scissor.lr_x, rdp.scissor.lr_y);
     else
-      grClipWindow (rdp.scissor.ul_x, rdp.scissor.ul_y, min(rdp.scissor.lr_x, (wxUint32)((d->frameX+d->imageW/d->scaleX)*rdp.scale_x+0.1f)), min(rdp.scissor.lr_y, (wxUint32)((d->frameY+d->imageH/d->scaleY)*rdp.scale_y+0.1f)));
+      grClipWindow (rdp.scissor.ul_x, rdp.scissor.ul_y, min(rdp.scissor.lr_x, (wxUint32)((d->frameX+d->imageW/d->scaleX+0.5f)*rdp.scale_x)), min(rdp.scissor.lr_y, (wxUint32)((d->frameY+d->imageH/d->scaleY+0.5f)*rdp.scale_y)));
 
     grCullMode (GR_CULL_DISABLE);
     if (rdp.cycle_mode == 2)
@@ -1745,7 +1745,8 @@ void uc6_sprite2d ()
 
     if (texsize > 4096)
     {
-      d.scaleX *= (float)stride/(float)d.imageW;
+      if (d.scaleX != 1)
+        d.scaleX *= (float)stride/(float)d.imageW;
       d.imageW	= stride;
       d.imageH	+= d.imageY;
       DrawImage (&d);
