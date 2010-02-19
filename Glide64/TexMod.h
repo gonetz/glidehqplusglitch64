@@ -397,7 +397,7 @@ static void mod_col_mul_texa_add_tex (wxUint16 *dst, int size, wxUint32 color)
 
 static void mod_tex_sub_col (wxUint16 *dst, int size, wxUint32 color)
 {
-	int cr, cg, cb, ca;
+	int cr, cg, cb;
 	wxUint16 col;
 	wxUint8 a, r, g, b;
 
