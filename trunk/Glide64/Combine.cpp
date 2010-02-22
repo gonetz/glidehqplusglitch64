@@ -10718,7 +10718,7 @@ static COMBINER color_cmb_list[] = {
   {0x6af1e4f0, cc__t0_mul_prima_add_prim_mul__shade},
   // Genie, diddy kong racing
   // (t0-prim)*shade_alpha+prim, (env-cmb)*shade+cmb
-  //	{0x6b310405, cc_env_sub__prim_inter_t0_using_shadea__mul_shade_add_env},
+  //    {0x6b310405, cc_env_sub__prim_inter_t0_using_shadea__mul_shade_add_env},
   {0x6b310405, cc_t0_mul_shadea},
   // Extreme G. Added by Gonetz
   // (t0-prim)*shade_alpha+prim  ** INC **
@@ -13068,7 +13068,7 @@ static COMBINER alpha_cmb_list[] = {
   // paper mario. Added by Gonetz
   // (t0-0)*prim+0, (cmb-0)*shade+0
   {0x0ef90f38, ac_t0_mul_prim_mul_shade},
-  // Pik	achu's mouth, smash bros
+  // Pik        achu's mouth, smash bros
   // (t0-0)*prim+0, (cmb-0)*env+0
   {0x0ef90f78, ac_t0_mul_prim_mul_env},
   // bomb mask, zelda 2. Added by Gonetz
