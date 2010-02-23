@@ -112,7 +112,7 @@ void DrawHiresDepthImage (DRAWIMAGE *d)
     GR_COMBINE_LOCAL_NONE,
     GR_COMBINE_OTHER_TEXTURE,
     FXFALSE);
-  grAlphaBlendFunction (GR_BLEND_ONE,	
+  grAlphaBlendFunction (GR_BLEND_ONE,   
     GR_BLEND_ZERO,
     GR_BLEND_ONE,
     GR_BLEND_ZERO);
@@ -303,16 +303,16 @@ void DrawImage (DRAWIMAGE *d)
 
 
   // SetTextureImage ()
-  rdp.timg.format = d->imageFmt;	// RGBA
-  rdp.timg.size = d->imageSiz;		// 16-bit
+  rdp.timg.format = d->imageFmt;        // RGBA
+  rdp.timg.size = d->imageSiz;          // 16-bit
   rdp.timg.addr = d->imagePtr;
   rdp.timg.width = (d->imageW%2)?d->imageW-1:d->imageW;
   rdp.timg.set_by = 0;
 
   // SetTile ()
   TILE *tile = &rdp.tiles[0];
-  tile->format = d->imageFmt;	// RGBA
-  tile->size = d->imageSiz;		// 16-bit
+  tile->format = d->imageFmt;   // RGBA
+  tile->size = d->imageSiz;             // 16-bit
   tile->line = line;
   tile->t_mem = 0;
   tile->palette = (wxUint8)d->imagePal;
@@ -335,7 +335,7 @@ void DrawImage (DRAWIMAGE *d)
     rdp.allow_combine = 0;
     rdp.update &= ~UPDATE_TEXTURE;
   }
-  update ();				// note: allow loading of texture
+  update ();                            // note: allow loading of texture
 
   float Z = 1.0f;
 
@@ -386,7 +386,7 @@ void DrawImage (DRAWIMAGE *d)
         GR_COMBINE_OTHER_TEXTURE,
         FXFALSE);
       grConstantColorValue (0xFFFFFFFF);
-      grAlphaBlendFunction (GR_BLEND_ONE,	// use alpha compare, but not T0 alpha
+      grAlphaBlendFunction (GR_BLEND_ONE,       // use alpha compare, but not T0 alpha
         GR_BLEND_ZERO,
         GR_BLEND_ZERO,
         GR_BLEND_ZERO);
@@ -410,8 +410,8 @@ void DrawImage (DRAWIMAGE *d)
   float by = ul_y - my * ul_v;
 
   int cur_wrap_u, cur_wrap_v, cur_u, cur_v;
-  int cb_u, cb_v;	// coordinate-base
-  int tb_u, tb_v;	// texture-base
+  int cb_u, cb_v;       // coordinate-base
+  int tb_u, tb_v;       // texture-base
 
   nul_v = ul_v;
   nul_y = ul_y;
@@ -427,7 +427,7 @@ void DrawImage (DRAWIMAGE *d)
 
   while (1)
   {
-    cur_wrap_u = min_wrap_u + 1 + 1024;	// x wrapping is not required
+    cur_wrap_u = min_wrap_u + 1 + 1024; // x wrapping is not required
     cur_u = min_256_u + 1;
 
     // calculate intersection with this point
@@ -566,7 +566,7 @@ void DrawHiresImage(DRAWIMAGE *d, int screensize = FALSE)
     rdp.allow_combine = 0;
     rdp.update &= ~UPDATE_TEXTURE;
   }
-  update ();				// note: allow loading of texture
+  update ();                            // note: allow loading of texture
 
   float Z = 1.0f;
   if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030)) 
@@ -597,7 +597,7 @@ void DrawHiresImage(DRAWIMAGE *d, int screensize = FALSE)
       GR_COMBINE_OTHER_TEXTURE,
       FXFALSE);
     grConstantColorValue (0xFFFFFFFF);
-    grAlphaBlendFunction (GR_BLEND_ONE,	// use alpha compare, but not T0 alpha
+    grAlphaBlendFunction (GR_BLEND_ONE, // use alpha compare, but not T0 alpha
       GR_BLEND_ZERO,
       GR_BLEND_ZERO,
       GR_BLEND_ZERO);
@@ -745,27 +745,27 @@ static void uc6_bg_1cyc ()
 
   DRAWIMAGE d;
 
-  d.imageX	= (((wxUint16 *)gfx.RDRAM)[(addr+0)^1] >> 5);	// 0
-  d.imageW	= (((wxUint16 *)gfx.RDRAM)[(addr+1)^1] >> 2);	// 1
-  d.frameX	= ((short*)gfx.RDRAM)[(addr+2)^1] / 4.0f;	// 2
-  d.frameW	= ((wxUint16 *)gfx.RDRAM)[(addr+3)^1] >> 2;		// 3
+  d.imageX      = (((wxUint16 *)gfx.RDRAM)[(addr+0)^1] >> 5);   // 0
+  d.imageW      = (((wxUint16 *)gfx.RDRAM)[(addr+1)^1] >> 2);   // 1
+  d.frameX      = ((short*)gfx.RDRAM)[(addr+2)^1] / 4.0f;       // 2
+  d.frameW      = ((wxUint16 *)gfx.RDRAM)[(addr+3)^1] >> 2;             // 3
 
-  d.imageY	= (((wxUint16 *)gfx.RDRAM)[(addr+4)^1] >> 5);	// 4
-  d.imageH	= (((wxUint16 *)gfx.RDRAM)[(addr+5)^1] >> 2);	// 5
-  d.frameY	= ((short*)gfx.RDRAM)[(addr+6)^1] / 4.0f;	// 6
-  d.frameH	= ((wxUint16 *)gfx.RDRAM)[(addr+7)^1] >> 2;		// 7
+  d.imageY      = (((wxUint16 *)gfx.RDRAM)[(addr+4)^1] >> 5);   // 4
+  d.imageH      = (((wxUint16 *)gfx.RDRAM)[(addr+5)^1] >> 2);   // 5
+  d.frameY      = ((short*)gfx.RDRAM)[(addr+6)^1] / 4.0f;       // 6
+  d.frameH      = ((wxUint16 *)gfx.RDRAM)[(addr+7)^1] >> 2;             // 7
 
-  d.imagePtr	= segoffset(((wxUint32*)gfx.RDRAM)[(addr+8)>>1]);	// 8,9
-  //	wxUint16  imageLoad	= ((wxUint16 *)gfx.RDRAM)[(addr+10)^1];	// 10
-  d.imageFmt	= ((wxUint8 *)gfx.RDRAM)[(((addr+11)<<1)+0)^3];	// 11
-  d.imageSiz	= ((wxUint8 *)gfx.RDRAM)[(((addr+11)<<1)+1)^3];	// |
-  d.imagePal	= ((wxUint16 *)gfx.RDRAM)[(addr+12)^1];	// 12
-  wxUint16 imageFlip = ((wxUint16 *)gfx.RDRAM)[(addr+13)^1];	// 13;
-  d.flipX 	= (wxUint8)imageFlip&0x01;
+  d.imagePtr    = segoffset(((wxUint32*)gfx.RDRAM)[(addr+8)>>1]);       // 8,9
+  //    wxUint16  imageLoad     = ((wxUint16 *)gfx.RDRAM)[(addr+10)^1]; // 10
+  d.imageFmt    = ((wxUint8 *)gfx.RDRAM)[(((addr+11)<<1)+0)^3]; // 11
+  d.imageSiz    = ((wxUint8 *)gfx.RDRAM)[(((addr+11)<<1)+1)^3]; // |
+  d.imagePal    = ((wxUint16 *)gfx.RDRAM)[(addr+12)^1]; // 12
+  wxUint16 imageFlip = ((wxUint16 *)gfx.RDRAM)[(addr+13)^1];    // 13;
+  d.flipX       = (wxUint8)imageFlip&0x01;
 
-  d.scaleX	= ((short *)gfx.RDRAM)[(addr+14)^1] / 1024.0f;	// 14
-  d.scaleY	= ((short *)gfx.RDRAM)[(addr+15)^1] / 1024.0f;	// 15
-  d.flipY 	= 0;
+  d.scaleX      = ((short *)gfx.RDRAM)[(addr+14)^1] / 1024.0f;  // 14
+  d.scaleY      = ((short *)gfx.RDRAM)[(addr+15)^1] / 1024.0f;  // 15
+  d.flipY       = 0;
   int imageYorig= ((int *)gfx.RDRAM)[(addr+16)>>1] >> 5;
   rdp.last_bg = d.imagePtr;
 
@@ -784,7 +784,7 @@ static void uc6_bg_1cyc ()
   {
     if ( (d.imagePtr != rdp.cimg) && (d.imagePtr != rdp.ocimg) && d.imagePtr) //can't draw from framebuffer
       DrawImage (&d);
-    else	
+    else        
     {
       RDP("uc6:bg_1cyc skipped\n");
     }
@@ -806,26 +806,26 @@ static void uc6_bg_copy ()
 
   DRAWIMAGE d;
 
-  d.imageX	= (((wxUint16 *)gfx.RDRAM)[(addr+0)^1] >> 5);	// 0
-  d.imageW	= (((wxUint16 *)gfx.RDRAM)[(addr+1)^1] >> 2);	// 1
-  d.frameX	= ((short*)gfx.RDRAM)[(addr+2)^1] / 4.0f;	// 2
-  d.frameW	= ((wxUint16 *)gfx.RDRAM)[(addr+3)^1] >> 2;		// 3
+  d.imageX      = (((wxUint16 *)gfx.RDRAM)[(addr+0)^1] >> 5);   // 0
+  d.imageW      = (((wxUint16 *)gfx.RDRAM)[(addr+1)^1] >> 2);   // 1
+  d.frameX      = ((short*)gfx.RDRAM)[(addr+2)^1] / 4.0f;       // 2
+  d.frameW      = ((wxUint16 *)gfx.RDRAM)[(addr+3)^1] >> 2;             // 3
 
-  d.imageY	= (((wxUint16 *)gfx.RDRAM)[(addr+4)^1] >> 5);	// 4
-  d.imageH	= (((wxUint16 *)gfx.RDRAM)[(addr+5)^1] >> 2);	// 5
-  d.frameY	= ((short*)gfx.RDRAM)[(addr+6)^1] / 4.0f;	// 6
-  d.frameH	= ((wxUint16 *)gfx.RDRAM)[(addr+7)^1] >> 2;		// 7
+  d.imageY      = (((wxUint16 *)gfx.RDRAM)[(addr+4)^1] >> 5);   // 4
+  d.imageH      = (((wxUint16 *)gfx.RDRAM)[(addr+5)^1] >> 2);   // 5
+  d.frameY      = ((short*)gfx.RDRAM)[(addr+6)^1] / 4.0f;       // 6
+  d.frameH      = ((wxUint16 *)gfx.RDRAM)[(addr+7)^1] >> 2;             // 7
 
-  d.imagePtr	= segoffset(((wxUint32*)gfx.RDRAM)[(addr+8)>>1]);	// 8,9
-  d.imageFmt	= ((wxUint8 *)gfx.RDRAM)[(((addr+11)<<1)+0)^3];	// 11
-  d.imageSiz	= ((wxUint8 *)gfx.RDRAM)[(((addr+11)<<1)+1)^3];	// |
-  d.imagePal	= ((wxUint16 *)gfx.RDRAM)[(addr+12)^1];	// 12
-  wxUint16 imageFlip = ((wxUint16 *)gfx.RDRAM)[(addr+13)^1];	// 13;
-  d.flipX 	= (wxUint8)imageFlip&0x01;
+  d.imagePtr    = segoffset(((wxUint32*)gfx.RDRAM)[(addr+8)>>1]);       // 8,9
+  d.imageFmt    = ((wxUint8 *)gfx.RDRAM)[(((addr+11)<<1)+0)^3]; // 11
+  d.imageSiz    = ((wxUint8 *)gfx.RDRAM)[(((addr+11)<<1)+1)^3]; // |
+  d.imagePal    = ((wxUint16 *)gfx.RDRAM)[(addr+12)^1]; // 12
+  wxUint16 imageFlip = ((wxUint16 *)gfx.RDRAM)[(addr+13)^1];    // 13;
+  d.flipX       = (wxUint8)imageFlip&0x01;
 
-  d.scaleX	= 1.0f;	// 14
-  d.scaleY	= 1.0f;	// 15
-  d.flipY 	= 0;
+  d.scaleX      = 1.0f; // 14
+  d.scaleY      = 1.0f; // 15
+  d.flipY       = 0;
   rdp.last_bg = d.imagePtr;
 
   FRDP ("imagePtr: %08lx\n", d.imagePtr);
@@ -843,7 +843,7 @@ static void uc6_bg_copy ()
   {
     if ( (d.imagePtr != rdp.cimg) && (d.imagePtr != rdp.ocimg) && d.imagePtr)  //can't draw from framebuffer
       DrawImage (&d);
-    else	
+    else        
     {
       RDP("uc6:bg_copy skipped\n");
     }
@@ -1089,7 +1089,7 @@ static void uc6_draw_polygons (VERTEX v[4])
   }
   else
   {
-    rdp.vtxbuf = rdp.vtx1;	// copy from v to rdp.vtx1
+    rdp.vtxbuf = rdp.vtx1;      // copy from v to rdp.vtx1
     rdp.vtxbuf2 = rdp.vtx2;
     rdp.vtx_buffer = 0;
     rdp.n_global = 3;
@@ -1097,7 +1097,7 @@ static void uc6_draw_polygons (VERTEX v[4])
     do_triangle_stuff_2 ();
     rdp.tri_n ++;
 
-    rdp.vtxbuf = rdp.vtx1;	// copy from v to rdp.vtx1
+    rdp.vtxbuf = rdp.vtx1;      // copy from v to rdp.vtx1
     rdp.vtxbuf2 = rdp.vtx2;
     rdp.vtx_buffer = 0;
     rdp.n_global = 3;
@@ -1115,23 +1115,23 @@ static void uc6_draw_polygons (VERTEX v[4])
 
 static void uc6_obj_rectangle ()
 {
-  //	RDP ("uc6:obj_rectangle\n");
+  //    RDP ("uc6:obj_rectangle\n");
 
   wxUint32 addr = segoffset(rdp.cmd1) >> 1;
 
-  float objX		= ((short*)gfx.RDRAM)[(addr+0)^1] / 4.0f;		// 0
-  float scaleW	= ((wxUint16 *)gfx.RDRAM)[(addr+1)^1] / 1024.0f;	// 1
-  short imageW	= ((short*)gfx.RDRAM)[(addr+2)^1] >> 5;			// 2, 3 is padding
-  float objY		= ((short*)gfx.RDRAM)[(addr+4)^1] / 4.0f;		// 4
-  float scaleH	= ((wxUint16 *)gfx.RDRAM)[(addr+5)^1] / 1024.0f;	// 5
-  short imageH	= ((short*)gfx.RDRAM)[(addr+6)^1] >> 5;			// 6, 7 is padding
+  float objX            = ((short*)gfx.RDRAM)[(addr+0)^1] / 4.0f;               // 0
+  float scaleW  = ((wxUint16 *)gfx.RDRAM)[(addr+1)^1] / 1024.0f;        // 1
+  short imageW  = ((short*)gfx.RDRAM)[(addr+2)^1] >> 5;                 // 2, 3 is padding
+  float objY            = ((short*)gfx.RDRAM)[(addr+4)^1] / 4.0f;               // 4
+  float scaleH  = ((wxUint16 *)gfx.RDRAM)[(addr+5)^1] / 1024.0f;        // 5
+  short imageH  = ((short*)gfx.RDRAM)[(addr+6)^1] >> 5;                 // 6, 7 is padding
 
-  wxUint16  imageStride	= ((wxUint16 *)gfx.RDRAM)[(addr+8)^1];			// 8
-  wxUint16  imageAdrs		= ((wxUint16 *)gfx.RDRAM)[(addr+9)^1];			// 9
-  wxUint8  imageFmt		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+0)^3];	// 10
-  wxUint8  imageSiz		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+1)^3];	// |
-  wxUint8  imagePal		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+2)^3];	// 11
-  wxUint8  imageFlags	= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+3)^3];	// |
+  wxUint16  imageStride = ((wxUint16 *)gfx.RDRAM)[(addr+8)^1];                  // 8
+  wxUint16  imageAdrs           = ((wxUint16 *)gfx.RDRAM)[(addr+9)^1];                  // 9
+  wxUint8  imageFmt             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+0)^3]; // 10
+  wxUint8  imageSiz             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+1)^3]; // |
+  wxUint8  imagePal             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+2)^3]; // 11
+  wxUint8  imageFlags   = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+3)^3]; // |
 
   if (imageW < 0) 
     imageW = (short)rdp.scissor_o.lr_x - (short)objX - imageW;
@@ -1156,8 +1156,8 @@ static void uc6_obj_rectangle ()
 
   // SetTile ()
   TILE *tile = &rdp.tiles[0];
-  tile->format = imageFmt;	// RGBA
-  tile->size = imageSiz;		// 16-bit
+  tile->format = imageFmt;      // RGBA
+  tile->size = imageSiz;                // 16-bit
   tile->line = imageStride;
   tile->t_mem = imageAdrs;
   tile->palette = imagePal;
@@ -1230,19 +1230,19 @@ static void uc6_obj_sprite ()
 {
   wxUint32 addr = segoffset(rdp.cmd1) >> 1;
 
-  float objX		= ((short*)gfx.RDRAM)[(addr+0)^1] / 4.0f;		// 0
-  float scaleW	= ((wxUint16 *)gfx.RDRAM)[(addr+1)^1] / 1024.0f;	// 1
-  short imageW	= ((short*)gfx.RDRAM)[(addr+2)^1] >> 5;			// 2, 3 is padding
-  float objY		= ((short*)gfx.RDRAM)[(addr+4)^1] / 4.0f;		// 4
-  float scaleH	= ((wxUint16 *)gfx.RDRAM)[(addr+5)^1] / 1024.0f;	// 5
-  short imageH	= ((short*)gfx.RDRAM)[(addr+6)^1] >> 5;			// 6, 7 is padding
+  float objX            = ((short*)gfx.RDRAM)[(addr+0)^1] / 4.0f;               // 0
+  float scaleW  = ((wxUint16 *)gfx.RDRAM)[(addr+1)^1] / 1024.0f;        // 1
+  short imageW  = ((short*)gfx.RDRAM)[(addr+2)^1] >> 5;                 // 2, 3 is padding
+  float objY            = ((short*)gfx.RDRAM)[(addr+4)^1] / 4.0f;               // 4
+  float scaleH  = ((wxUint16 *)gfx.RDRAM)[(addr+5)^1] / 1024.0f;        // 5
+  short imageH  = ((short*)gfx.RDRAM)[(addr+6)^1] >> 5;                 // 6, 7 is padding
 
-  wxUint16  imageStride	= ((wxUint16 *)gfx.RDRAM)[(addr+8)^1];			// 8
-  wxUint16  imageAdrs		= ((wxUint16 *)gfx.RDRAM)[(addr+9)^1];			// 9
-  wxUint8  imageFmt		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+0)^3];	// 10
-  wxUint8  imageSiz		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+1)^3];	// |
-  wxUint8  imagePal		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+2)^3];	// 11
-  wxUint8  imageFlags	= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+3)^3];	// |
+  wxUint16  imageStride = ((wxUint16 *)gfx.RDRAM)[(addr+8)^1];                  // 8
+  wxUint16  imageAdrs           = ((wxUint16 *)gfx.RDRAM)[(addr+9)^1];                  // 9
+  wxUint8  imageFmt             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+0)^3]; // 10
+  wxUint8  imageSiz             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+1)^3]; // |
+  wxUint8  imagePal             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+2)^3]; // 11
+  wxUint8  imageFlags   = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+3)^3]; // |
 
   FRDP ("uc6:obj_sprite #%d, #%d\n"
     "objX: %f, scaleW: %f, imageW: %d\n"
@@ -1252,8 +1252,8 @@ static void uc6_obj_sprite ()
 
   // SetTile ()
   TILE *tile = &rdp.tiles[0];
-  tile->format = imageFmt;	// RGBA
-  tile->size = imageSiz;		// 16-bit
+  tile->format = imageFmt;      // RGBA
+  tile->size = imageSiz;                // 16-bit
   tile->line = imageStride;
   tile->t_mem = imageAdrs;
   tile->palette = imagePal;
@@ -1306,7 +1306,7 @@ static void uc6_obj_sprite ()
     ul_v = 0.5f;
 
   // Make the vertices
-  //	FRDP("scale_x: %f, scale_y: %f\n", rdp.cur_cache[0]->scale_x, rdp.cur_cache[0]->scale_y);
+  //    FRDP("scale_x: %f, scale_y: %f\n", rdp.cur_cache[0]->scale_x, rdp.cur_cache[0]->scale_y);
 
   VERTEX v[4] = {
     { ul_x, ul_y, Z, 1, ul_u, ul_v },
@@ -1333,7 +1333,7 @@ static void uc6_obj_movemem ()
   int index = rdp.cmd0 & 0xFFFF;
   wxUint32 addr = segoffset(rdp.cmd1) >> 1;
 
-  if (index == 0) {	// movemem matrix
+  if (index == 0) {     // movemem matrix
     mat_2d.A = ((int*)gfx.RDRAM)[(addr+0)>>1] / 65536.0f;
     mat_2d.B = ((int*)gfx.RDRAM)[(addr+2)>>1] / 65536.0f;
     mat_2d.C = ((int*)gfx.RDRAM)[(addr+4)>>1] / 65536.0f;
@@ -1346,7 +1346,7 @@ static void uc6_obj_movemem ()
     FRDP ("mat_2d\nA: %f, B: %f, c: %f, D: %f\nX: %f, Y: %f\nBaseScaleX: %f, BaseScaleY: %f\n",
       mat_2d.A, mat_2d.B, mat_2d.C, mat_2d.D, mat_2d.X, mat_2d.Y, mat_2d.BaseScaleX, mat_2d.BaseScaleY);
   }
-  else if (index == 2) {	// movemem submatrix
+  else if (index == 2) {        // movemem submatrix
     mat_2d.X = ((short*)gfx.RDRAM)[(addr+0)^1] / 4.0f;
     mat_2d.Y = ((short*)gfx.RDRAM)[(addr+1)^1] / 4.0f;
     mat_2d.BaseScaleX = ((wxUint16*)gfx.RDRAM)[(addr+2)^1] / 1024.0f;
@@ -1432,19 +1432,19 @@ static void uc6_obj_rectangle_r ()
 {
   wxUint32 addr = segoffset(rdp.cmd1) >> 1;
 
-  float objX		= ((short*)gfx.RDRAM)[(addr+0)^1] / 4.0f;		// 0
-  float scaleW	= ((wxUint16 *)gfx.RDRAM)[(addr+1)^1] / 1024.0f;	// 1
-  short imageW	= ((short *)gfx.RDRAM)[(addr+2)^1] >> 5;			// 2, 3 is padding
-  float objY		= ((short*)gfx.RDRAM)[(addr+4)^1] / 4.0f;		// 4
-  float scaleH	= ((wxUint16 *)gfx.RDRAM)[(addr+5)^1] / 1024.0f;	// 5
-  short imageH	= ((short*)gfx.RDRAM)[(addr+6)^1] >> 5;			// 6, 7 is padding
+  float objX            = ((short*)gfx.RDRAM)[(addr+0)^1] / 4.0f;               // 0
+  float scaleW  = ((wxUint16 *)gfx.RDRAM)[(addr+1)^1] / 1024.0f;        // 1
+  short imageW  = ((short *)gfx.RDRAM)[(addr+2)^1] >> 5;                        // 2, 3 is padding
+  float objY            = ((short*)gfx.RDRAM)[(addr+4)^1] / 4.0f;               // 4
+  float scaleH  = ((wxUint16 *)gfx.RDRAM)[(addr+5)^1] / 1024.0f;        // 5
+  short imageH  = ((short*)gfx.RDRAM)[(addr+6)^1] >> 5;                 // 6, 7 is padding
 
-  wxUint16  imageStride	= ((wxUint16 *)gfx.RDRAM)[(addr+8)^1];			// 8
-  wxUint16  imageAdrs		= ((wxUint16 *)gfx.RDRAM)[(addr+9)^1];			// 9
-  wxUint8  imageFmt		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+0)^3];	// 10
-  wxUint8  imageSiz		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+1)^3];	// |
-  wxUint8  imagePal		= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+2)^3];	// 11
-  wxUint8  imageFlags	= ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+3)^3];	// |
+  wxUint16  imageStride = ((wxUint16 *)gfx.RDRAM)[(addr+8)^1];                  // 8
+  wxUint16  imageAdrs           = ((wxUint16 *)gfx.RDRAM)[(addr+9)^1];                  // 9
+  wxUint8  imageFmt             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+0)^3]; // 10
+  wxUint8  imageSiz             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+1)^3]; // |
+  wxUint8  imagePal             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+2)^3]; // 11
+  wxUint8  imageFlags   = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+3)^3]; // |
 
   if (imageW < 0) 
     imageW = (short)rdp.scissor_o.lr_x - (short)objX - imageW;
@@ -1469,8 +1469,8 @@ static void uc6_obj_rectangle_r ()
   }
   // SetTile ()
   TILE *tile = &rdp.tiles[0];
-  tile->format = imageFmt;	// RGBA
-  tile->size = imageSiz;		// 16-bit
+  tile->format = imageFmt;      // RGBA
+  tile->size = imageSiz;                // 16-bit
   tile->line = imageStride;
   tile->t_mem = imageAdrs;
   tile->palette = imagePal;
@@ -1548,21 +1548,21 @@ static void uc6_obj_loadtxtr ()
   rdp.update |= UPDATE_TEXTURE;
 
   wxUint32 addr = segoffset(rdp.cmd1) >> 1;
-  wxUint32 type	= ((wxUint32*)gfx.RDRAM)[(addr + 0) >> 1];			// 0, 1
+  wxUint32 type = ((wxUint32*)gfx.RDRAM)[(addr + 0) >> 1];                      // 0, 1
 
-  if (type == 0x00000030) {	// TLUT
-    wxUint32 image		= segoffset(((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1]);	// 2, 3
-    wxUint16  phead		= ((wxUint16 *)gfx.RDRAM)[(addr + 4) ^ 1] - 256;	// 4
-    wxUint16  pnum		= ((wxUint16 *)gfx.RDRAM)[(addr + 5) ^ 1] + 1;		// 5
+  if (type == 0x00000030) {     // TLUT
+    wxUint32 image              = segoffset(((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1]);   // 2, 3
+    wxUint16  phead             = ((wxUint16 *)gfx.RDRAM)[(addr + 4) ^ 1] - 256;        // 4
+    wxUint16  pnum              = ((wxUint16 *)gfx.RDRAM)[(addr + 5) ^ 1] + 1;          // 5
 
     FRDP ("palette addr: %08lx, start: %d, num: %d\n", image, phead, pnum);
     load_palette (image, phead, pnum);
   }
-  else if (type == 0x00001033) {	// TxtrBlock
-    wxUint32 image		= segoffset(((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1]);	// 2, 3
-    wxUint16  tmem		= ((wxUint16 *)gfx.RDRAM)[(addr + 4) ^ 1];	// 4
-    wxUint16  tsize		= ((wxUint16 *)gfx.RDRAM)[(addr + 5) ^ 1];	// 5
-    wxUint16  tline		= ((wxUint16 *)gfx.RDRAM)[(addr + 6) ^ 1];	// 6
+  else if (type == 0x00001033) {        // TxtrBlock
+    wxUint32 image              = segoffset(((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1]);   // 2, 3
+    wxUint16  tmem              = ((wxUint16 *)gfx.RDRAM)[(addr + 4) ^ 1];      // 4
+    wxUint16  tsize             = ((wxUint16 *)gfx.RDRAM)[(addr + 5) ^ 1];      // 5
+    wxUint16  tline             = ((wxUint16 *)gfx.RDRAM)[(addr + 6) ^ 1];      // 6
 
     FRDP ("addr: %08lx, tmem: %08lx, size: %d\n", image, tmem, tsize);
     rdp.timg.addr = image;
@@ -1575,10 +1575,10 @@ static void uc6_obj_loadtxtr ()
   }
   else if (type == 0x00fc1034)
   {
-    wxUint32 image		= segoffset(((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1]);	// 2, 3
-    wxUint16  tmem		= ((wxUint16 *)gfx.RDRAM)[(addr + 4) ^ 1];	// 4
-    wxUint16  twidth	= ((wxUint16 *)gfx.RDRAM)[(addr + 5) ^ 1];	// 5
-    wxUint16  theight	= ((wxUint16 *)gfx.RDRAM)[(addr + 6) ^ 1];	// 6
+    wxUint32 image              = segoffset(((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1]);   // 2, 3
+    wxUint16  tmem              = ((wxUint16 *)gfx.RDRAM)[(addr + 4) ^ 1];      // 4
+    wxUint16  twidth    = ((wxUint16 *)gfx.RDRAM)[(addr + 5) ^ 1];      // 5
+    wxUint16  theight   = ((wxUint16 *)gfx.RDRAM)[(addr + 6) ^ 1];      // 6
 
     FRDP ("tile addr: %08lx, tmem: %08lx, twidth: %d, theight: %d\n", image, tmem, twidth, theight);
 
@@ -1657,16 +1657,16 @@ void uc6_sprite2d ()
   wxUint32 addr = segoffset(rdp.cmd1) >> 1;
   DRAWIMAGE d;
 
-  d.imagePtr	= segoffset(((wxUint32*)gfx.RDRAM)[(addr+0)>>1]);	// 0,1
-  wxUint16 stride = (((wxUint16 *)gfx.RDRAM)[(addr+4)^1]);	// 4
-  d.imageW	= (((wxUint16 *)gfx.RDRAM)[(addr+5)^1]);	// 5
-  d.imageH	= (((wxUint16 *)gfx.RDRAM)[(addr+6)^1]);	// 6
-  d.imageFmt	= ((wxUint8 *)gfx.RDRAM)[(((addr+7)<<1)+0)^3];	// 7
-  d.imageSiz	= ((wxUint8 *)gfx.RDRAM)[(((addr+7)<<1)+1)^3];	// |
-  d.imagePal	= 0;
-  d.imageX	= (((wxUint16 *)gfx.RDRAM)[(addr+8)^1]);	// 8
-  d.imageY	= (((wxUint16 *)gfx.RDRAM)[(addr+9)^1]);	// 9
-  wxUint32 tlut		= ((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1];	// 2, 3
+  d.imagePtr    = segoffset(((wxUint32*)gfx.RDRAM)[(addr+0)>>1]);       // 0,1
+  wxUint16 stride = (((wxUint16 *)gfx.RDRAM)[(addr+4)^1]);      // 4
+  d.imageW      = (((wxUint16 *)gfx.RDRAM)[(addr+5)^1]);        // 5
+  d.imageH      = (((wxUint16 *)gfx.RDRAM)[(addr+6)^1]);        // 6
+  d.imageFmt    = ((wxUint8 *)gfx.RDRAM)[(((addr+7)<<1)+0)^3];  // 7
+  d.imageSiz    = ((wxUint8 *)gfx.RDRAM)[(((addr+7)<<1)+1)^3];  // |
+  d.imagePal    = 0;
+  d.imageX      = (((wxUint16 *)gfx.RDRAM)[(addr+8)^1]);        // 8
+  d.imageY      = (((wxUint16 *)gfx.RDRAM)[(addr+9)^1]);        // 9
+  wxUint32 tlut         = ((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1];      // 2, 3
   //low-level implementation of sprite2d apparently calls setothermode command to set tlut mode
   //However, description of sprite2d microcode just says that 
   //TlutPointer should be Null when CI images will not be used.
@@ -1687,7 +1687,7 @@ void uc6_sprite2d ()
   }
 
   if (d.imageW == 0)
-    return;//	  d.imageW = stride;
+    return;//     d.imageW = stride;
 
   cmd0 = ((wxUint32*)gfx.RDRAM)[a>>2]; //check next command
   while (1)
@@ -1697,8 +1697,8 @@ void uc6_sprite2d ()
       wxUint32 cmd1 = ((wxUint32*)gfx.RDRAM)[(a>>2)+1]; 
       rdp.pc[rdp.pc_i] = (a+8) & BMASK;
 
-      d.scaleX	= ((cmd1>>16)&0xFFFF)/1024.0f;
-      d.scaleY	= (cmd1&0xFFFF)/1024.0f;
+      d.scaleX  = ((cmd1>>16)&0xFFFF)/1024.0f;
+      d.scaleY  = (cmd1&0xFFFF)/1024.0f;
       //the code below causes wrong background height in super robot spirit, so it is disabled.
       //need to find, for which game this hack was made
       //if( (cmd1&0xFFFF) < 0x100 )
@@ -1714,17 +1714,17 @@ void uc6_sprite2d ()
     {
       wxUint32 cmd1 = ((wxUint32*)gfx.RDRAM)[(a>>2)+1]; 
 
-      d.frameX	= ((short)((cmd1>>16)&0xFFFF)) / 4.0f;
-      d.frameY	= ((short)(cmd1&0xFFFF)) / 4.0f;	
+      d.frameX  = ((short)((cmd1>>16)&0xFFFF)) / 4.0f;
+      d.frameY  = ((short)(cmd1&0xFFFF)) / 4.0f;        
       d.frameW    = (wxUint16) (d.imageW / d.scaleX);
       d.frameH    = (wxUint16) (d.imageH / d.scaleY);
       if (settings.hacks&hack_WCWnitro)
       {
         int scaleY = (int)d.scaleY;
-        d.imageH	/= scaleY;
-        d.imageY	/= scaleY;
+        d.imageH        /= scaleY;
+        d.imageY        /= scaleY;
         stride      *= scaleY;
-        d.scaleY	= 1.0f;
+        d.scaleY        = 1.0f;
       }
       FRDP ("imagePtr: %08lx\n", d.imagePtr);
       FRDP ("frameX: %f, frameW: %d, frameY: %f, frameH: %d\n", d.frameX, d.frameW, d.frameY, d.frameH);
@@ -1747,14 +1747,14 @@ void uc6_sprite2d ()
     {
       if (d.scaleX != 1)
         d.scaleX *= (float)stride/(float)d.imageW;
-      d.imageW	= stride;
-      d.imageH	+= d.imageY;
+      d.imageW  = stride;
+      d.imageH  += d.imageY;
       DrawImage (&d);
     }
     else
     {
       wxUint16 line = d.imageW;
-      if (line & 7) line += 8;	// round up
+      if (line & 7) line += 8;  // round up
       line >>= 3;
       if (d.imageSiz == 0)
       {
@@ -1780,8 +1780,8 @@ void uc6_sprite2d ()
 
       // SetTile ()
       TILE *tile = &rdp.tiles[0];
-      tile->format = d.imageFmt;	
-      tile->size = d.imageSiz;		
+      tile->format = d.imageFmt;        
+      tile->size = d.imageSiz;          
       tile->line = line;//(d.imageW>>3);
       tile->t_mem = 0;
       tile->palette = 0;
@@ -1849,7 +1849,7 @@ void uc6_sprite2d ()
           v[i].y *= rdp.scale_y;
         }
 
-        //	ConvertCoordsConvert (v, 4);
+        //      ConvertCoordsConvert (v, 4);
         AllowShadeMods (v, 4);
         for (int s = 0; s < 4; s++)
           apply_shade_mods (&(v[s]));
@@ -1872,7 +1872,7 @@ void uc6_sprite2d ()
         }
         else
         {
-          rdp.vtxbuf = rdp.vtx1;	// copy from v to rdp.vtx1
+          rdp.vtxbuf = rdp.vtx1;        // copy from v to rdp.vtx1
           rdp.vtxbuf2 = rdp.vtx2;
           rdp.vtx_buffer = 0;
           rdp.n_global = 3;
@@ -1880,7 +1880,7 @@ void uc6_sprite2d ()
           do_triangle_stuff_2 ();
           rdp.tri_n ++;
 
-          rdp.vtxbuf = rdp.vtx1;	// copy from v to rdp.vtx1
+          rdp.vtxbuf = rdp.vtx1;        // copy from v to rdp.vtx1
           rdp.vtxbuf2 = rdp.vtx2;
           rdp.vtx_buffer = 0;
           rdp.n_global = 3;
