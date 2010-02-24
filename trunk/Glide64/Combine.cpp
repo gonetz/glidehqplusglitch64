@@ -3984,6 +3984,98 @@ static void cc__t1_inter_t0_using_enva__sub_prim_mul_prima_add_prim ()  //Aded b
   T1_INTER_T0_USING_FACTOR (factor);
 }
 
+static void cc_t0_sub_prim_mul_shade_add_env ()
+{
+  if (cmb.combine_ext)
+  {
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ZERO, 1,
+      GR_CMBX_ZERO, 0);
+    cmb.tex |= 1;
+    cmb.tex_ccolor = rdp.prim_color;
+    CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ITRGB, 0,
+      GR_CMBX_B, 0);
+    CC_ENV ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_TEXTURE_RGB,
+      GR_COMBINE_LOCAL_CONSTANT,
+      GR_COMBINE_OTHER_ITERATED);
+    CC_ENV ();
+    MOD_0 (TMOD_TEX_SUB_COL);
+    MOD_0_COL (rdp.prim_color & 0xFFFFFF00);
+    USE_T0 ();
+  }
+}
+
+static void cc_t1_sub_prim_mul_shade_add_env ()
+{
+  if (cmb.combine_ext)
+  {
+    T1CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ZERO, 1,
+      GR_CMBX_ZERO, 0);
+    T0CCMBEXT(GR_CMBX_OTHER_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ZERO, 1,
+      GR_CMBX_ZERO, 0);
+    cmb.tex |= 2;
+    cmb.tex_ccolor = rdp.prim_color;
+    CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ITRGB, 0,
+      GR_CMBX_B, 0);
+    CC_ENV ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_TEXTURE_RGB,
+      GR_COMBINE_LOCAL_CONSTANT,
+      GR_COMBINE_OTHER_ITERATED);
+    CC_ENV ();
+    MOD_1 (TMOD_TEX_SUB_COL);
+    MOD_1_COL (rdp.prim_color & 0xFFFFFF00);
+    USE_T1 ();
+  }
+}
+
+static void cc__t0_sub_prim_mul_shade_add_env__mul_shadea ()
+{
+  if (cmb.combine_ext)
+  {
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ITRGB, 0,
+      GR_CMBX_ZERO, 0);
+    cmb.tex |= 1;
+    cmb.tex_ccolor = rdp.prim_color;
+    CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_X,
+      GR_CMBX_ITALPHA, 0,
+      GR_CMBX_B, 0);
+    CC_ENV ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_TEXTURE_RGB,
+      GR_COMBINE_LOCAL_CONSTANT,
+      GR_COMBINE_OTHER_ITERATED);
+    MULSHADE_SHADEA();
+    CC_ENV ();
+    MOD_0 (TMOD_TEX_SUB_COL);
+    MOD_0_COL (rdp.prim_color & 0xFFFFFF00);
+    USE_T0 ();
+  }
+}
+
 static void cc__t0_mul_shade__sub_env_mul_shadea_add_env ()  //Aded by Gonetz
 {
   if (rdp.tiles[rdp.cur_tile].format == 4)
@@ -11089,7 +11181,7 @@ static COMBINER color_cmb_list[] = {
   // text, Top Gear Rally. Added by Gonetz
   // (prim-env)*t1+env, (cmb-0)*t1+0  ** INC **
   {0xa253e2f0, cc_prim_sub_env_mul_t1_add_env_mul_t0},
-  //    {0xa253e2f0, cc_prim_sub_env_mul_t1_add_env},
+  // {0xa253e2f0, cc_prim_sub_env_mul_t1_add_env},
   // a pole in the cut-scene that appears after you receive odolwa's mask, zelda 2 [Ogy]. Added by Gonetz
   // (prim-env)*t1+env, (cmb-0)*shade+0  ** INC **
   {0xa253e4f0, cc_t1_mul_prim_mul_shade},
@@ -11147,10 +11239,13 @@ static COMBINER color_cmb_list[] = {
   {0xa421e3f0, cc__t0_sub_t1__mul_prim_mul_shade_add_prim_mul_env},
   // background, pokemon stadium 2
   // (t0-prim)*shade+env
-  {0xa431a431, cc_t0_mul_shade},
+  {0xa431a431, cc_t0_sub_prim_mul_shade_add_env},
+  // Trophy, pokemon stadium 2
+  // (t0-prim)*shade+env, (cmb-0)*shade_a+0
+  {0xa431ebf0, cc__t0_sub_prim_mul_shade_add_env__mul_shadea},
   // Buildings, pokemon stadium 2
   // (t1-prim)*shade+env
-  {0xa432a432, cc_t1_mul_shade},
+  {0xa432a432, cc_t1_sub_prim_mul_shade_add_env},
   // bomberman 64 [Ogy]
   // (t0-env)*shade+env
   {0xa451a451, cc_t0_mul_shade_add_env},
