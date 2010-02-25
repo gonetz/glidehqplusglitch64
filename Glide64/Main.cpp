@@ -1667,7 +1667,9 @@ static void CheckDRAMSize()
   {
     test = 0;
   }
-  if (!test)
+  if (test)
+    BMASK = 0x7FFFFF;
+  else
     BMASK = WMASK;
 #ifdef LOGGING
   sprintf (out_buf, "Detected RDRAM size: %08lx\n", BMASK);
