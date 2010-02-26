@@ -408,7 +408,7 @@ static void mod_tex_sub_col (wxUint16 *dst, int size, wxUint32 color)
 	for (int i=0; i<size; i++)
 	{
 		col = *dst;
-		a = col & 0xF000;
+		a = (wxUint8)(col & 0xF000);
 		r = (wxUint8)max((((col >> 8) & 0xF) - cr), 0);
 		g = (wxUint8)max((((col >> 4) & 0xF) - cg), 0);
 		b = (wxUint8)max(((col & 0xF) - cb), 0);
