@@ -2689,7 +2689,7 @@ grTexMultibaseAddress( GrChipID_t       tmu,
 }
 
 
-static void MySleep(FxU32 ms)
+inline void MySleep(FxU32 ms)
 {
 #ifdef _WIN32
   Sleep(ms);
