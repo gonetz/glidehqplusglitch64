@@ -571,7 +571,7 @@ void ConfigNotebook::set_properties()
     lblTexCache->SetToolTip(tooltip);
     lblTexCacheMB->SetToolTip(tooltip);
     spinEnhCacheSize->SetToolTip(tooltip);
-    spinEnhCacheSize->SetMinSize(wxSize(50, -1));
+    spinEnhCacheSize->SetMinSize(wxSize(55, 21));
     spinEnhCacheSize->SetValue(settings.ghq_cache_size);
     cbxEnhIgnoreBG->SetToolTip(wxT("Ignore Backgrounds:\nIt is used to skip enhancement for wide narrow textures, usually used for backgrounds.\nThis may save texture memory greatly and increase performance.\n[Recommended: On (off for 'Store' mode)]"));
     cbxEnhIgnoreBG->SetValue(settings.ghq_enht_nobg>0);
