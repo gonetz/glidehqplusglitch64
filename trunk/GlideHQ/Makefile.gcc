@@ -62,8 +62,8 @@ EXT_INC = ./inc
 EXT_LIB = ./lib
 
 # boost library & headers
-BOOST_INC = ../boost_1_39_0
-BOOST_LIB = ../boost_1_39_0/stage/lib
+BOOST_INC = ../boost_1_42_0
+BOOST_LIB = ../boost_1_42_0/stage/lib
 
 CC = g++
 CFLAGS = -Wall -W -pedantic -ansi -Wno-long-long
@@ -78,8 +78,8 @@ CFLAGS += -DDEBUG
 endif
 
 LD = g++
-LDFLAGS = -shared -lstdc++ -lpthread
-LDLIBS = $(EXT_LIB)/libdxtn.a $(EXT_LIB)/libpng.a $(EXT_LIB)/libz.a $(BOOST_LIB)/libboost_filesystem-gcc43-mt-s.a $(BOOST_LIB)/libboost_system-gcc43-mt-s.a $(BOOST_LIB)/libboost_thread-gcc43-mt-s.a
+LDFLAGS = -shared -lstdc++ -lpthread 
+LDLIBS = -lpng -lz $(EXT_LIB)/libdxtn.a $(BOOST_LIB)/libboost_filesystem.a $(BOOST_LIB)/libboost_system.a $(BOOST_LIB)/libboost_thread.a
 
 RM = rm
 
