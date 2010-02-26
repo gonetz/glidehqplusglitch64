@@ -1292,7 +1292,7 @@ void CALL ReadScreen(void **dest, int *width, int *height)
 {
   *width = settings.res_x;
   *height = settings.res_y;
-  wxUint8 * buff = new wxUint8 [settings.res_x * settings.res_y * 3];
+  wxUint8 * buff = (wxUint8*)malloc(settings.res_x * settings.res_y * 3);
   wxUint8 * line = buff;
   *dest = (void*)buff;
 
