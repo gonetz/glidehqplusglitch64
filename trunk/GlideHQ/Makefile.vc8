@@ -41,8 +41,8 @@
 #       Microsoft VisualC++ 8.0 (VS2005)
 #
 #    Libraries:
-#       boost  1.38.0   (http://www.boost.org)  bjam --toolset=msvc-8.0 link=static runtime-link=static variant=release,debug stage
-#       libpng 1.2.35   (http://www.libpng.org) built with /MT or /MTd switch
+#       boost  1.41.0   (http://www.boost.org)  bjam --toolset=msvc-8.0 link=static runtime-link=static variant=release,debug stage
+#       libpng 1.4.0    (http://www.libpng.org) built with /MT or /MTd switch
 #       zlib   1.2.3    (http://www.zlib.org)   built with /MT or /MTd switch
 #       tc     1.1+                             patched for ARGB input and ATI Radeon workaround
 #
@@ -67,8 +67,8 @@ EXT_INC = ./inc
 EXT_LIB = ./lib
 
 # boost library & headers
-BOOST_INC = ../boost_1_38_0
-BOOST_LIB = ../boost_1_38_0/stage/lib
+BOOST_INC = ../boost_1_41_0
+BOOST_LIB = ../boost_1_41_0/stage/lib
 
 CC = cl
 AS = nasm

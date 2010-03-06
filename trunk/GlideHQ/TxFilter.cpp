@@ -54,7 +54,14 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
                    int cachesize, wchar_t *path, wchar_t *ident,
                    dispInfoFuncExt callback)
 {
-  _options = options;
+  /* HACKALERT: the emulator misbehaves and sometimes forgets to shutdown */
+  if ((ident && wcscmp(ident, L"DEFAULT") != 0 && _ident.compare(ident) == 0) &&
+      _maxwidth  == maxwidth  &&
+      _maxheight == maxheight &&
+      _maxbpp    == maxbpp    &&
+      _options   == options   &&
+      _cacheSize == cachesize) return;
+  TxFilter::~TxFilter();
 
   /* shamelessness :P this first call to the debug output message creates
    * a file in the executable directory. */
@@ -66,6 +73,8 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
   INFO(0, L"\n");
   INFO(0, L" Glide64 official website : http://glide64.emuxhaven.net\n");
   INFO(0, L"------------------------------------------------------------------\n");
+
+  _options = options;
 
   _txImage      = new TxImage();
   _txQuantize   = new TxQuantize();

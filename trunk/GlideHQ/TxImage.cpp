@@ -46,7 +46,7 @@ TxImage::getPNGInfo(FILE *fp, png_structp *png_ptr, png_infop *info_ptr)
   if (fread(sig, 1, PNG_CHK_BYTES, fp) != PNG_CHK_BYTES)
     return 0;
 
-  if (!png_check_sig(sig, PNG_CHK_BYTES))
+  if (png_sig_cmp(sig, 0, PNG_CHK_BYTES) != 0)
     return 0;
 
   /* get PNG file info */
@@ -131,7 +131,7 @@ TxImage::readPNG(FILE* fp, int* width, int* height, uint16* format)
 
   /* expand 1,2,4 bit gray scale to 8 bit gray scale */
   if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
-    png_set_gray_1_2_4_to_8(png_ptr);
+    png_set_expand_gray_1_2_4_to_8(png_ptr);
 
   /* convert gray scale or gray scale + alpha to rgb color */
   if (color_type == PNG_COLOR_TYPE_GRAY ||
