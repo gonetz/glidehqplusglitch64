@@ -38,11 +38,11 @@
 #define VERSIONNAME             "GlideHQ.dll\0"
 #define PRODNAME                "GlideHQ\0"
 #define DESCRIPT                "Texture filtering DLL\0"
-#define COPYRIGHTSTR            "Copyright (C) 2007 Hiroshi Morii aka KoolSmoky\0"
+#define COPYRIGHTSTR            "Copyright (C) 2007 Hiroshi Morii\0"
 #define CONTACTSTR              "Hiroshi Morii <koolsmoky@users.sourceforge.net> http://www.3dfxzone.it/koolsmoky\0"
 
 #define MANVERSION              1
-#define MANREVISION             00
+#define MANREVISION             01
 #define MINVERSION              00
 
 #define VERSIONSTR "1.00.00." BUILD_NUMBER_STR
