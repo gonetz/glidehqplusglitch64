@@ -1737,7 +1737,7 @@ static void rdp_setscissor()
 
   rdp.update |= UPDATE_SCISSOR;
 
-  if (rdp.view_scale[0] < 1) //viewport is not set?
+  if (rdp.view_scale[0] == 0) //viewport is not set?
   {
     rdp.view_scale[0] = (rdp.scissor_o.lr_x>>1)*rdp.scale_x;
     rdp.view_scale[1] = (rdp.scissor_o.lr_y>>1)*-rdp.scale_y;
