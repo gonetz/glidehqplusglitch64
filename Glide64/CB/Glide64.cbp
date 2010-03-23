@@ -3,6 +3,7 @@
 	<FileVersion major="1" minor="6" />
 	<Project>
 		<Option title="Glide64" />
+		<Option makefile="Makefile.gcc" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Option virtualFolders="Config/;Texture/;Ucode/;Resources/;" />
@@ -13,11 +14,18 @@
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
+				<Option host_application="mupen64plus" />
 				<Compiler>
 					<Add option="-Wall" />
 					<Add option="-g" />
 					<Add option="-DBUILD_DLL" />
 				</Compiler>
+				<MakeCommands>
+					<Build command="$make -f $makefile " />
+					<CompileFile command="" />
+					<Clean command="" />
+					<DistClean command="" />
+				</MakeCommands>
 			</Target>
 			<Target title="Release">
 				<Option output="../Plugin/Glide64" prefix_auto="1" extension_auto="1" />
@@ -47,7 +55,10 @@
 		</Compiler>
 		<Linker>
 			<Add option="`wx-config --libs`" />
-			<Add library="../lib/glide3x.so" />
+			<Add option="-lglide3x" />
+			<Add option="../3dmathSIMD.o" />
+			<Add option="../FixedPoint.o" />
+			<Add option="../Texture.o" />
 			<Add directory="../lib" />
 		</Linker>
 		<Unit filename="../3dmath.cpp" />
@@ -76,6 +87,8 @@
 		<Unit filename="../FBtoScreen.h" />
 		<Unit filename="../Gfx #1.3.h" />
 		<Unit filename="../GlideExtensions.h" />
+		<Unit filename="../Keys.cpp" />
+		<Unit filename="../Keys.h" />
 		<Unit filename="../Main.cpp" />
 		<Unit filename="../MiClWr16b.h">
 			<Option virtualFolder="Texture/" />
