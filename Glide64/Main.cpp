@@ -182,6 +182,7 @@ int    capture_screen = 0;
 wxString capture_path;
 
 wxString pluginPath;
+wxString iniPath;
 wxString iniName;
 
 /******************************************************************
@@ -198,7 +199,10 @@ EXPORT void CALL SetConfigDir(char *configDir)
   wxString dirName(configDir, wxConvUTF8);
   wxString path = wxPathOnly(dirName);
   if (wxDirExists(path))
+  {
     iniName = path + wxT("/Glide64.ini");
+    iniPath = path;
+  }
 }
 
 static void PluginPath()
@@ -330,10 +334,7 @@ static wxConfigBase * OpenIni()
   if (!ini)
   {
     if (iniName.IsEmpty())
-    {
-      iniName = pluginPath;
-      iniName.Append(_T("/Glide64.ini"));
-    }
+      iniName = pluginPath + wxT("/Glide64.ini");
     if (wxFileExists(iniName))
     {
       wxFileInputStream is(iniName);
@@ -355,7 +356,8 @@ void ReadSettings ()
     return;
   ini->SetPath(_T("/SETTINGS"));
 
-  settings.card_id = (wxUint8)ini->Read(_T("card_id"), 0l);
+  settings.card_id = ini->Read(_T("card_id"), 0l);
+  settings.lang_id = ini->Read(_T("lang_id"), wxLANGUAGE_ENGLISH_US);
   settings.res_data = (wxUint32)ini->Read(_T("resolution"), 7);
   if (settings.res_data >= 24) settings.res_data = 12;
   settings.scr_res_x = settings.res_x = resolutions[settings.res_data][0];
@@ -606,6 +608,7 @@ void WriteSettings (bool saveEmulationSettings)
   ini->SetPath(_T("/SETTINGS"));
 
   ini->Write(_T("card_id"), settings.card_id);
+  ini->Write(_T("lang_id"), settings.lang_id);
   ini->Write(_T("resolution"), (int)settings.res_data);
   ini->Write(_T("ssformat"), settings.ssformat);
   ini->Write(_T("vsync"), settings.vsync);
