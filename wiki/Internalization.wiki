@@ -30,7 +30,7 @@ When translation is done, copy binary message catalog file (.mo) into the proper
 
 == How to submit your translation ==
 
-Send your work to me by email, or post it here: [http: link to be here]
+Send your work to me by email, or post it here: http://code.google.com/p/glidehqplusglitch64/issues/detail?id=61
 
 == Where to get translation for your language ==
 
