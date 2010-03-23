@@ -48,6 +48,8 @@
 #include "Gfx #1.3.h"
 #include "DepthBufferRender.h"
 #include "Config.h"
+#include <wx/file.h>
+#include <wx/dir.h>
 // begin wxGlade: ::extracode
 // end wxGlade
 
@@ -57,16 +59,16 @@ ConfigNotebook::ConfigNotebook(wxWindow* parent, int id, const wxPoint& pos, con
 wxNotebook(parent, id, pos, size, 0)
 {
   // begin wxGlade: ConfigNotebook::ConfigNotebook
-  //common settings panel
-  CommonSettingsPanel = new wxPanel(this, wxID_ANY);
-  CommonRenderingSizer_staticbox = new wxStaticBox(CommonSettingsPanel, -1, wxT("Rendering"));
-  OtherSizer_staticbox = new wxStaticBox(CommonSettingsPanel, -1, wxT("Other"));
-  SpeedSizer_staticbox = new wxStaticBox(CommonSettingsPanel, -1, wxT("Speed"));
-  TimeSizer_staticbox = new wxStaticBox(CommonSettingsPanel, -1, wxT("Time"));
-  OnScreenDisplaySizer_staticbox = new wxStaticBox(CommonSettingsPanel, -1, wxT("On screen display"));
-  WrapperSizer_staticbox = new wxStaticBox(CommonSettingsPanel, -1, wxT("OpenGL settings"));
-  WrapperFBOptionsSizer_staticbox = new wxStaticBox(CommonSettingsPanel, -1, wxT("Frame buffer emulation"));
-  lblResolution = new wxStaticText(CommonSettingsPanel, wxID_ANY, wxT("Windowed or\n3dfx card resolution:"));
+  //Basic settings panel
+  BasicSettingsPanel = new wxPanel(this, wxID_ANY);
+  BasicRenderingSizer_staticbox = new wxStaticBox(BasicSettingsPanel, -1, _("Rendering"));
+  OtherSizer_staticbox = new wxStaticBox(BasicSettingsPanel, -1, _("Other"));
+  SpeedSizer_staticbox = new wxStaticBox(BasicSettingsPanel, -1, _("Speed"));
+  TimeSizer_staticbox = new wxStaticBox(BasicSettingsPanel, -1, _("Time"));
+  OnScreenDisplaySizer_staticbox = new wxStaticBox(BasicSettingsPanel, -1, _("On screen display"));
+  WrapperSizer_staticbox = new wxStaticBox(BasicSettingsPanel, -1, _("OpenGL settings"));
+  WrapperFBOptionsSizer_staticbox = new wxStaticBox(BasicSettingsPanel, -1, _("Frame buffer emulation"));
+  lblResolution = new wxStaticText(BasicSettingsPanel, wxID_ANY, _("Windowed or\n3dfx card resolution:"));
   const wxString cmbResolution_choices[] = {
     wxT("320x200"),
     wxT("320x240"),
@@ -93,83 +95,84 @@ wxNotebook(parent, id, pos, size, 0)
     wxT("2048x1536"),
     wxT("2048x2048")
   };
-  cmbResolution = new wxComboBox(CommonSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 24, cmbResolution_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-  cbxVSync = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("Vertical sync"));
-  cbxAdvancedSettings = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("Show advanced emulation options"));
-  cbxTextureSettings = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("Show texture enhancement options"));
-  lblScreenShotFormat = new wxStaticText(CommonSettingsPanel, wxID_ANY, wxT("Screenshot format:"));
-  cmbScreenShotFormat = new wxComboBox(CommonSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-  const wxString GlideCardBox_choices[] = {
-    wxT("#1"),
-    wxT("#2"),
-    wxT("#3"),
-    wxT("#4")
-  };
-  GlideCardBox = new wxRadioBox(CommonSettingsPanel, wxID_ANY, wxT("Glide Card # (multiple cards)"), wxDefaultPosition, wxDefaultSize, 4, GlideCardBox_choices, 0, wxRA_SPECIFY_COLS);
-  cbxFPS = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("FPS counter"));
-  cbxVIS = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("VI/s counter"));
-  cbxPercent = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("% speed"));
-  cbxClockEnabled = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("Clock enabled"));
-  cbxClock24 = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("Clock is 24-hour"));
-  cbxTextTransparent = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("Transparent text"));
-  lblFSResolution = new wxStaticText(CommonSettingsPanel, wxID_ANY, wxT("Full screen\nresolution:"));
+  cmbResolution = new wxComboBox(BasicSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 24, cmbResolution_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
+  cbxVSync = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("Vertical sync"));
+  cbxAdvancedSettings = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("Show advanced emulation options"));
+  cbxTextureSettings = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("Show texture enhancement options"));
+  lblScreenShotFormat = new wxStaticText(BasicSettingsPanel, wxID_ANY, _("Screenshot format:"));
+  cmbScreenShotFormat = new wxComboBox(BasicSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, NULL, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
+  lang_id = settings.lang_id;
+  wxString strLanguage = _("Language: ");
+  wxString strLanguageName = lang_id == wxLANGUAGE_ENGLISH_US ? wxLocale::GetLanguageName(lang_id) : wxString(_("LANGUAGE_NAME"));
+  if (strLanguageName != wxT("LANGUAGE_NAME"))
+    strLanguage += strLanguageName;
+  else
+    strLanguage += wxLocale::GetLanguageName(lang_id);
+  btnLanguage = new wxButton(BasicSettingsPanel, wxID_Language, strLanguage);
+  cbxFPS = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("FPS counter"));
+  cbxVIS = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("VI/s counter"));
+  cbxPercent = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("% speed"));
+  cbxClockEnabled = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("Clock enabled"));
+  cbxClock24 = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("Clock is 24-hour"));
+  cbxTextTransparent = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("Transparent text background"));
+  lblFSResolution = new wxStaticText(BasicSettingsPanel, wxID_ANY, _("Full screen\nresolution:"));
   const wxString *cmbFSResolution_choices = NULL;
-  cmbFSResolution = new wxComboBox(CommonSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, cmbFSResolution_choices, wxCB_DROPDOWN|wxCB_READONLY);
-  cbxAnisotropic = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("Anisotropic filtering"));
-  cbxVRAM = new wxCheckBox(CommonSettingsPanel, wxID_VRAM, wxT("Autodetect "));
-  lblVRAM = new wxStaticText(CommonSettingsPanel, wxID_ANY, wxT("VRAM size"));
-  spinVRAM = new wxSpinCtrl(CommonSettingsPanel, wxID_ANY, wxT("128"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_CENTRE, 32, 2000);
-  lblMb = new wxStaticText(CommonSettingsPanel, wxID_ANY, wxT("Mb"));
-  cbxFBO = new wxCheckBox(CommonSettingsPanel, wxID_ANY, wxT("Use frame buffer objects"));
+  cmbFSResolution = new wxComboBox(BasicSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, cmbFSResolution_choices, wxCB_DROPDOWN|wxCB_READONLY);
+  cbxAnisotropic = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("Anisotropic filtering"));
+  cbxVRAM = new wxCheckBox(BasicSettingsPanel, wxID_VRAM, _("Autodetect "));
+  lblVRAM = new wxStaticText(BasicSettingsPanel, wxID_ANY, _("VRAM size"));
+  spinVRAM = new wxSpinCtrl(BasicSettingsPanel, wxID_ANY, wxT("128"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS|wxTE_CENTRE, 32, 2000);
+  lblMb = new wxStaticText(BasicSettingsPanel, wxID_ANY, _("Mb"));
+  cbxFBO = new wxCheckBox(BasicSettingsPanel, wxID_ANY, _("Use frame buffer objects"));
 
   //emulation settings panel
   if (settings.advanced_options)
   {
     EmuSettingsPanel = new wxPanel(this, wxID_ANY);
     if (romopen)
-      EmuSettingsBoxSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, wxT("Current game emulation settings. Change with care!"));
+      EmuSettingsBoxSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, _("Current game emulation settings. Change with care!"));
     else
-      EmuSettingsBoxSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, wxT("Default emulation settings. Not recommended to change!"));
-    EmuSettingsLeftSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, wxT("General options"));
-    FrameBufferSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, wxT("Frame buffer emulation"));
-    DepthBufferSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, wxT("Depth buffer emulation"));
-    lbFiltering = new wxStaticText(EmuSettingsPanel, wxID_ANY, wxT("Filtering mode:"));
+      EmuSettingsBoxSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, _("Default emulation settings. Not recommended to change!"));
+    EmuSettingsLeftSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, _("General options"));
+    FrameBufferSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, _("Frame buffer emulation"));
+    DepthBufferSizer_staticbox = new wxStaticBox(EmuSettingsPanel, -1, _("Depth buffer emulation"));
+    lbFiltering = new wxStaticText(EmuSettingsPanel, wxID_ANY, _("Filtering mode:"));
     const wxString cmbFiltering_choices[] = {
-      wxT("Automatic"),
-      wxT("Force Bilinear"),
-      wxT("Force Point-sampled")
+      _("Automatic"),
+      _("Force Bilinear"),
+      _("Force Point-sampled")
     };
     cmbFiltering = new wxComboBox(EmuSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 3, cmbFiltering_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-    lbBufferSwap = new wxStaticText(EmuSettingsPanel, wxID_ANY, wxT("Buffer swapping method:"));
+    lbBufferSwap = new wxStaticText(EmuSettingsPanel, wxID_ANY, _("Buffer swapping method:"));
     const wxString cmbBufferSwap_choices[] = {
-      wxT("Old"),
-      wxT("New"),
-      wxT("Hybrid")
+      _("Old"),
+      _("New"),
+      _("Hybrid")
     };
     cmbBufferSwap = new wxComboBox(EmuSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 3, cmbBufferSwap_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-    lblLOD = new wxStaticText(EmuSettingsPanel, wxID_ANY, wxT("LOD calculation:"));
+    lblLOD = new wxStaticText(EmuSettingsPanel, wxID_ANY, _("LOD calculation:"));
     const wxString cmbLOD_choices[] = {
-      wxT("off"),
-      wxT("fast"),
-      wxT("precise")
+      _("off"),
+      _("fast"),
+      _("precise")
     };
     cmbLOD = new wxComboBox(EmuSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 3, cmbLOD_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-    lblAspect = new wxStaticText(EmuSettingsPanel, wxID_ANY, wxT("Aspect ratio:"));
+    lblAspect = new wxStaticText(EmuSettingsPanel, wxID_ANY, _("Aspect ratio:"));
     const wxString cmbAspect_choices[] = {
-      wxT("4:3 (default)"),
-      wxT("Force 16:9"),
-      wxT("Stretch")
+      _("4:3 (default)"),
+      _("Force 16:9"),
+      _("Stretch")
     };
     cmbAspect = new wxComboBox(EmuSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 3, cmbAspect_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-    cbxFog = new wxCheckBox(EmuSettingsPanel, wxID_ANY, wxT("Fog"));
-    cbxBuffer = new wxCheckBox(EmuSettingsPanel, wxID_ANY, wxT("Buffer clear on every frame"));
-    cbxFBEnable = new wxCheckBox(EmuSettingsPanel, wxID_FBEnable, wxT("Enable frame buffer emulation"));
-    cbxFBHWFBE = new wxCheckBox(EmuSettingsPanel, wxID_ANY, wxT("Hardware frame buffer emulation"));
-    cbxFBGetFBI = new wxCheckBox(EmuSettingsPanel, wxID_ANY, wxT("Get frame buffer info"));
-    cbxFBReadEveryFrame = new wxCheckBox(EmuSettingsPanel, wxID_ANY, wxT("Read every frame (slow!)"));
-    cbxFBasTex = new wxCheckBox(EmuSettingsPanel, wxID_ANY, wxT("Render N64 frame buffer as texture"));
-    cbxDetect = new wxCheckBox(EmuSettingsPanel, wxID_ANY, wxT("Detect CPU write to the N64 frame buffer"));
-    cbxFBDepthBuffer = new wxCheckBox(EmuSettingsPanel, wxID_ANY, wxT("Software depth buffer rendering"));
+    cbxFog = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Fog"));
+    cbxBuffer = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Buffer clear on every frame"));
+    cbxFBEnable = new wxCheckBox(EmuSettingsPanel, wxID_FBEnable, _("Enable frame buffer emulation"));
+    cbxFBHWFBE = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Hardware frame buffer emulation"));
+    cbxFBGetFBI = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Get frame buffer info"));
+    cbxFBReadEveryFrame = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Read every frame (slow!)"));
+    cbxFBasTex = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Render N64 frame buffer as texture"));
+    cbxDetect = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Detect CPU write to the N64 frame buffer"));
+    cbxFBDepthBuffer = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Software depth buffer rendering"));
   }
 
 #ifdef TEXTURE_FILTER
@@ -193,27 +196,27 @@ wxNotebook(parent, id, pos, size, 0)
       grGlideShutdown ();
 
     TexturePanel = new wxPanel(this, wxID_ANY);
-    EnhTexSizer_staticbox = new wxStaticBox(TexturePanel, -1, wxT("Texture enhancement"));
-    TextureRightSizer_staticbox = new wxStaticBox(TexturePanel, -1, wxT("Hi-resolution textures"));
-    CommonSizer_staticbox = new wxStaticBox(TexturePanel, -1, wxT("Common"));
-    PresetsSizer_staticbox = new wxStaticBox(TexturePanel, -1, wxT("Presets"));
-    EnhTexPerfTweaksSizer_staticbox = new wxStaticBox(TexturePanel, -1, wxT("Performance tweaks"));
-    HRTexPerfTweaksSizer_staticbox = new wxStaticBox(TexturePanel, -1, wxT("Performance tweaks"));
-    lblFilter = new wxStaticText(TexturePanel, wxID_ANY, wxT("Filter"));
+    EnhTexSizer_staticbox = new wxStaticBox(TexturePanel, -1, _("Texture enhancement"));
+    TextureRightSizer_staticbox = new wxStaticBox(TexturePanel, -1, _("Hi-resolution textures"));
+    CommonSizer_staticbox = new wxStaticBox(TexturePanel, -1, _("Common"));
+    PresetsSizer_staticbox = new wxStaticBox(TexturePanel, -1, _("Presets"));
+    EnhTexPerfTweaksSizer_staticbox = new wxStaticBox(TexturePanel, -1, _("Performance tweaks"));
+    HRTexPerfTweaksSizer_staticbox = new wxStaticBox(TexturePanel, -1, _("Performance tweaks"));
+    lblFilter = new wxStaticText(TexturePanel, wxID_ANY, _("Filter"));
     const wxString cmbEnhFilter_choices[] = {
-      wxT("None"),
-      wxT("Smooth filtering 1"),
-      wxT("Smooth filtering 2"),
-      wxT("Smooth filtering 3"),
-      wxT("Smooth filtering 4"),
-      wxT("Sharp filtering 1"),
-      wxT("Sharp filtering 2")
+      _("None"),
+      _("Smooth filtering 1"),
+      _("Smooth filtering 2"),
+      _("Smooth filtering 3"),
+      _("Smooth filtering 4"),
+      _("Sharp filtering 1"),
+      _("Sharp filtering 2")
     };
     cmbEnhFilter = new wxComboBox(TexturePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 7, cmbEnhFilter_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-    lblEnhancement = new wxStaticText(TexturePanel, wxID_ANY, wxT("Enhancement"));
+    lblEnhancement = new wxStaticText(TexturePanel, wxID_ANY, _("Enhancement"));
     const wxString cmbEnhEnhancement_choices[] = {
-      wxT("None"),
-      wxT("Store"),
+      _("None"),
+      _("Store"),
       wxT("X2"),
       wxT("X2SAI"),
       wxT("HQ2X"),
@@ -223,43 +226,43 @@ wxNotebook(parent, id, pos, size, 0)
       wxT("HQ4X")
     };
     cmbEnhEnhancement = new wxComboBox(TexturePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 9, cmbEnhEnhancement_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-    lblTexCache = new wxStaticText(TexturePanel, wxID_ANY, wxT("Texture cache"));
+    lblTexCache = new wxStaticText(TexturePanel, wxID_ANY, _("Texture cache"));
     spinEnhCacheSize = new wxSpinCtrl(TexturePanel, wxID_ANY, wxT("0"), wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 0, 300);
-    lblTexCacheMB = new wxStaticText(TexturePanel, wxID_ANY, wxT("Mbytes"));
-    cbxEnhIgnoreBG = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Ignore Backgrounds"));
-    cbxEnhTexCompression = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Apply texture compression"));
-    cbxEnhCompressCache = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Compress texture cache"));
-    lblHrsFormat = new wxStaticText(TexturePanel, wxID_ANY, wxT("Format"));
+    lblTexCacheMB = new wxStaticText(TexturePanel, wxID_ANY, _("Mbytes"));
+    cbxEnhIgnoreBG = new wxCheckBox(TexturePanel, wxID_ANY, _("Ignore Backgrounds"));
+    cbxEnhTexCompression = new wxCheckBox(TexturePanel, wxID_ANY, _("Apply texture compression"));
+    cbxEnhCompressCache = new wxCheckBox(TexturePanel, wxID_ANY, _("Compress texture cache"));
+    lblHrsFormat = new wxStaticText(TexturePanel, wxID_ANY, _("Format"));
     const wxString cmbHrsFormat_choices[] = {
-      wxT("None"),
-      wxT("Rice format")
+      _("None"),
+      _("Rice format")
     };
     cmbHrsFormat = new wxComboBox(TexturePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 2, cmbHrsFormat_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-    cbxHrsTile = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Tile textures"));
-    cbxHrsForce16 = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Force 16bpp textures"));
-    cbxHrsAltCRC = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Alternative CRC calculation"));
-    cbxHrsTexCompression = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Apply texture compression"));
-    cbxHrsCompressCache = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Compress texture cache"));
-    cbxHrsLetFly = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Use alpha channel fully"));
-    cbxHrsTexEdit = new wxCheckBox(TexturePanel, wxID_TexEdit, wxT("Texture dumping/editing mode"));
-    lblTexCompression = new wxStaticText(TexturePanel, wxID_ANY, wxT("Texture compression method"));
+    cbxHrsTile = new wxCheckBox(TexturePanel, wxID_ANY, _("Tile textures"));
+    cbxHrsForce16 = new wxCheckBox(TexturePanel, wxID_ANY, _("Force 16bpp textures"));
+    cbxHrsAltCRC = new wxCheckBox(TexturePanel, wxID_ANY, _("Alternative CRC calculation"));
+    cbxHrsTexCompression = new wxCheckBox(TexturePanel, wxID_ANY, _("Apply texture compression"));
+    cbxHrsCompressCache = new wxCheckBox(TexturePanel, wxID_ANY, _("Compress texture cache"));
+    cbxHrsLetFly = new wxCheckBox(TexturePanel, wxID_ANY, _("Use alpha channel fully"));
+    cbxHrsTexEdit = new wxCheckBox(TexturePanel, wxID_TexEdit, _("Texture dumping/editing mode"));
+    lblTexCompression = new wxStaticText(TexturePanel, wxID_ANY, _("Texture compression method"));
     const wxString cmbTextureCompression_choices[] = {
       wxT("S3TC"),
       wxT("FXT1")
     };
     cmbTextureCompression = new wxComboBox(TexturePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, evoodoo ? 1 : 2, cmbTextureCompression_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-    cbxSaveTexCache = new wxCheckBox(TexturePanel, wxID_ANY, wxT("Save texture cache to hard disk"));
-    btnPerformance = new wxButton(TexturePanel, wxID_Performance, wxT("Best performance"));
-    btnQuality = new wxButton(TexturePanel, wxID_Quality, wxT("Best texture quality"));
+    cbxSaveTexCache = new wxCheckBox(TexturePanel, wxID_ANY, _("Save texture cache to hard disk"));
+    btnPerformance = new wxButton(TexturePanel, wxID_Performance, _("Best performance"));
+    btnQuality = new wxButton(TexturePanel, wxID_Quality, _("Best texture quality"));
   }
 #endif //TEXTURE_FILTER
 
 #ifndef _ENDUSER_RELEASE_
   DebugPanel = new wxPanel(this, wxID_ANY);
-  DevSettingsSizer_staticbox = new wxStaticBox(DebugPanel, -1, wxT("Developers settings"));
-  DebugSizer_staticbox = new wxStaticBox(DebugPanel, -1, wxT("Debug/Misc"));
-  cbxAutoUcode = new wxCheckBox(DebugPanel, wxID_ANY, wxT("Autodetect Microcode"));
-  lblForceUcode = new wxStaticText(DebugPanel, wxID_ANY, wxT("Force Microcode:"));
+  DevSettingsSizer_staticbox = new wxStaticBox(DebugPanel, -1, _("Developers settings"));
+  DebugSizer_staticbox = new wxStaticBox(DebugPanel, -1, _("Debug/Misc"));
+  cbxAutoUcode = new wxCheckBox(DebugPanel, wxID_ANY, _("Autodetect Microcode"));
+  lblForceUcode = new wxStaticText(DebugPanel, wxID_ANY, _("Force Microcode:"));
   const wxString cmbForceUcode_choices[] = {
     wxT("0: RSP SW 2.0X (ex. Mario)"),
     wxT("1: F3DEX 1.XX (ex. Star Fox)"),
@@ -272,21 +275,21 @@ wxNotebook(parent, id, pos, size, 0)
     wxT("8: F3DEXBG 2.08 Conker's Bad Fur Day")
   };
   cmbForceUcode = new wxComboBox(DebugPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 9, cmbForceUcode_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-  cbxWireframe = new wxCheckBox(DebugPanel, wxID_ANY, wxT("Wireframe using:"));
+  cbxWireframe = new wxCheckBox(DebugPanel, wxID_ANY, _("Wireframe using:"));
   const wxString cmbWireframe_choices[] = {
-    wxT("Original colors"),
-    wxT("Vertex colors"),
-    wxT("Red only")
+    _("Original colors"),
+    _("Vertex colors"),
+    _("Red only")
   };
   cmbWireframe = new wxComboBox(DebugPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 3, cmbWireframe_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
-  cbxLog = new wxCheckBox(DebugPanel, wxID_ANY, wxT("Log to rdp.txt (SLOW)"));
-  cbxCombRed = new wxCheckBox(DebugPanel, wxID_ANY, wxT("unknown combiners as red"));
-  cbxLogClear = new wxCheckBox(DebugPanel, wxID_ANY, wxT("Log clear every frame"));
-  cbxCmbLog = new wxCheckBox(DebugPanel, wxID_ANY, wxT("combiner logging"));
-  cbxWindowLog = new wxCheckBox(DebugPanel, wxID_ANY, wxT("Run (+log) in window"));
-  cbxCmbLogClear = new wxCheckBox(DebugPanel, wxID_ANY, wxT("cmb. clear every frame"));
-  cbxErrLog = new wxCheckBox(DebugPanel, wxID_ANY, wxT("Error log (rdp_e.txt)"));
-  cbxBilinearTexCache = new wxCheckBox(DebugPanel, wxID_ANY, wxT("Bilinear filter texture cache"));
+  cbxLog = new wxCheckBox(DebugPanel, wxID_ANY, _("Log to rdp.txt (SLOW)"));
+  cbxCombRed = new wxCheckBox(DebugPanel, wxID_ANY, _("Unknown combiners as red"));
+  cbxLogClear = new wxCheckBox(DebugPanel, wxID_ANY, _("Log clear every frame"));
+  cbxCmbLog = new wxCheckBox(DebugPanel, wxID_ANY, _("Combiner logging"));
+  cbxWindowLog = new wxCheckBox(DebugPanel, wxID_ANY, _("Run (+log) in window"));
+  cbxCmbLogClear = new wxCheckBox(DebugPanel, wxID_ANY, _("Cmb. clear every frame"));
+  cbxErrLog = new wxCheckBox(DebugPanel, wxID_ANY, _("Error log (rdp_e.txt)"));
+  cbxBilinearTexCache = new wxCheckBox(DebugPanel, wxID_ANY, _("Bilinear filter texture cache"));
 #endif //_ENDUSER_RELEASE_
 
   set_properties();
@@ -299,6 +302,7 @@ BEGIN_EVENT_TABLE(ConfigNotebook, wxNotebook)
 // begin wxGlade: ConfigNotebook::event_table
 EVT_CHECKBOX(wxID_VRAM, ConfigNotebook::OnClickVRAM)
 EVT_CHECKBOX(wxID_FBEnable, ConfigNotebook::OnClickFB)
+EVT_BUTTON(wxID_Language, ConfigNotebook::OnLanguageSelect)
 #ifdef TEXTURE_FILTER
 EVT_BUTTON(wxID_Performance, ConfigNotebook::onPerformace)
 EVT_BUTTON(wxID_Quality, ConfigNotebook::onQuality)
@@ -317,7 +321,7 @@ void ConfigNotebook::OnClickVRAM(wxCommandEvent &event)
     if (enable)
       spinVRAM->SetValue(settings.wrpVRAM);
     else
-      spinVRAM->SetValue(wxT(" auto"));
+      spinVRAM->SetValue(_(" auto"));
     spinVRAM->Enable(enable);
     lblMb->Enable(enable);
   }
@@ -331,6 +335,61 @@ void ConfigNotebook::OnClickFB(wxCommandEvent &event)
     cbxFBHWFBE->Enable(cbxFBEnable->GetValue());
   //    event.Skip();
   //    wxLogDebug(wxT("Event handler (ConfigNotebook::FrameBufferOnClick) not implemented yet")); //notify the user that he hasn't implemented the event handler yet
+}
+
+static wxString GetTranslationsPath()
+{
+  if (!iniPath.IsEmpty())
+    return iniPath; //.BeforeLast(wxFileName::GetPathSeparator());
+  return pluginPath;
+}
+
+void ConfigNotebook::OnLanguageSelect(wxCommandEvent &event)
+{
+  if (event.GetEventObject() != btnLanguage)
+    event.Skip();
+  wxArrayString files;
+  size_t nbLangs = wxDir::GetAllFiles(GetTranslationsPath(), &files, wxString(wxT("Glide64_*.mo")), wxDIR_FILES);
+  if (nbLangs == 0)
+  {
+      wxMessageBox(wxT("No translation (Glide64_*.mo) files found.\nUsing default language."), wxT("Files not found"), wxOK|wxICON_EXCLAMATION);
+      settings.lang_id = wxLANGUAGE_ENGLISH_US;
+      return;
+  }
+  size_t i;
+  wxArrayInt aLangIds;
+  wxArrayString aLangNames;
+  const wxLanguageInfo * info = wxLocale::GetLanguageInfo(wxLANGUAGE_ENGLISH_US);
+  aLangIds.Add(info->Language);
+  aLangNames.Add(info->Description);
+  for (i = 0; i < nbLangs; i++)
+  {
+    info = wxLocale::FindLanguageInfo(wxFileName(files[i]).GetName().AfterFirst('_'));
+    if (info && wxLocale::IsAvailable(info->Language)) {
+      //vLangInfos.push_back(LangInfo(info->Description, info->Language));
+      aLangIds.Add(info->Language);
+      aLangNames.Add(info->Description);
+    }
+  }
+  if (aLangIds.Count() == 1)
+  {
+      wxMessageBox(wxT("No translations supported by your OS found.\nUsing default language."), wxT("Files not found"), wxOK|wxICON_EXCLAMATION);
+      settings.lang_id = wxLANGUAGE_ENGLISH_US;
+      return;
+  }
+  int lng = wxGetSingleChoiceIndex (
+              _("Please choose language:"),
+              _("Language"),
+              aLangNames,
+              this
+            );
+  if (lng != -1 && lang_id != aLangIds[lng])
+  {
+    lang_id = aLangIds[lng];
+    wxString strLanguage(_("Press OK to change to "));
+    strLanguage += aLangNames[lng];
+    btnLanguage->wxButton::SetLabel(strLanguage);
+  }
 }
 
 #ifdef TEXTURE_FILTER
@@ -422,46 +481,45 @@ wxLogDebug(wxT("Event handler (ConfigNotebook::onPageChanging) not implemented y
 void ConfigNotebook::set_properties()
 {
   // begin wxGlade: ConfigNotebook::set_properties
-  //common panel
-  AddPage(CommonSettingsPanel, wxT("Common settings"));
-  wxString tooltip = wxT("Resolution\nThis option selects the fullscreen resolution for 3dfx cards and windowed resolution for other cards\n(note again that for 3dfx cards the plugin must be in fullscreen mode to see anything).\n[recommended: 640x480, 800x600, 1024x768]");
+  //Basic panel
+  AddPage(BasicSettingsPanel, _("Basic settings"));
+  wxString tooltip = _("Resolution\nThis option selects the fullscreen resolution for 3dfx cards and windowed resolution for other cards\n(note again that for 3dfx cards the plugin must be in fullscreen mode to see anything).\n[Recommended: 640x480, 800x600, 1024x768]");
   lblResolution->SetToolTip(tooltip);
   cmbResolution->SetToolTip(tooltip);
   cmbResolution->SetSelection(settings.res_data);
-  cbxVSync->SetToolTip(wxT("Vertical sync\nThis option will enable the vertical sync, which will prevent tearing.\nNote: this option will ONLY have effect if vsync is set to \"Software Controlled\".\n"));
+  cbxVSync->SetToolTip(_("Vertical sync\nThis option will enable the vertical sync, which will prevent tearing.\nNote: this option will ONLY have effect if vsync is set to \"Software Controlled\".\n"));
   cbxVSync->SetValue(settings.vsync>0);
-  tooltip = wxT("Select a format, in which screen shots will be saved");
+  tooltip = _("Select a format, in which screen shots will be saved");
   lblScreenShotFormat->SetToolTip(tooltip);
   cmbScreenShotFormat->SetToolTip(tooltip);
   for (int f = 0; f < NumOfFormats; f++) {
     cmbScreenShotFormat->Append(ScreenShotFormats[f].format);
   }
   cmbScreenShotFormat->SetSelection(settings.ssformat);
-  GlideCardBox->SetToolTip(wxT("Glide card #\nThis option is only for users with multiple glide cards installed in one machine.\nThis selects the glide card number to use. If you only have one glide card installed\nin your system,set this option to #1. Otherwise, select the number that corresponds\nto the glide card you want to use.\n[recommended: #1 if only one glide card present]"));
-  GlideCardBox->SetSelection(settings.card_id);
-  cbxFPS->SetToolTip(wxT("FPS counter\nWhen this option is checked, a FPS (frames per second) counter will be shown\nin the lower left corner of the screen.\n[recommended: your preference]"));
+  btnLanguage->SetToolTip(_("Language select:\nPress the button to invoke language selection dialog.\nSelected language will be activated after restart of the configuration dialog."));
+  cbxFPS->SetToolTip(_("FPS counter\nWhen this option is checked, a FPS (frames per second) counter will be shown\nin the lower left corner of the screen.\n[Recommended: your preference]"));
   cbxFPS->SetValue((settings.show_fps&1) > 0);
-  cbxVIS->SetToolTip(wxT("VI/s counter\nWhen this option is checked, a VI/s (vertical interrupts per second) counter\nwill be shown in the lower left corner of the screen.  This is like the FPS\ncounter but will be consistent at 60 VI/s for full speed on NTSC (U) games and\n50 VI/s for full speed on PAL (E) ones.\n[recommended: your preference]"));
+  cbxVIS->SetToolTip(_("VI/s counter\nWhen this option is checked, a VI/s (vertical interrupts per second) counter\nwill be shown in the lower left corner of the screen.  This is like the FPS\ncounter but will be consistent at 60 VI/s for full speed on NTSC (U) games and\n50 VI/s for full speed on PAL (E) ones.\n[Recommended: your preference]"));
   cbxVIS->SetValue((settings.show_fps&2) > 0);
-  cbxPercent->SetToolTip(wxT("% speed\nThis displays a percentage of the actual N64 speed in the lower\nleft corner of the screen.\n[recommended: your preference]"));
+  cbxPercent->SetToolTip(_("% speed\nThis displays a percentage of the actual N64 speed in the lower\nleft corner of the screen.\n[Recommended: your preference]"));
   cbxPercent->SetValue((settings.show_fps&4) > 0);
-  cbxClockEnabled->SetToolTip(wxT("Clock enabled\nThis option will put a clock in the lower right corner of the screen, showing the current time.\n[reccomended: your preference]"));
+  cbxClockEnabled->SetToolTip(_("Clock enabled\nThis option will put a clock in the lower right corner of the screen, showing the current time.\n[Recommended: your preference]"));
   cbxClockEnabled->SetValue(settings.clock>0);
   cbxClock24->SetValue(settings.clock_24_hr>0);
-  cbxClock24->SetToolTip(wxT("Display hours as 24-hour clock.\n[reccomended: your preference]"));
-  cbxTextTransparent->SetToolTip(wxT("Text transparent\nIf this is checked, all on-screen messages will have a transparent background.  Otherwise, it will have a solid black background.\n[reccomended: your preference]"));
+  cbxClock24->SetToolTip(_("Display hours as 24-hour clock.\n[Recommended: your preference]"));
+  cbxTextTransparent->SetToolTip(_("Transparent text background\nIf this is checked, all on-screen messages will have a transparent background.  Otherwise, it will have a solid black background.\n[Recommended: your preference]"));
   cbxTextTransparent->SetValue((settings.show_fps&8) > 0);
   cbxAdvancedSettings->SetValue(settings.advanced_options > 0);
-  cbxAdvancedSettings->SetToolTip(wxT("Enable \"Emulation settings\" panel. For experienced users only!\nIt shows default emulation settings when game is not loaded, or current game settings otherwise."));
+  cbxAdvancedSettings->SetToolTip(_("Enable \"Emulation settings\" panel. For experienced users only!\nIt shows default emulation settings when game is not loaded, or current game settings otherwise."));
   cbxTextureSettings->SetValue(settings.texenh_options > 0);
-  cbxTextureSettings->SetToolTip(wxT("Enable \"Texture enhancement\" panel.\nIt shows various texture enhancement options as well as options for hi-resolution textures."));
-  tooltip = wxT("Full screen resolution:\nThis sets the full screen resolution for people who use the wrapper (non-voodoo video cards).\nAll the resolutions that your video card/monitor support should be displayed.\n[Recommended: Native (max) resolution of your monitor - unless performance becomes an issue]");
+  cbxTextureSettings->SetToolTip(_("Enable \"Texture enhancement\" panel.\nIt shows various enhancement options for original textures as well as options for hi-resolution textures."));
+  tooltip = _("Full screen resolution:\nThis sets the full screen resolution for non-3dfx video cards.\nAll the resolutions that your video card/monitor support should be displayed.\n[Recommended: native (max) resolution of your monitor - unless performance becomes an issue]");
   lblFSResolution->SetToolTip(tooltip);
   cmbFSResolution->SetToolTip(tooltip);
-  cbxAnisotropic->SetToolTip(wxT("Anisotropic filtering:\nThis filter sharpens and brings out the details of textures that recede into the distance.\nWhen activated, it will use the max anisotropy your video card supports.\nHowever, this will override native way of texture filtering and may cause visual artifacts in some games.\n[Recommended: Your preference, game dependant]"));
-  cbxVRAM->SetToolTip(wxT("Autodetect VRAM Size:\nSince OpenGL cannot do this reliably at the moment, the option to set this manually is available.\nIf checked, plugin will try to autodetect VRAM size.\nBut if this appears wrong, please uncheck and set it to correct value.\n[Recommended: On]"));
+  cbxAnisotropic->SetToolTip(_("Anisotropic filtering:\nThis filter sharpens and brings out the details of textures that recede into the distance.\nWhen activated, it will use the max anisotropy your video card supports.\nHowever, this will override native way of texture filtering and may cause visual artifacts in some games.\n[Recommended: your preference, game dependant]"));
+  cbxVRAM->SetToolTip(_("Autodetect VRAM Size:\nSince OpenGL cannot do this reliably at the moment, the option to set this manually is available.\nIf checked, plugin will try to autodetect VRAM size.\nBut if this appears wrong, please uncheck and set it to correct value.\n[Recommended: on]"));
   spinVRAM->SetMinSize(wxSize(55, 21));
-  cbxFBO->SetToolTip(wxT("Use Frame buffer objects:\nChanges the way FB effects are rendered - with or without usage of the OpenGL Frame Buffer Objects (FBO) extension.\nThe choice depends on game and your video card. FBO off is good for NVIDIA cards, while for ATI cards, it's usually best that FBOs are turned on.\nAlso, some FB effects works only with one of the methods, no matter, which card you have.\nOn the whole, with FBO off, compatibility/ accuracy is a bit better (which is the case for Resident Evil 2).\nHowever, with FBO on with some systems, it can actually be a bit faster in cases.\n[Recommended: Video card and game dependant]"));
+  cbxFBO->SetToolTip(_("Use frame buffer objects:\nChanges the way FB effects are rendered - with or without usage of the OpenGL Frame Buffer Objects (FBO) extension.\nThe choice depends on game and your video card. FBO off is good for NVIDIA cards, while for ATI cards, it's usually best that FBOs are turned on.\nAlso, some FB effects works only with one of the methods, no matter, which card you have.\nOn the whole, with FBO off, compatibility/ accuracy is a bit better (which is the case for Resident Evil 2).\nHowever, with FBO on with some systems, it can actually be a bit faster in cases.\n[Recommended: video card and game dependant]"));
   char strConfigWrapperExt[] = "grConfigWrapperExt";
   GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress(strConfigWrapperExt);
   if (grConfigWrapperExt)
@@ -484,7 +542,7 @@ void ConfigNotebook::set_properties()
 #ifdef __WINDOWS__
     cbxVRAM->SetValue(settings.wrpVRAM == 0);
     if (cbxVRAM->GetValue())
-      spinVRAM->SetValue(wxT(" auto"));
+      spinVRAM->SetValue(_(" auto"));
     else
       spinVRAM->SetValue(settings.wrpVRAM);
     spinVRAM->Enable(!cbxVRAM->GetValue());
@@ -498,7 +556,6 @@ void ConfigNotebook::set_properties()
 #endif
     cbxFBO->SetValue(settings.wrpFBO > 0);
     cbxAnisotropic->SetValue(settings.wrpAnisotropic > 0);
-    GlideCardBox->Disable();
   }
   else
   {
@@ -517,90 +574,91 @@ void ConfigNotebook::set_properties()
   //emulation settings panel
   if (settings.advanced_options)
   {
-    AddPage(EmuSettingsPanel, wxT("Emulation settings"));
-    tooltip = wxT("Filtering mode\nThere are three filtering modes possible:\n* Automatic filtering - filter exactly how the N64 specifies.\n* Point-sampled filtering - causes texels to appear square and sharp.\n* Bilinear filtering - interpolates the texture to make it appear more smooth.\n[recommended: Force Bilinear]");
+    AddPage(EmuSettingsPanel, _("Emulation settings"));
+    tooltip = _("Filtering mode\nThere are three filtering modes possible:\n* Automatic filtering - filter exactly how the N64 specifies.\n* Point-sampled filtering - causes texels to appear square and sharp.\n* Bilinear filtering - interpolates the texture to make it appear more smooth.\n[Recommended: Automatic]");
     lbFiltering->SetToolTip(tooltip);
     cmbFiltering->SetToolTip(tooltip);
     cmbFiltering->SetSelection(settings.filtering);
-    tooltip = wxT("Buffer swapping method\nThere are 3 buffer swapping methods:\n* old - swap buffers when vertical interrupt has occured.\n* new - swap buffers when set of conditions is satisfied. Prevents flicker on some games.\n* hybrid - mix of first two methods.\nCan prevent even more flickering then previous method, but also can cause artefacts.\nIf you have flickering problems in a game (or graphics that don't show),\ntry to change swapping method.\n[recommended: new (hybrid for Paper Mario)]");
+    tooltip = _("Buffer swapping method\nThere are 3 buffer swapping methods:\n* old - swap buffers when vertical interrupt has occured.\n* new - swap buffers when set of conditions is satisfied. Prevents flicker on some games.\n* hybrid - mix of first two methods.\nCan prevent even more flickering then previous method, but also can cause artefacts.\nIf you have flickering problems in a game (or graphics that don't show),\ntry to change swapping method.\n[Recommended: new (hybrid for Paper Mario)]");
     lbBufferSwap->SetToolTip(tooltip);
     cmbBufferSwap->SetToolTip(tooltip);
     cmbBufferSwap->SetSelection(settings.swapmode);
-    tooltip = wxT("Per-pixel level-of-detail calculation\nN64 uses special mechanism for mip-mapping, which nearly impossible to reproduce\ncorrectly on PC hardware. This option enables approximate emulation of this feature.\nFor example, it is required for the Peach/Bowser portrait's transition in Super Mario 64.\nThere are 3 modes:\n* off - LOD is not calculated\n* fast - fast imprecise LOD calculation.\n* precise - most precise LOD calculation possible, but more slow.\n[recommended: your preference]");
+    tooltip = _("Per-pixel level-of-detail calculation\nN64 uses special mechanism for mip-mapping, which nearly impossible to reproduce\ncorrectly on PC hardware. This option enables approximate emulation of this feature.\nFor example, it is required for the Peach/Bowser portrait's transition in Super Mario 64.\nThere are 3 modes:\n* off - LOD is not calculated\n* fast - fast imprecise LOD calculation.\n* precise - most precise LOD calculation possible, but more slow.\n[Recommended: your preference]");
     lblLOD->SetToolTip(tooltip);
     cmbLOD->SetToolTip(tooltip);
     cmbLOD->SetSelection(settings.lodmode);
     cmbAspect->SetSelection(settings.aspectmode);
-    tooltip = wxT("Aspect ratio of the output.\nMost N64 games use 4:3 aspect ratio, but some support widescreen too.\nYou may select appropriate aspect here and set widescreen mode in game settings.\nIn \"Stretch\" mode the output will be stretched to the entire screen,\nother modes may add black boarders if necessary");
+    tooltip = _("Aspect ratio of the output.\nMost N64 games use 4:3 aspect ratio, but some support widescreen too.\nYou may select appropriate aspect here and set widescreen mode in game settings.\nIn \"Stretch\" mode the output will be stretched to the entire screen,\nother modes may add black boarders if necessary");
     cmbAspect->SetToolTip(tooltip);
     lblAspect->SetToolTip(tooltip);
-    cbxFog->SetToolTip(wxT("Fog enabled\nThis option, when checked, will allow fog to be used.\n[recommended: on]"));
+    cbxFog->SetToolTip(_("Fog enabled\nSets fog emulation on//off.\n[Recommended: on]"));
     cbxFog->SetValue(settings.fog>0);
-    cbxBuffer->SetToolTip(wxT("Buffer clear on every frame\nIf this option is checked, the buffer will be cleared (screen initialized to black)\nat the beginning of each frame. If this option is disabled, the speed might increase\nslightly, but some trails may appear.\n[recommended: on]"));
+    cbxBuffer->SetToolTip(_("Buffer clear on every frame\nForces the frame buffer to be cleared every frame drawn.\nUsually frame buffer clear is controlled by the game.\nHowever, in some cases it is not well emulated,\nand some garbage may be left on the screen.\nIn such cases, this option must be set on.\n[Recommended: on]"));
     cbxBuffer->SetValue(settings.buff_clear>0);
-    cbxFBEnable->SetToolTip(wxT("Enable frame buffer emulation\nIf on, plugin will try to detect frame buffer usage and apply appropriate frame buffer emulation.\n[reccomended: on for games which use frame buffer effects]"));
+    cbxFBEnable->SetToolTip(_("Enable frame buffer emulation\nIf on, plugin will try to detect frame buffer usage and apply appropriate frame buffer emulation.\n[Recommended: on for games which use frame buffer effects]"));
     cbxFBEnable->SetValue(fb_emulation_enabled);
-    cbxFBHWFBE->SetToolTip(wxT("Enable hardware frame buffer emulation\nIf this option is on, plugin will create auxilary frame buffers in video memory instead of copying\nframe buffer content into main memory. This allows plugin to run frame buffer effects without slowdown\nand without scaling image down to N64's native resolution. This feature is fully supported by\nVoodoo 4/5 cards and partially by Voodoo3 and Banshee. Modern cards also fully support it.\n[reccomended: on, if supported by your hardware]"));
+    cbxFBHWFBE->SetToolTip(_("Enable hardware frame buffer emulation\nIf this option is on, plugin will create auxilary frame buffers in video memory instead of copying\nframe buffer content into main memory. This allows plugin to run frame buffer effects without slowdown\nand without scaling image down to N64's native resolution. This feature is fully supported by\nVoodoo 4/5 cards and partially by Voodoo3 and Banshee. Modern cards also fully support it.\n[Recommended: on, if supported by your hardware]"));
     cbxFBHWFBE->SetValue(((settings.frame_buffer&fb_hwfbe)>0));
     cbxFBHWFBE->Enable(fb_emulation_enabled);
-    cbxFBGetFBI->SetToolTip(wxT("Get information about frame buffers\nThis is compatibility option. It must be set on for Mupen64 and off for 1964"));
+    cbxFBGetFBI->SetToolTip(_("Get information about frame buffers\nThis is compatibility option. It must be set on for Mupen64 and off for 1964"));
     cbxFBGetFBI->SetValue((settings.frame_buffer&fb_get_info)>0);
-    cbxFBReadEveryFrame->SetToolTip(wxT("Read every frame\nIn some games plugin can't detect frame buffer usage.\nIn such case you need to enable this option to see frame buffer effects.\nEvery drawn frame will be read from video card -> it works very slow.\n[reccomended: mostly off (needed only for a few games)]"));
+    cbxFBReadEveryFrame->SetToolTip(_("Read every frame\nIn some games plugin can't detect frame buffer usage.\nIn such cases you need to enable this option to see frame buffer effects.\nEvery drawn frame will be read from video card -> it works very slow.\n[Recommended: mostly off (needed only for a few games)]"));
     cbxFBReadEveryFrame->SetValue((settings.frame_buffer&fb_ref)>0);
-    cbxFBasTex->SetToolTip(wxT("Render N64 frame buffer as texture\nWhen this option is enabled, content of each N64 frame buffer is rendered\nas texture over the frame, rendered by the plugin. This prevents graphics lost,\nbut may cause slowdowns and various glitches in some games.\n[recommended: mostly off]"));
+    cbxFBasTex->SetToolTip(_("Render N64 frame buffer as texture\nWhen this option is enabled, content of each N64 frame buffer is rendered\nas texture over the frame, rendered by the plugin. This prevents graphics lost,\nbut may cause slowdowns and various glitches in some games.\n[Recommended: mostly off]"));
     cbxFBasTex->SetValue((settings.frame_buffer&fb_read_back_to_screen)>0);
-    cbxDetect->SetToolTip(wxT("Detect CPU write to the N64 frame buffer\nthis option works as the previous options, but the plugin is trying to detect,\nwhen game uses CPU writes to N64 frame buffer. The N64 frame buffer is rendered\nonly when CPU writes is detected. Use this option for those games, in which you\nsee still image or no image at all for some time with no reason.\n[recommended: mostly off]"));
+    cbxDetect->SetToolTip(_("Detect CPU write to the N64 frame buffer\nThis option works as the previous options, but the plugin is trying to detect,\nwhen game uses CPU writes to N64 frame buffer. The N64 frame buffer is rendered\nonly when CPU writes is detected. Use this option for those games, in which you\nsee still image or no image at all for some time with no reason.\n[Recommended: mostly off]"));
     cbxDetect->SetValue((settings.frame_buffer&fb_cpu_write_hack)>0);
-    cbxFBDepthBuffer->SetToolTip(wxT("Enable depth buffer rendering\nThis option is used to fully emulate N64 depth buffer.\nIt is required for correct emulation of depth buffer based effects.\nHowever, it requires fast (>1GHz) CPU to work full speed.\n[reccomended: on for fast PC]"));
+    cbxFBDepthBuffer->SetToolTip(_("Enable depth buffer rendering\nThis option is used to fully emulate N64 depth buffer.\nIt is required for correct emulation of depth buffer based effects.\nHowever, it requires fast (>1GHz) CPU to work full speed.\n[Recommended: on for fast PC]"));
     cbxFBDepthBuffer->SetValue((settings.frame_buffer&fb_depth_render)>0);
   }
 
 #ifdef TEXTURE_FILTER
   if (settings.texenh_options)
   {
-    AddPage(TexturePanel, wxT("Texture enhancement"));
-    tooltip = wxT("Filters:\nApply a filter to either smooth or sharpen textures.\nThere are 4 different smoothing filters and 2 different sharpening filters.\nThe higher the number, the stronger the effect,\ni.e. \"Smoothing filter 4\" will have a much more noticeable effect than \"Smoothing filter 1\".\nBe aware that performance may have an impact depending on the game and/or the PC.\n[Recommended: User preference]");
+    AddPage(TexturePanel, _("Texture enhancement"));
+    tooltip = _("Filters:\nApply a filter to either smooth or sharpen textures.\nThere are 4 different smoothing filters and 2 different sharpening filters.\nThe higher the number, the stronger the effect,\ni.e. \"Smoothing filter 4\" will have a much more noticeable effect than \"Smoothing filter 1\".\nBe aware that performance may have an impact depending on the game and/or the PC.\n[Recommended: your preference]");
     lblFilter->SetToolTip(tooltip);
     cmbEnhFilter->SetToolTip(tooltip);
     cmbEnhFilter->SetSelection(settings.ghq_fltr);
-    tooltip = wxT("Filter types:\n7 different filters are selectable here, each one with a distinctive look.\nBe aware of possible performance impacts.\n\nIMPORTANT: 'Store' mode - saves textures in cache 'as is'. It can improve performance in games, which load many textures.\nDisable 'Ignore backgrounds' option for better result\n\n[Recommended: User Preference]");
+    tooltip = _("Texture enhancement:\n7 different filters are selectable here, each one with a distinctive look.\nBe aware of possible performance impacts.\n\nIMPORTANT: 'Store' mode - saves textures in cache 'as is'. It can improve performance in games, which load many textures.\nDisable 'Ignore backgrounds' option for better result.\n\n[Recommended: your preference]");
     lblEnhancement->SetToolTip(tooltip);
     cmbEnhEnhancement->SetToolTip(tooltip);
     cmbEnhEnhancement->SetSelection(settings.ghq_enht);
-    tooltip = wxT("Texture cache size:\nEnhanced and filtered textures can be cached to aid performance.\nThis setting will adjust how much PC memory will be dedicated for texture cache.\nThis helps boost performance if there are subsequent requests for the same texture (usually the case).\nNormally, 128MB should be more than enough but there is a sweet spot for each game.\nSuper Mario may not need more than 32megs, but Conker streams a lot of textures,\nso setting 256+ megs can boost performance. Adjust accordingly if you are encountering speed issues.\n'0' disables cache.\n[Recommended: PC and game dependant]");
+    tooltip = _("Texture cache size:\nEnhanced and filtered textures can be cached to aid performance.\nThis setting will adjust how much PC memory will be dedicated for texture cache.\nThis helps boost performance if there are subsequent requests for the same texture (usually the case).\nNormally, 128MB should be more than enough but there is a sweet spot for each game.\nSuper Mario may not need more than 32megs, but Conker streams a lot of textures,\nso setting 256+ megs can boost performance. Adjust accordingly if you are encountering speed issues.\n'0' disables cache.\n[Recommended: PC and game dependant]");
     lblTexCache->SetToolTip(tooltip);
     lblTexCacheMB->SetToolTip(tooltip);
     spinEnhCacheSize->SetToolTip(tooltip);
     spinEnhCacheSize->SetMinSize(wxSize(55, 21));
     spinEnhCacheSize->SetValue(settings.ghq_cache_size);
-    cbxEnhIgnoreBG->SetToolTip(wxT("Ignore Backgrounds:\nIt is used to skip enhancement for wide narrow textures, usually used for backgrounds.\nThis may save texture memory greatly and increase performance.\n[Recommended: On (off for 'Store' mode)]"));
+    cbxEnhIgnoreBG->SetToolTip(_("Ignore Backgrounds:\nIt is used to skip enhancement for long narrow textures, usually used for backgrounds.\nThis may save texture memory greatly and increase performance.\n[Recommended: on (off for 'Store' mode)]"));
     cbxEnhIgnoreBG->SetValue(settings.ghq_enht_nobg>0);
-    cbxEnhTexCompression->SetToolTip(wxT("Texture compression:\nTextures will be compressed using selected texture compression method.\nThe overall compression ratio is about 1/6 for FXT1 and 1/4 for S3TC.\nIn addition to saving space on the texture cache,\nthe space occupied on the GFX hardware's texture RAM,\nby the enhanced textures, will be greatly reduced.\nThis minimizes texture RAM usage,\ndecreasing the number of texture swaps to the GFX hardware leading to performance gains.\nHowever, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradtion of small size textures and color banding of gradient colored textures.\n[Recommended: Off]"));
+    tooltip = _("Texture compression:\nTextures will be compressed using selected texture compression method.\nThe overall compression ratio is about 1/6 for FXT1 and 1/4 for S3TC.\nIn addition to saving space on the texture cache,\nthe space occupied on the GFX hardware's texture RAM,\nby the enhanced textures, will be greatly reduced.\nThis minimizes texture RAM usage,\ndecreasing the number of texture swaps to the GFX hardware leading to performance gains.\nHowever, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradtion of small size textures and color banding of gradient colored textures.\n[Recommended: off]");
+    cbxEnhTexCompression->SetToolTip(tooltip);
+    cbxHrsTexCompression->SetToolTip(tooltip);
     cbxEnhTexCompression->SetValue(settings.ghq_enht_cmpr>0);
-    cbxEnhCompressCache->SetToolTip(wxT("Compress texture cache:\nMemory will be compressed so that more textures can be held in the texture cache.\nThe compression ratio varies with each texture,\nbut 1/5 of the original size would be a modest approximation.\nThey will be decompressed on-the-fly, before being downloaded to the gfx hardware.\nThis option will still help save memory space even when using texture compression.\n[Recommended: ON]"));
+    cbxEnhCompressCache->SetToolTip(_("Compress texture cache:\nMemory will be compressed so that more textures can be held in the texture cache.\nThe compression ratio varies with each texture,\nbut 1/5 of the original size would be a modest approximation.\nThey will be decompressed on-the-fly, before being downloaded to the gfx hardware.\nThis option will still help save memory space even when using texture compression.\n[Recommended: on]"));
     cbxEnhCompressCache->SetValue(settings.ghq_enht_gz>0);
-    tooltip = wxT("Hi-res pack format:\nChose which method is to be used for loading Hi-res texture packs.\nOnly Rice's format is available currently.\nLeave on \"None\" if you will not be needing to load hi-res packs.\n[Recommended: Rice's Format. Default: \"None\"]");
+    tooltip = _("Hi-res pack format:\nChose which method is to be used for loading Hi-res texture packs.\nOnly Rice's format is available currently.\nLeave on \"None\" if you will not be needing to load hi-res packs.\n[Recommended: Rice's format. Default: \"None\"]");
     lblHrsFormat->SetToolTip(tooltip);
     cmbHrsFormat->SetToolTip(tooltip);
     cmbHrsFormat->SetSelection(settings.ghq_hirs);
-    cbxHrsTile->SetToolTip(wxT("Tile textures:\nWhen on, wide texture will be split on several tiles to fit in one 256-width texture.\nThis tiled texture takes much less video memory space and thus overall performance will increase.\nHowever, corresponding polygons must be split too, and this is not polished yet\n- various issues are possible, including black lines and polygons distortions.\n[Recommended: Off]"));
+    cbxHrsTile->SetToolTip(_("Tile textures:\nWhen on, wide texture will be split on several tiles to fit in one 256-width texture.\nThis tiled texture takes much less video memory space and thus overall performance will increase.\nHowever, corresponding polygons must be split too, and this is not polished yet\n- various issues are possible, including black lines and polygons distortions.\n[Recommended: off]"));
     cbxHrsTile->SetValue(settings.ghq_hirs_tile>0);
-    cbxHrsForce16->SetToolTip(wxT("Force 16bpp textures:\nThe color of the textures will be reduced to 16bpp.\nThis is another space saver and performance enhancer.\nThis halves the space used on the texture cache and the GFX hardware's texture RAM.\nColor reduction is done so that the original quality is preserved as much as possible.\nDepending on the texture, this usually is hardly noticeable.\nSometimes though, it can be: skies are a good example.\n[Recommended: Off]"));
+    cbxHrsForce16->SetToolTip(_("Force 16bpp textures:\nThe color of the textures will be reduced to 16bpp.\nThis is another space saver and performance enhancer.\nThis halves the space used on the texture cache and the GFX hardware's texture RAM.\nColor reduction is done so that the original quality is preserved as much as possible.\nDepending on the texture, this usually is hardly noticeable.\nSometimes though, it can be: skies are a good example.\n[Recommended: off]"));
     cbxHrsForce16->SetValue(settings.ghq_hirs_f16bpp>0);
-    cbxHrsTexEdit->SetToolTip(wxT("Texture dumping mode:\nIn this mode, you have that ability to dump textures on screen to the appropriate folder.\nYou can also reload textures while the game is running to see how they look instantly - big time saver!\n\nHotkeys: \"R\" reloads hires textures from texture packs - \"D\" toggles texture dumps on/off."));
+    cbxHrsTexEdit->SetToolTip(_("Texture dumping mode:\nIn this mode, you have that ability to dump textures on screen to the appropriate folder.\nYou can also reload textures while the game is running to see how they look instantly - big time saver!\n\nHotkeys: \"R\" reloads hires textures from the texture pack - \"D\" toggles texture dumps on/off."));
     cbxHrsTexEdit->SetValue(settings.ghq_hirs_dump>0);
-    cbxHrsAltCRC->SetToolTip(wxT("Alternative CRC calculation:\nThis option enables emulation of a palette CRC calculation bug in RiceVideo.\nIf some textures are not loaded, try to set this option on/off.\n[Recommended:  texture pack dependant, mostly on]"));
+    cbxHrsAltCRC->SetToolTip(_("Alternative CRC calculation:\nThis option enables emulation of a palette CRC calculation bug in RiceVideo.\nIf some textures are not loaded, try to set this option on/off.\n[Recommended: texture pack dependant, mostly on]"));
     cbxHrsAltCRC->SetValue(settings.ghq_hirs_altcrc>0 && settings.ghq_hirs_dump==0);
     if (settings.ghq_hirs_dump)
       cbxHrsAltCRC->Disable();
-    cbxHrsTexCompression->SetToolTip(wxT("Texture compression:\nTextures will be compressed using selected texture compression method.\nThe overall compression ratio is about 1/6 for FXT1 and 1/4 for S3TC.\nIn addition to saving space on the texture cache,\nthe space occupied on the GFX hardware's texture RAM,\nby the enhanced textures, will be greatly reduced.\nThis minimizes texture RAM usage,\ndecreasing the number of texture swaps to the GFX hardware leading to performance gains.\nHowever, this can lead to various undesirable issues with loaded textures\nand thus is recommend to not be used unless performance gains are needed.\n[Recommended: Off]"));
     cbxHrsTexCompression->SetValue(settings.ghq_hirs_cmpr>0);
-    cbxHrsCompressCache->SetToolTip(wxT("Compress texture cache:\nWhen game started, plugin loads all its hi-resolution textures into PC memory.\nSince hi-resolution textures are usually large, the whole pack can take hundreds megabytes of memory.\nCache compression allows save memory space greatly.\nTextures will be decompressed on-the-fly, before being downloaded to the gfx hardware.\nThis option will still help save memory space even when using texture compression.\n[Recommended: ON]"));
+    cbxHrsCompressCache->SetToolTip(_("Compress texture cache:\nWhen game started, plugin loads all its hi-resolution textures into PC memory.\nSince hi-resolution textures are usually large, the whole pack can take hundreds megabytes of memory.\nCache compression allows save memory space greatly.\nTextures will be decompressed on-the-fly, before being downloaded to the gfx hardware.\nThis option will still help save memory space even when using texture compression.\n[Recommended: on]"));
     cbxHrsCompressCache->SetValue(settings.ghq_hirs_gz>0);
-    cbxHrsLetFly->SetToolTip(wxT("Use Alpha channel fully:\nWhen this option is off, 16bit rgba textures will be loaded using RiceVideo style\n- with 1bit for alpha channel.\nWhen it is on, GlideHQ will check, how alpha channel is used by the hires texture,\nand select most appropriate format for it.\nThis gives texture designers freedom to play with alpha, as they need,\nregardless of format of original N64 texture.\nFor older and badly designed texture packs it can cause unwanted black borders.\n[Recommended: texture pack dependant]"));
+    cbxHrsLetFly->SetToolTip(_("Use Alpha channel fully:\nWhen this option is off, 16bit rgba textures will be loaded using RiceVideo style\n- with 1bit for alpha channel.\nWhen it is on, GlideHQ will check, how alpha channel is used by the hires texture,\nand select most appropriate format for it.\nThis gives texture designers freedom to play with alpha, as they need,\nregardless of format of original N64 texture.\nFor older and badly designed texture packs it can cause unwanted black borders.\n[Recommended: texture pack dependant]"));
     cbxHrsLetFly->SetValue(settings.ghq_hirs_let_texartists_fly>0);
     cmbTextureCompression->SetSelection(settings.ghq_cmpr);
-    cbxSaveTexCache->SetToolTip(wxT("Save texture cache to HD:\n\nFor enhanced textures cache:\nThis will save all previously loaded and enhanced textures to HD.\nSo upon next game launch, all the textures will be instantly loaded, resulting in smoother performance.\n\nFor high-resolution textures cache:\nAfter creation, loading hi-res texture will take only a few seconds upon game launch,\nas opposed to the 5 -60 seconds a pack can take to load without this cache file.\nThe only downside here is upon any changes to the pack, the cache file will need to be manually deleted.\n\nSaved cache files go into a folder called \"Cache\" within the Plugins folder.\n\n[Highly Recommended: ON]"));
+    cbxSaveTexCache->SetToolTip(_("Save texture cache to HD:\n\nFor enhanced textures cache:\nThis will save all previously loaded and enhanced textures to HD.\nSo upon next game launch, all the textures will be instantly loaded, resulting in smoother performance.\n\nFor high-resolution textures cache:\nAfter creation, loading hi-res texture will take only a few seconds upon game launch,\nas opposed to the 5 -60 seconds a pack can take to load without this cache file.\nThe only downside here is upon any changes to the pack, the cache file will need to be manually deleted.\n\nSaved cache files go into a folder called \"Cache\" within the Plugins folder.\n\n[Highly Recommended: on]"));
     cbxSaveTexCache->SetValue(settings.ghq_cache_save>0);
     TexturePanel->SetMinSize(wxSize(526, 494));
 
@@ -623,31 +681,31 @@ void ConfigNotebook::set_properties()
 #endif //TEXTURE_FILTER
 
 #ifndef _ENDUSER_RELEASE_
-  AddPage(DebugPanel, wxT("Debug"));
-  cbxAutoUcode->SetToolTip(wxT("Autodetect Microcode\nIf this option is checked, the microcode of the game\nwill be detected automatically from the INI, and\ntherefore it will not need to be set in this\nconfiguration dialog.\n[recommended: on]"));
+  AddPage(DebugPanel, _("Debug"));
+  cbxAutoUcode->SetToolTip(_("Autodetect Microcode\nIf this option is checked, the microcode of the game\nwill be detected automatically from the INI, and\ntherefore it will not need to be set in this\nconfiguration dialog.\n[Recommended: on]"));
   cbxAutoUcode->SetValue(settings.autodetect_ucode>0);
-  tooltip = wxT("Force Microcode\nThis option ONLY has an effect if Autodetect Microcode\nis unchecked, the crc from the game could not be\nfound in the INI, OR after the game has already started\nrunning. In any of those three cases, this will\nselect the microcode to use\n[recommended: any, turn on Autodetect Microcode]");
+  tooltip = _("Force Microcode\nThis option ONLY has an effect if Autodetect Microcode\nis unchecked, the crc from the game could not be\nfound in the INI, OR after the game has already started\nrunning. In any of those three cases, this will\nselect the microcode to use\n[Recommended: any, turn on Autodetect Microcode]");
   lblForceUcode->SetToolTip(tooltip);
   cmbForceUcode->SetToolTip(tooltip);
   cmbForceUcode->SetSelection(settings.ucode);
-  cbxWireframe->SetToolTip(wxT("Wireframe\nThis option, when checked, makes it so that the plugin will draw only the\noutlines of objects.  The colors specified in the combo box to the right\ndetermines the color that the wireframes show up as.\n[recommended: off]"));
+  cbxWireframe->SetToolTip(_("Wireframe\nThis option, when checked, makes it so that the plugin will draw only the\noutlines of objects.  The colors specified in the combo box to the right\ndetermines the color that the wireframes show up as.\n[Recommended: off]"));
   cbxWireframe->SetValue(settings.wireframe>0);
-  cmbWireframe->SetToolTip(wxT("Wireframe Colors\nThis selects the colors to use for the wireframes (if wireframe mode is enabled).\nThere are 3 modes:\n* Original colors - draw exactly as it would normally, textures and all, only in wireframes.\n* Vertex colors - use the colors specified in the vertices to draw the wireframes with.\n* Red only - use a constant red color to draw the wireframes.\n[recommended: Vertex colors]"));
+  cmbWireframe->SetToolTip(_("Wireframe Colors\nThis selects the colors to use for the wireframes (if wireframe mode is enabled).\nThere are 3 modes:\n* Original colors - draw exactly as it would normally, textures and all, only in wireframes.\n* Vertex colors - use the colors specified in the vertices to draw the wireframes with.\n* Red only - use a constant red color to draw the wireframes.\n[Recommended: Vertex colors]"));
   cmbWireframe->SetSelection(settings.wfmode);
-  cbxLog->SetToolTip(wxT("Log to RDP.txt\nRECOMMENDED FOR DEBUGGING ONLY - this option, when checked, will log EVERY SINGLE\nCOMMAND the plugin processes to a file called RDP.txt in the current directory.\nThis is incredibly slow, so I recommend keeping it disabled.\n[recommended: off]"));
+  cbxLog->SetToolTip(_("Log to RDP.txt\nRECOMMENDED FOR DEBUGGING ONLY - this option, when checked, will log EVERY SINGLE\nCOMMAND the plugin processes to a file called RDP.txt in the current directory.\nThis is incredibly slow, so I recommend keeping it disabled.\n[Recommended: off]"));
   cbxLog->SetValue(settings.logging>0);
-  cbxCombRed->SetToolTip(wxT("Unknown combiners as red\nObjects that use an unimplemented combine mode will show up as red instead of\nassuming texture with full alpha. Disable this option to remove the red stuff\nand at least have a guess at the correct combine mode.\n[recommended: off]"));
+  cbxCombRed->SetToolTip(_("Unknown combiners as red\nObjects that use an unimplemented combine mode will show up as red instead of\nassuming texture with full alpha. Disable this option to remove the red stuff\nand at least have a guess at the correct combine mode.\n[Recommended: off]"));
   cbxCombRed->SetValue(settings.unk_as_red>0);
-  cbxLogClear->SetToolTip(wxT("Log clear every frame\nRECOMMENDED FOR DEBUGGING ONLY - this option has no effect unless 'Log to RDP.txt'\nis checked. This will make it so that the log, RDP.txt, will be cleared at the\nbeginning of every frame.\n[recommended: off]"));
+  cbxLogClear->SetToolTip(_("Log clear every frame\nRECOMMENDED FOR DEBUGGING ONLY - this option has no effect unless 'Log to RDP.txt'\nis checked. This will make it so that the log, RDP.txt, will be cleared at the\nbeginning of every frame.\n[Recommended: off]"));
   cbxLogClear->SetValue(settings.log_clear>0);
-  cbxCmbLog->SetToolTip(wxT("Log unknown combiners\nRECOMMENDED FOR DEBUGGING ONLY - when checked, this option will cause every\nunimplemented combiner drawn to be logged to a file called Unimp.txt in the\ncurrent directory. This becomes slow when there are unimplemented combiners\non the screen, so I recommend keeping it disabled.\n[recommended: off]"));
+  cbxCmbLog->SetToolTip(_("Log unknown combiners\nRECOMMENDED FOR DEBUGGING ONLY - when checked, this option will cause every\nunimplemented combiner drawn to be logged to a file called Unimp.txt in the\ncurrent directory. This becomes slow when there are unimplemented combiners\non the screen, so I recommend keeping it disabled.\n[Recommended: off]"));
   cbxCmbLog->SetValue(settings.log_unk>0);
-  cbxWindowLog->SetToolTip(wxT("Run and log in window\nRECOMMENDED FOR DEBUGGING ONLY - this option will make it so that the plugin will\nstill process dlists in windowed mode. This allows for logging to occur while not\nin fullscreen, possibly allowing you to debug a crash.\n[recommended: off]"));
+  cbxWindowLog->SetToolTip(_("Run and log in window\nRECOMMENDED FOR DEBUGGING ONLY - this option will make it so that the plugin will\nstill process dlists in windowed mode. This allows for logging to occur while not\nin fullscreen, possibly allowing you to debug a crash.\n[Recommended: off]"));
   cbxWindowLog->SetValue(settings.run_in_window>0);
-  cbxCmbLogClear->SetToolTip(wxT("Clear unknown combiner log every frame\nRECOMMENDED FOR DEBUGGING ONLY - this option works much like 'Log clear every frame'\nexcept it clears the combiner log (Unimp.txt) instead of RDP.txt at the\nbeginning of each frame. Again, this option has no effect if 'combiner logging' is disabled.\n[recommended: off]"));
+  cbxCmbLogClear->SetToolTip(_("Clear unknown combiner log every frame\nRECOMMENDED FOR DEBUGGING ONLY - this option works much like 'Log clear every frame'\nexcept it clears the combiner log (Unimp.txt) instead of RDP.txt at the\nbeginning of each frame. Again, this option has no effect if 'combiner logging' is disabled.\n[Recommended: off]"));
   cbxCmbLogClear->SetValue(settings.unk_clear>0);
   cbxErrLog->SetValue(settings.elogging>0);
-  cbxBilinearTexCache->SetToolTip(wxT("Bilinear filter texture cache\nRECOMMENDED FOR DEBUGGING ONLY - when checked, this option will make the graphical\ndebugger texture cache use bilinear filtering as opposed to point-sampled filtering,\nwhich it will use otherwise. See 'Filtering mode' for descriptions of bilinear and\npoint-sampled filtering.\n[recommended: off]"));
+  cbxBilinearTexCache->SetToolTip(_("Bilinear filter texture cache\nRECOMMENDED FOR DEBUGGING ONLY - when checked, this option will make the graphical\ndebugger texture cache use bilinear filtering as opposed to point-sampled filtering,\nwhich it will use otherwise. See 'Filtering mode' for descriptions of bilinear and\npoint-sampled filtering.\n[Recommended: off]"));
   cbxBilinearTexCache->SetValue(settings.filter_cache>0);
 #endif //_ENDUSER_RELEASE_
   // end wxGlade
@@ -658,7 +716,7 @@ void ConfigNotebook::do_layout()
 {
   // begin wxGlade: ConfigNotebook::do_layout
 
-  //common panel
+  //Basic panel
     wxBoxSizer* ConfigMainSizer = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* OtherSizer = new wxStaticBoxSizer(OtherSizer_staticbox, wxVERTICAL);
     wxBoxSizer* OtherOtherSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -669,8 +727,8 @@ void ConfigNotebook::do_layout()
     wxBoxSizer* InfoMainSizer = new wxBoxSizer(wxVERTICAL);
     wxStaticBoxSizer* TimeSizer = new wxStaticBoxSizer(TimeSizer_staticbox, wxVERTICAL);
     wxStaticBoxSizer* SpeedSizer = new wxStaticBoxSizer(SpeedSizer_staticbox, wxVERTICAL);
-    wxBoxSizer* CommonLeftSizer = new wxBoxSizer(wxVERTICAL);
-    wxStaticBoxSizer* CommonRenderingSizer = new wxStaticBoxSizer(CommonRenderingSizer_staticbox, wxVERTICAL);
+    wxBoxSizer* BasicLeftSizer = new wxBoxSizer(wxVERTICAL);
+    wxStaticBoxSizer* BasicRenderingSizer = new wxStaticBoxSizer(BasicRenderingSizer_staticbox, wxVERTICAL);
     wxStaticBoxSizer* WrapperSizer = new wxStaticBoxSizer(WrapperSizer_staticbox, wxVERTICAL);
     wxStaticBoxSizer* WrapperFBOptionsSizer = new wxStaticBoxSizer(WrapperFBOptionsSizer_staticbox, wxVERTICAL);
     wxBoxSizer* VRAMSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -679,8 +737,8 @@ void ConfigNotebook::do_layout()
     ResolutionSizer->Add(lblResolution, 1, wxALIGN_CENTER_VERTICAL, 0);
     ResolutionSizer->Add(20, 20, 0, 0, 0);
     ResolutionSizer->Add(cmbResolution, 0, wxALIGN_CENTER_VERTICAL, 0);
-    CommonRenderingSizer->Add(ResolutionSizer, 0, wxTOP|wxBOTTOM, 10);
-    CommonRenderingSizer->Add(cbxVSync, 0, wxBOTTOM, 10);
+    BasicRenderingSizer->Add(ResolutionSizer, 0, wxTOP|wxBOTTOM, 10);
+    BasicRenderingSizer->Add(cbxVSync, 0, wxBOTTOM, 10);
     FSResolutionSizer->Add(lblFSResolution, 1, wxALIGN_CENTER_VERTICAL, 0);
     FSResolutionSizer->Add(20, 20, 0, 0, 0);
     FSResolutionSizer->Add(cmbFSResolution, 0, 0, 0);
@@ -693,9 +751,9 @@ void ConfigNotebook::do_layout()
     WrapperSizer->Add(VRAMSizer, 0, wxBOTTOM|wxEXPAND, 10);
     WrapperFBOptionsSizer->Add(cbxFBO, 0, wxTOP|wxBOTTOM, 10);
     WrapperSizer->Add(WrapperFBOptionsSizer, 0, wxEXPAND, 0);
-    CommonRenderingSizer->Add(WrapperSizer, 0, wxEXPAND, 0);
-    CommonLeftSizer->Add(CommonRenderingSizer, 1, wxEXPAND, 0);
-    ConfigUpperSizer->Add(CommonLeftSizer, 1, wxLEFT|wxRIGHT|wxEXPAND, 10);
+    BasicRenderingSizer->Add(WrapperSizer, 0, wxEXPAND, 0);
+    BasicLeftSizer->Add(BasicRenderingSizer, 1, wxEXPAND, 0);
+    ConfigUpperSizer->Add(BasicLeftSizer, 1, wxLEFT|wxRIGHT|wxEXPAND, 10);
     SpeedSizer->Add(cbxFPS, 0, wxTOP|wxBOTTOM, 10);
     SpeedSizer->Add(cbxVIS, 0, wxBOTTOM, 10);
     SpeedSizer->Add(cbxPercent, 0, wxBOTTOM, 10);
@@ -711,13 +769,13 @@ void ConfigNotebook::do_layout()
     ShowPanelsSizer->Add(cbxTextureSettings, 1, wxLEFT, 10);
     OtherSizer->Add(ShowPanelsSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 10);
     ScreenShotFormatSizer->Add(lblScreenShotFormat, 0, 0, 0);
-    ScreenShotFormatSizer->Add(40, 20, 0, 0, 0);
+    ScreenShotFormatSizer->Add(20, 20, 0, 0, 0);
     ScreenShotFormatSizer->Add(cmbScreenShotFormat, 0, 0, 0);
     OtherOtherSizer->Add(ScreenShotFormatSizer, 1, wxALIGN_CENTER_VERTICAL, 0);
-    OtherOtherSizer->Add(GlideCardBox, 1, wxLEFT, 10);
+    OtherOtherSizer->Add(btnLanguage, 1, wxLEFT, 10);
     OtherSizer->Add(OtherOtherSizer, 0, wxEXPAND, 0);
     ConfigMainSizer->Add(OtherSizer, 0, wxALL|wxEXPAND, 10);
-    CommonSettingsPanel->SetSizer(ConfigMainSizer);
+    BasicSettingsPanel->SetSizer(ConfigMainSizer);
 
   //emulation settings panel
   if (settings.advanced_options)
@@ -785,15 +843,15 @@ void ConfigNotebook::do_layout()
     wxBoxSizer* EnhSizer = new wxBoxSizer(wxHORIZONTAL);
     wxBoxSizer* FilterSizer = new wxBoxSizer(wxHORIZONTAL);
     FilterSizer->Add(lblFilter, 0, 0, 0);
-    FilterSizer->Add(60, 20, 0, 0, 0);
-    FilterSizer->Add(cmbEnhFilter, 1, wxEXPAND, 0);
+    FilterSizer->Add(20, 20, 0, 0, 0);
+    FilterSizer->Add(cmbEnhFilter, 0, 0, 0);
     EnhTexSizer->Add(FilterSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 10);
     EnhSizer->Add(lblEnhancement, 0, 0, 0);
     EnhSizer->Add(20, 20, 0, 0, 0);
-    EnhSizer->Add(cmbEnhEnhancement, 1, 0, 0);
+    EnhSizer->Add(cmbEnhEnhancement, 0, 0, 0);
     EnhTexSizer->Add(EnhSizer, 0, wxBOTTOM|wxEXPAND, 10);
     TexCacheSizer->Add(lblTexCache, 0, 0, 0);
-    TexCacheSizer->Add(16, 20, 0, 0, 0);
+    TexCacheSizer->Add(20, 20, 0, 0, 0);
     TexCacheSizer->Add(spinEnhCacheSize, 0, 0, 0);
     TexCacheSizer->Add(lblTexCacheMB, 0, wxLEFT|wxALIGN_BOTTOM, 4);
     EnhTexSizer->Add(TexCacheSizer, 0, wxBOTTOM|wxEXPAND, 10);
@@ -803,8 +861,8 @@ void ConfigNotebook::do_layout()
     EnhTexSizer->Add(EnhTexPerfTweaksSizer, 1, wxEXPAND, 0);
     TexLeftSizer->Add(EnhTexSizer, 1, wxALL|wxEXPAND, 10);
     FormatSizer->Add(lblHrsFormat, 0, 0, 0);
-    FormatSizer->Add(60, 20, 0, 0, 0);
-    FormatSizer->Add(cmbHrsFormat, 1, 0, 0);
+    FormatSizer->Add(20, 20, 0, 0, 0);
+    FormatSizer->Add(cmbHrsFormat, 0, 0, 0);
     TextureRightSizer->Add(FormatSizer, 0, wxTOP|wxBOTTOM|wxEXPAND, 10);
     TextureRightSizer->Add(cbxHrsAltCRC, 0, wxBOTTOM, 10);
     TextureRightSizer->Add(cbxHrsTexEdit, 0, wxBOTTOM, 10);
@@ -839,7 +897,7 @@ void ConfigNotebook::do_layout()
   wxBoxSizer* ForceUcodeSizer = new wxBoxSizer(wxHORIZONTAL);
   DevSettingsSizer->Add(cbxAutoUcode, 1, 0, 0);
   ForceUcodeSizer->Add(lblForceUcode, 0, 0, 0);
-  ForceUcodeSizer->Add(30, 20, 0, 0, 0);
+  ForceUcodeSizer->Add(20, 20, 0, 0, 0);
   ForceUcodeSizer->Add(cmbForceUcode, 0, 0, 0);
   DevSettingsSizer->Add(ForceUcodeSizer, 1, wxEXPAND, 0);
   WireframeSizer->Add(cbxWireframe, 0, 0, 0);
@@ -892,12 +950,12 @@ void ConfigNotebook::SaveSettings()
     is_advanced_changed = memcmp(&oldsettings, &settings, sizeof(SETTINGS));
   }
 
+  settings.lang_id = lang_id;
   settings.res_data = cmbResolution->GetSelection();
   settings.scr_res_x = settings.res_x = resolutions[settings.res_data][0];
   settings.scr_res_y = settings.res_y = resolutions[settings.res_data][1];
   settings.vsync = (int)cbxVSync->GetValue();
   settings.ssformat = cmbScreenShotFormat->GetSelection();
-  settings.card_id = GlideCardBox->GetSelection();
   settings.show_fps =
     (cbxFPS->GetValue()?1:0) |
     (cbxVIS->GetValue()?2:0) |
@@ -1039,7 +1097,7 @@ void Glide64ConfigDialog::OnCancel(wxCommandEvent &event)
 void Glide64ConfigDialog::set_properties()
 {
   // begin wxGlade: Glide64ConfigDialog::set_properties
-  SetTitle(wxT("Glide64 settings"));
+  SetTitle(_("Glide64 settings"));
   // end wxGlade
 }
 
@@ -1104,6 +1162,28 @@ wxUint32 texhirs[] = {
 };
 #endif
 
+static void SetLocale(wxLocale & locale)
+{
+  if (settings.lang_id >= 0 && settings.lang_id != wxLANGUAGE_ENGLISH_US)
+  {
+    if (locale.Init(settings.lang_id, wxLOCALE_CONV_ENCODING))
+    {
+      wxString fileName(wxT("Glide64_"));
+      fileName += wxLocale::GetLanguageInfo(settings.lang_id)->CanonicalName;
+      wxLocale::AddCatalogLookupPathPrefix(GetTranslationsPath());
+      if (!locale.AddCatalog(fileName))
+      {
+        wxString strMessage(wxT("Can't find file "));
+        strMessage += fileName;
+        strMessage += wxT(".mo for language '");
+        strMessage += wxLocale::GetLanguageInfo(settings.lang_id)->Description;
+        strMessage += wxT("'\nUsing default language.");
+        wxMessageBox(strMessage, wxT("File not found"), wxOK|wxICON_EXCLAMATION);
+	      settings.lang_id = wxLANGUAGE_ENGLISH_US;
+      } 
+    }
+  }
+}
 
 wxWindow * hostWindow = NULL;
 
@@ -1118,8 +1198,11 @@ void CALL DllConfig ( HWND hParent )
 {
   LOG ("DllConfig ()\n");
   mutexProcessDList->Lock();
+  ReadSettings();
 
-  ReadSettings ();
+  //translation
+  wxLocale locale;
+  SetLocale(locale);
 
   if (romopen)
   {
@@ -1203,7 +1286,7 @@ wxDialog(parent, id, title, pos, size, wxDEFAULT_DIALOG_STYLE)
 void AboutDialog::set_properties()
 {
   // begin wxGlade: AboutDialog::set_properties
-  SetTitle(wxT("About Glide64"));
+  SetTitle(_("About Glide64"));
   button_ok->SetDefault();
   // end wxGlade
 }
@@ -1236,31 +1319,31 @@ void AboutDialog::do_layout()
 
   wxStaticBitmap* bitmap_1 = new wxStaticBitmap(this, wxID_ANY, wxBitmap(logo_xpm, wxBITMAP_TYPE_XPM), wxDefaultPosition, wxDefaultSize, wxRAISED_BORDER);
   sizer_1->Add(bitmap_1, 0, wxALL|wxEXPAND, 10);
-  wxStaticText* label_1 = new wxStaticText(this, wxID_ANY, wxT("authors:"));
+  wxStaticText* label_1 = new wxStaticText(this, wxID_ANY, _("authors:"));
   sizer_1->Add(label_1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
   wxStaticBitmap* bitmap_2 = new wxStaticBitmap(this, wxID_ANY, wxBitmap(usa_xpm, wxBITMAP_TYPE_XPM), wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER);
   sizer_2->Add(bitmap_2, 0, wxALL|wxALIGN_CENTER_VERTICAL, 10);
-  wxStaticText* label_2 = new wxStaticText(this, wxID_ANY, wxT("Dave2001. Original author and former main developer.\nHe founded Glide64 project on Dec. 29th, 2001.\nLeft the project at fall of 2002.\n"));
+  wxStaticText* label_2 = new wxStaticText(this, wxID_ANY, _("Dave2001. Original author and former main developer.\nHe founded Glide64 project on Dec. 29th, 2001.\nLeft the project at fall of 2002.\n"));
   label_2->Enable(false);
   sizer_2->Add(label_2, 0, 0, 0);
   sizer_1->Add(sizer_2, 1, wxEXPAND, 0);
   wxStaticBitmap* bitmap_3 = new wxStaticBitmap(this, wxID_ANY, wxBitmap(brazil_xpm, wxBITMAP_TYPE_XPM), wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER);
   sizer_3->Add(bitmap_3, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 10);
-  wxStaticText* label_3 = new wxStaticText(this, wxID_ANY, wxT("Gugaman. Developer. Joined the project at winter 2002\n and left it at fall 2002."));
+  wxStaticText* label_3 = new wxStaticText(this, wxID_ANY, _("Gugaman. Developer. Joined the project at winter 2002\n and left it at fall 2002."));
   label_3->Enable(false);
   sizer_3->Add(label_3, 0, 0, 0);
   sizer_1->Add(sizer_3, 1, wxEXPAND, 0);
   wxStaticBitmap* bitmap_4 = new wxStaticBitmap(this, wxID_ANY, wxBitmap(russia_xpm, wxBITMAP_TYPE_XPM), wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER);
   sizer_4->Add(bitmap_4, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxALIGN_CENTER_VERTICAL, 10);
-  wxStaticText* label_4 = new wxStaticText(this, wxID_ANY, wxT("Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\nMain developer since fall of 2002."));
+  wxStaticText* label_4 = new wxStaticText(this, wxID_ANY, _("Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\nMain developer since fall of 2002."));
   sizer_4->Add(label_4, 0, 0, 0);
   sizer_1->Add(sizer_4, 1, wxEXPAND, 0);
   wxStaticBitmap* bitmap_5 = new wxStaticBitmap(this, wxID_ANY, wxBitmap(japan_xpm, wxBITMAP_TYPE_XPM), wxDefaultPosition, wxDefaultSize, wxSTATIC_BORDER);
   sizer_13->Add(bitmap_5, 0, wxLEFT|wxRIGHT|wxBOTTOM, 10);
-  wxStaticText* label_15 = new wxStaticText(this, wxID_ANY, wxT("Hiroshi 'KoolSmoky' Morii, Joined the project in 2007. "));
+  wxStaticText* label_15 = new wxStaticText(this, wxID_ANY, _("Hiroshi 'KoolSmoky' Morii, Joined the project in 2007. "));
   sizer_13->Add(label_15, 0, 0, 0);
   sizer_1->Add(sizer_13, 1, wxEXPAND, 0);
-  wxStaticText* label_5 = new wxStaticText(this, wxID_ANY, wxT("Glitch64 (the wrapper) authors:"));
+  wxStaticText* label_5 = new wxStaticText(this, wxID_ANY, _("Glitch64 (the wrapper) authors:"));
   sizer_1->Add(label_5, 0, wxBOTTOM|wxALIGN_CENTER_HORIZONTAL, 10);
   wxStaticBitmap* bitmap_6 = new wxStaticBitmap(this, wxID_ANY, wxBitmap(france_xpm, wxBITMAP_TYPE_XPM));
   sizer_6->Add(bitmap_6, 0, wxLEFT|wxRIGHT|wxBOTTOM, 10);
@@ -1284,21 +1367,21 @@ void AboutDialog::do_layout()
   sizer_10->Add(label_9, 0, 0, 0);
   sizer_8->Add(sizer_10, 1, wxEXPAND, 0);
   sizer_1->Add(sizer_8, 0, wxEXPAND, 0);
-  wxStaticText* label_10 = new wxStaticText(this, wxID_ANY, wxT("GlideHQ author:"));
+  wxStaticText* label_10 = new wxStaticText(this, wxID_ANY, _("GlideHQ author:"));
   sizer_11->Add(label_10, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 10);
   wxStaticBitmap* bitmap_10 = new wxStaticBitmap(this, wxID_ANY, wxBitmap(japan_xpm, wxBITMAP_TYPE_XPM));
   sizer_11->Add(bitmap_10, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL, 10);
   wxStaticText* label_11 = new wxStaticText(this, wxID_ANY, wxT("Hiroshi 'KoolSmoky' Morii"));
   sizer_11->Add(label_11, 0, wxALIGN_CENTER_VERTICAL, 0);
   sizer_1->Add(sizer_11, 1, wxEXPAND, 0);
-  wxStaticText* label_12 = new wxStaticText(this, wxID_ANY, wxT("beta tester:"));
+  wxStaticText* label_12 = new wxStaticText(this, wxID_ANY, _("beta tester:"));
   sizer_12->Add(label_12, 0, wxLEFT|wxALIGN_CENTER_VERTICAL, 10);
   wxStaticBitmap* bitmap_11 = new wxStaticBitmap(this, wxID_ANY, wxBitmap(france_xpm, wxBITMAP_TYPE_XPM));
   sizer_12->Add(bitmap_11, 0, wxLEFT|wxRIGHT|wxALIGN_CENTER_VERTICAL, 10);
   wxStaticText* label_13 = new wxStaticText(this, wxID_ANY, wxT("olivieryuyu"));
   sizer_12->Add(label_13, 0, wxALIGN_CENTER_VERTICAL, 0);
   sizer_1->Add(sizer_12, 1, wxEXPAND, 0);
-  wxStaticText* label_14 = new wxStaticText(this, wxID_ANY, wxT("special thanks to:\n Orkin, Rice, Daniel Borca, Legend.\nThanks to EmuXHaven for hosting my site:\nhttp://glide64.emuxhaven.net\n"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
+  wxStaticText* label_14 = new wxStaticText(this, wxID_ANY, _("special thanks to:\n Orkin, Rice, Daniel Borca, Legend.\nThanks to EmuXHaven for hosting my site:\nhttp://glide64.emuxhaven.net\n"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE);
   sizer_1->Add(label_14, 0, wxALIGN_CENTER_HORIZONTAL, 0);
   sizer_1->Add(button_ok, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 10);
   SetSizer(sizer_1);
@@ -1327,6 +1410,12 @@ void CALL DllAbout ( HWND hParent )
   //  hostWindow->SubclassWin(hwnd);
   hostWindow->Disable();
 #endif
+
+  //translation
+  ReadSettings();
+  wxLocale locale;
+  SetLocale(locale);
+
   AboutDialog* AboutGlide64 = new AboutDialog(hostWindow, wxID_ANY, wxEmptyString);
   AboutGlide64->ShowModal();
 #ifdef __WINDOWS__

@@ -190,6 +190,7 @@ extern SCREEN_SHOT_FORMAT ScreenShotFormats[];
 
 typedef struct {
   int card_id;
+  int lang_id;
 
   wxUint32 res_x, scr_res_x;
   wxUint32 res_y, scr_res_y;
@@ -775,6 +776,9 @@ extern wxUint32   offset_textures;
 extern wxUint32   offset_texbuf1;
 
 extern int	ucode_error_report;
+
+extern wxString pluginPath;
+extern wxString iniPath;
 
 // RDP functions
 void rdp_reset ();
