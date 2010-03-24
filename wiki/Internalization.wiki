@@ -34,4 +34,4 @@ Send your work to me by email, or post it here: http://code.google.com/p/glidehq
 
 == Where to get translation for your language ==
 
-Master message catalog *Glide64en.pot* and translated message catalogs in text form (.po) are stored in the Glide64 repository. You may download latest version from here, load into poEdit, create .mo file, copy it into proper place and enjoy. You may also use msgfmt program to create .mo file. Glide64 releases contain all translations, available at the release time.
+Master message catalog *Glide64en.pot* and translated message catalogs in text form (.po) are stored in the [http://code.google.com/p/glidehqplusglitch64/source/browse/#svn/trunk Glide64 repository]. You may download latest version from [http://code.google.com/p/glidehqplusglitch64/source/browse/#svn/trunk/Glide64/Internalization here], load into poEdit, create .mo file, copy it into proper place and enjoy. You may also use msgfmt program to create .mo file. Glide64 releases contain all translations, available at the release time.
