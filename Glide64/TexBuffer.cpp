@@ -147,6 +147,7 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.u_scale = texbuf.lr_u / (float)(texbuf.width);
   texbuf.v_scale = texbuf.lr_v / (float)(texbuf.height);
   texbuf.cache = 0;
+  texbuf.center = 0;
 
   FRDP("\nAllocateTextureBuffer. width: %d, height: %d, scr_width: %f, scr_height: %f, vi_width: %f, vi_height:%f, scale_x: %f, scale_y: %f, lr_u: %f, lr_v: %f, u_scale: %f, v_scale: %f\n", texbuf.width, texbuf.height, texbuf.scr_width, texbuf.scr_height, rdp.vi_width, rdp.vi_height, rdp.scale_x, rdp.scale_y, texbuf.lr_u, texbuf.lr_v, texbuf.u_scale, texbuf.v_scale);
 
@@ -428,7 +429,6 @@ int CloseTextureBuffer(int draw)
     rdp.cur_image = 0;
     return TRUE;
   }
-
   rdp.tbuff_tex = rdp.cur_image;
   rdp.cur_image = 0;
   GrTextureFormat_t buf_format = rdp.tbuff_tex->info.format;
@@ -662,6 +662,11 @@ int SwapTextureBuffer()
   return TRUE;
 }
 
+inline wxUint32 CalcCenter(TBUFF_COLOR_IMAGE * pTCI)
+{
+  return *((wxUint32*)(gfx.RDRAM + pTCI->addr + pTCI->height*pTCI->width + pTCI->width));
+}
+
 int FindTextureBuffer(wxUint32 addr, wxUint16 width)
 {
   if (rdp.skip_drawing)
@@ -677,10 +682,18 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
       rdp.tbuff_tex = &(rdp.texbufs[index].images[j]);
       if(addr >= rdp.tbuff_tex->addr && addr < rdp.tbuff_tex->end_addr)// && rdp.timg.format == 0)
       {
-        if (width == 1 || rdp.tbuff_tex->width == width || (rdp.tbuff_tex->width > 320 && rdp.tbuff_tex->width == width*2))
+        bool bCorrect;
+        if (rdp.tbuff_tex->center == 0)
+        {
+          rdp.tbuff_tex->center = CalcCenter(rdp.tbuff_tex);
+          bCorrect = width == 1 || rdp.tbuff_tex->width == width || (rdp.tbuff_tex->width > 320 && rdp.tbuff_tex->width == width*2);
+        }
+        else
+          bCorrect = rdp.tbuff_tex->center == CalcCenter(rdp.tbuff_tex);
+        if (bCorrect)
         {
           shift = addr - rdp.tbuff_tex->addr;
-          //          if (!rdp.motionblur)
+          // if (!rdp.motionblur)
           if (!rdp.cur_image)
             rdp.cur_tex_buf = index;
           found = TRUE;

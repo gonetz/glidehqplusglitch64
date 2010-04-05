@@ -505,15 +505,16 @@ typedef struct
 
 typedef struct
 {
-    GrChipID_t tmu;
+  GrChipID_t tmu;
 	wxUint32 addr;  //address of color image
 	wxUint32 end_addr;
 	wxUint32 tex_addr; //address in video memory
 	wxUint32 width;    //width of color image
 	wxUint32 height;   //height of color image
-	wxUint16  format;   //format of color image
-	int  clear;  //flag. texture buffer must be cleared
-	int  drawn;  //flag. if equal to 1, this image was already drawn in current frame
+	wxUint16 format;   //format of color image
+	wxUint8  clear;  //flag. texture buffer must be cleared
+	wxUint8  drawn;  //flag. if equal to 1, this image was already drawn in current frame
+  wxUint32 center; //bytes from the center of the color image
 	float scr_width; //width of rendered image
 	float scr_height; //height of rendered image
 	wxUint32 tex_width;  //width of texture buffer
