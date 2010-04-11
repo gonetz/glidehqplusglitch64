@@ -66,7 +66,7 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
   /* shamelessness :P this first call to the debug output message creates
    * a file in the executable directory. */
   INFO(0, L"------------------------------------------------------------------\n");
-  INFO(0, L" GlideHQ version 1.00.00.%d\n", BUILD_NUMBER);
+  INFO(0, L" GlideHQ version 1.02.00.%d\n", BUILD_NUMBER);
   INFO(0, L" Copyright (C) 2007  Hiroshi Morii   All Rights Reserved\n");
   INFO(0, L"    email   : koolsmoky(at)users.sourceforge.net\n");
   INFO(0, L"    website : http://www.3dfxzone.it/koolsmoky\n");
@@ -88,8 +88,9 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
   _tex1 = NULL;
   _tex2 = NULL;
 
-  _maxwidth  = maxwidth;
-  _maxheight = maxheight;
+  /* XXX: anything larger than 1024 * 1024 is overkill */
+  _maxwidth  = maxwidth  > 1024 ? 1024 : maxwidth;
+  _maxheight = maxheight > 1024 ? 1024 : maxheight;
   _maxbpp    = maxbpp;
 
   _cacheSize = cachesize;
@@ -120,7 +121,7 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
     _options &= ~COMPRESSION_MASK;
   }
 
-  if (TxMemBuf::getInstance()->init(maxwidth, maxheight)) {
+  if (TxMemBuf::getInstance()->init(_maxwidth, _maxheight)) {
     if (!_tex1)
       _tex1 = TxMemBuf::getInstance()->get(0);
 

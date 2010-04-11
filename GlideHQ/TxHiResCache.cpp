@@ -823,30 +823,8 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
         }
       }
 
-      /* expand to 3dfx Glide3x aspect ratio (8:1 - 1:8) */
-      if (!_txReSample->nextPow2(&tex, &width , &height, 32, 1)) {
-        free(tex);
-        tex = NULL;
-        DBG_INFO(80, L"Error: aspect ratio adjustment failed!\n");
-        continue;
-      }
-
 #else  /* TEXTURE_TILING */
 
-#if POW2_TEXTURES
-#if (POW2_TEXTURES == 2)
-      /* 3dfx Glide3x aspect ratio (8:1 - 1:8) */
-      if (!_txReSample->nextPow2(&tex, &width , &height, 32, 1)) {
-#else
-      /* normal pow2 expansion */
-      if (!_txReSample->nextPow2(&tex, &width , &height, 32, 0)) {
-#endif
-        free(tex);
-        tex = NULL;
-        DBG_INFO(80, L"Error: aspect ratio adjustment failed!\n");
-        continue;
-      }
-#endif
       /* minification */
       if (width > _maxwidth || height > _maxheight) {
         int ratio = 1;
@@ -874,11 +852,28 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
                                          * for large background textures are also ignored. It would be more
                                          * reasonable if decisions are made based on fourier-transform
                                          * spectrum or RMS error.
+                                         *
+                                         * NOTE: texture size must be checked before expanding to pow2 size.
                                          */
           ) {
         uint32 alpha = 0;
         int dataSize = 0;
         int compressionType = _options & COMPRESSION_MASK;
+
+#if POW2_TEXTURES
+#if (POW2_TEXTURES == 2)
+        /* 3dfx Glide3x aspect ratio (8:1 - 1:8) */
+        if (!_txReSample->nextPow2(&tex, &width , &height, 32, 1)) {
+#else
+        /* normal pow2 expansion */
+        if (!_txReSample->nextPow2(&tex, &width , &height, 32, 0)) {
+#endif
+          free(tex);
+          tex = NULL;
+          DBG_INFO(80, L"Error: aspect ratio adjustment failed!\n");
+          continue;
+        }
+#endif
 
         switch (_options & COMPRESSION_MASK) {
         case S3TC_COMPRESSION:
@@ -922,7 +917,7 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
         }
         /* compress it! */
         if (dataSize) {
-#if 0 /* TEST: dither before compression for better results with gradients */
+#if 1 /* TEST: dither before compression for better results with gradients */
           tmptex = (uint8 *)malloc(_txUtil->sizeofTx(width, height, destformat));
           if (tmptex) {
             if (_txQuantize->quantize(tex, tmptex, width, height, GR_TEXFMT_ARGB_8888, destformat, 0))
@@ -946,6 +941,23 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
             }
           }
         }
+
+      } else {
+
+#if POW2_TEXTURES
+#if (POW2_TEXTURES == 2)
+        /* 3dfx Glide3x aspect ratio (8:1 - 1:8) */
+        if (!_txReSample->nextPow2(&tex, &width , &height, 32, 1)) {
+#else
+        /* normal pow2 expansion */
+        if (!_txReSample->nextPow2(&tex, &width , &height, 32, 0)) {
+#endif
+          free(tex);
+          tex = NULL;
+          DBG_INFO(80, L"Error: aspect ratio adjustment failed!\n");
+          continue;
+        }
+#endif
       }
 
       /* quantize */
