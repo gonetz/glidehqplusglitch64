@@ -33,7 +33,7 @@
 #include <boost/bind.hpp>
 #include <boost/format.hpp>
 
-TxFilter::~TxFilter()
+void TxFilter::clear()
 {
   /* clear hires texture cache */
   delete _txHiResCache;
@@ -50,6 +50,11 @@ TxFilter::~TxFilter()
   delete _txUtil;
 }
 
+TxFilter::~TxFilter()
+{
+  clear();
+}
+
 TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
                    int cachesize, wchar_t *path, wchar_t *ident,
                    dispInfoFuncExt callback)
@@ -61,7 +66,7 @@ TxFilter::TxFilter(int maxwidth, int maxheight, int maxbpp, int options,
       _maxbpp    == maxbpp    &&
       _options   == options   &&
       _cacheSize == cachesize) return;
-  TxFilter::~TxFilter();
+  clear(); /* gcc does not allow the destructor to be called */
 
   /* shamelessness :P this first call to the debug output message creates
    * a file in the executable directory. */

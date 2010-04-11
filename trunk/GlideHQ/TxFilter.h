@@ -52,6 +52,7 @@ private:
   TxUtil *_txUtil;
   TxImage *_txImage;
   boolean _initialized;
+  void clear();
 public:
   ~TxFilter();
   TxFilter(int maxwidth,
