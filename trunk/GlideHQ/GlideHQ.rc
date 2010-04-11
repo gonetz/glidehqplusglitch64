@@ -42,10 +42,10 @@
 #define CONTACTSTR              "Hiroshi Morii <koolsmoky@users.sourceforge.net> http://www.3dfxzone.it/koolsmoky\0"
 
 #define MANVERSION              1
-#define MANREVISION             01
+#define MANREVISION             02
 #define MINVERSION              00
 
-#define VERSIONSTR "1.01.00." BUILD_NUMBER_STR
+#define VERSIONSTR "1.02.00." BUILD_NUMBER_STR
 
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION MANVERSION, MANREVISION, 0, BUILD_NUMBER

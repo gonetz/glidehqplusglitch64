@@ -29,7 +29,6 @@
 #include "TxDbg.h"
 #include <zlib.h>
 #include <boost/filesystem.hpp>
-#include <memory.h>
 
 TxCache::~TxCache()
 {
