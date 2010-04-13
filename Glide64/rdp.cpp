@@ -249,6 +249,9 @@ void rdp_reset ()
   rdp.c_Ac1 = 0;
   rdp.c_Ad1 = 0;
 
+  rdp.K4 = rdp.K5 = 0;
+  rdp.SCALE = rdp.CENTER = 0;
+
   int i;
   // Clear the palette CRC
   for (i=0; i<16; i++)
@@ -1125,7 +1128,7 @@ static void rdp_texrect()
     lr_y = max(0.0f, ((short)(rdp.cmd0 & 0x00000FFF)) / 4.0f);
   }
 
-  if (ul_x >= lr_x) 
+  if (ul_x >= lr_x)
   {
     FRDP("Wrong Texrect: ul_x: %f, lr_x: %f\n", ul_x, lr_x);
     return;
@@ -1237,7 +1240,7 @@ static void rdp_texrect()
   // ****
   // ** Texrect offset by Gugaman **
   //
-  //integer representation of texture coordinate. 
+  //integer representation of texture coordinate.
   //needed to detect and avoid overflow after shifting
   wxInt32 off_x_i = (rdp.cmd2 >> 16) & 0xFFFF;
   wxInt32 off_y_i = rdp.cmd2 & 0xFFFF;
@@ -1249,7 +1252,7 @@ static void rdp_texrect()
   if (off_y_i & 0x8000)
     off_y_i |= ~0xffff;
 
-  if (rdp.cycle_mode == 2) 
+  if (rdp.cycle_mode == 2)
     dsdx /= 4.0f;
 
   float s_ul_x = ul_x * rdp.scale_x + rdp.offset_x;
@@ -1311,13 +1314,13 @@ static void rdp_texrect()
       //shifting
       if (tile.shift_s)
       {
-        if (tile.shift_s > 10) 
+        if (tile.shift_s > 10)
         {
           wxUint8 iShift = (16 - tile.shift_s);
           x_i <<= iShift;
           sx = (float)(1 << iShift);
         }
-        else 
+        else
         {
           wxUint8 iShift = tile.shift_s;
           x_i >>= iShift;
@@ -1339,11 +1342,11 @@ static void rdp_texrect()
           sy = 1.0f/(float)(1 << iShift);
         }
       }
-      
+
       if (rdp.tbuff_tex && rdp.tbuff_tex->tile == i) //hwfbe texture
       {
-        float t0_off_x; 
-        float t0_off_y; 
+        float t0_off_x;
+        float t0_off_y;
         if (off_x_i + off_y_i == 0)
         {
           t0_off_x = tile.ul_s;
@@ -1366,7 +1369,7 @@ static void rdp_texrect()
         texUV[i].ul_v *= rdp.tbuff_tex->v_scale;
         texUV[i].lr_u *= rdp.tbuff_tex->u_scale;
         texUV[i].lr_v *= rdp.tbuff_tex->v_scale;
-        FRDP("tbuff_tex[%d] ul_u: %f, ul_v: %f, lr_u: %f, lr_v: %f\n", 
+        FRDP("tbuff_tex[%d] ul_u: %f, ul_v: %f, lr_u: %f, lr_v: %f\n",
           i, texUV[i].ul_u, texUV[i].ul_v, texUV[i].lr_u, texUV[i].lr_v);
       }
       else //common case
@@ -1691,14 +1694,22 @@ static void rdp_fullsync()
 
 static void rdp_setkeygb()
 {
-  RDP_E("setkeygb - IGNORED\n");
-  RDP("setkeygb - IGNORED\n");
+  wxUint32 sB = rdp.cmd1&0xFF;
+  wxUint32 cB = (rdp.cmd1>>8)&0xFF;
+  wxUint32 sG = (rdp.cmd1>>16)&0xFF;
+  wxUint32 cG = (rdp.cmd1>>24)&0xFF;
+  rdp.SCALE = (rdp.SCALE&0xFF0000FF) | (sG<<16) | (sB<<8);
+  rdp.CENTER = (rdp.CENTER&0xFF0000FF) | (cG<<16) | (cB<<8);
+  FRDP("setkeygb. cG=%02lx, sG=%02ls, cB=%02lx, sB=%02ls\n", cG, sG, cB, sB);
 }
 
 static void rdp_setkeyr()
 {
-  RDP_E("setkeyr - IGNORED\n");
-  RDP("setkeyr - IGNORED\n");
+  wxUint32 sR = rdp.cmd1&0xFF;
+  wxUint32 cR = (rdp.cmd1>>8)&0xFF;
+  rdp.SCALE = (rdp.SCALE&0x00FFFFFF) | (sR<<24);
+  rdp.CENTER = (rdp.CENTER&0x00FFFFFF) | (cR<<24);
+  FRDP("setkeyr. cR=%02lx, sR=%02ls\n", cR, sR);
 }
 
 static void rdp_setconvert()
@@ -1713,7 +1724,7 @@ static void rdp_setconvert()
   rdp.K4 = (wxUint8)(rdp.cmd1>>9)&0x1FF;
   rdp.K5 = (wxUint8)(rdp.cmd1&0x1FF);
   //  RDP_E("setconvert - IGNORED\n");
-  RDP("setconvert - IGNORED\n");
+  FRDP("setconvert. K4=%02lx K5=%02lx\n", rdp.K4, rdp.K5);
 }
 
 //

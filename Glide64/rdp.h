@@ -600,6 +600,8 @@ typedef struct
   wxUint32 prim_color;
   wxUint32 blend_color;
   wxUint32 env_color;
+  wxUint32 SCALE;
+  wxUint32 CENTER;
   wxUint32 prim_lodmin, prim_lodfrac;
   wxUint16 prim_depth;
   wxUint8 K4;
