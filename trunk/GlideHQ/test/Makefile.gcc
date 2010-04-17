@@ -42,6 +42,7 @@
 CC = g++
 CFLAGS += -I. -I../
 CFLAGS += -fPIC -DPIC
+CFLAGS += -DGHQCHK=1
 
 LD = g++
 LDFLAGS += -ldl -lstdc++

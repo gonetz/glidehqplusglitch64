@@ -33,7 +33,11 @@ TxDbg::TxDbg()
   _level = DBG_LEVEL;
 
   if (!_dbgfile)
+#ifdef GHQCHK
+    _dbgfile = fopen("ghqchk.txt", "w");
+#else
     _dbgfile = fopen("glidehq.dbg", "w");
+#endif
 }
 
 TxDbg::~TxDbg()
@@ -59,8 +63,13 @@ TxDbg::output(const int level, const wchar_t *format, ...)
   va_start(args, format);
   //swprintf(newformat, 4095, L"%d:\t", level);
   //wcscat(newformat, format);
+  //vfwprintf(_dbgfile, newformat, args);
   newformat = boost::str(boost::wformat(L"%d:\t%ls") % level % format);
   vfwprintf(_dbgfile, newformat.c_str(), args);
   fflush(_dbgfile);
+#ifdef GHQCHK
+  //vwprintf(newformat, args);
+  vwprintf(newformat.c_str(), args);
+#endif
   va_end(args);
 }

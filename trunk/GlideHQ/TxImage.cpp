@@ -93,8 +93,10 @@ TxImage::readPNG(FILE* fp, int* width, int* height, uint16* format)
   if (!fp)
     return NULL;
 
-  if (!getPNGInfo(fp, &png_ptr, &info_ptr))
+  if (!getPNGInfo(fp, &png_ptr, &info_ptr)) {
+    INFO(80, L"error reading png file! png image is corrupt.\n");
     return NULL;
+  }
 
   png_get_IHDR(png_ptr, info_ptr,
                (png_uint_32*)&o_width, (png_uint_32*)&o_height, &bit_depth, &color_type,
@@ -508,8 +510,10 @@ TxImage::readBMP(FILE* fp, int* width, int* height, uint16* format)
   if (!fp)
     return NULL;
 
-  if (!getBMPInfo(fp, &bmp_fhdr, &bmp_ihdr))
+  if (!getBMPInfo(fp, &bmp_fhdr, &bmp_ihdr)) {
+    INFO(80, L"error reading bitmap file! bitmap image is corrupt.\n");
     return NULL;
+  }
 
   DBG_INFO(80, L"bmp format %d x %d bitdepth:%d compression:%x offset:%d\n",
            bmp_ihdr.biWidth, bmp_ihdr.biHeight, bmp_ihdr.biBitCount,
@@ -739,8 +743,10 @@ TxImage::readDDS(FILE* fp, int* width, int* height, uint16* format)
   if (!fp)
     return NULL;
 
-  if (!getDDSInfo(fp, &dds_fhdr))
+  if (!getDDSInfo(fp, &dds_fhdr)) {
+    INFO(80, L"error reading dds file! dds image is corrupt.\n");
     return NULL;
+  }
 
   DBG_INFO(80, L"dds format %d x %d HeaderSize %d LinearSize %d\n",
            dds_fhdr.dwWidth, dds_fhdr.dwHeight, dds_fhdr.dwSize, dds_fhdr.dwLinearSize);
