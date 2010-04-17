@@ -76,7 +76,7 @@ dxt1_rgb_quantize (dword *cc, const byte *lines[], int comps)
 #ifndef YUV
     int minSum = 2000; /* big enough */
 #else
-    int minSum = 300000;
+    int minSum = 2000000;
 #endif
     int maxSum = -1; /* small enough */
     int minCol = 0; /* phoudoin: silent compiler! */
@@ -205,7 +205,7 @@ dxt1_rgba_quantize (dword *cc, const byte *lines[], int comps)
 #ifndef YUV
     int minSum = 2000;          /* big enough */
 #else
-    int minSum = 300000;
+    int minSum = 2000000;
 #endif
     int maxSum = -1;		/* small enough */
     int minCol = 0;		/* phoudoin: silent compiler! */
@@ -320,7 +320,7 @@ dxt3_rgba_quantize (dword *cc, const byte *lines[], int comps)
 #ifndef YUV
     int minSum = 2000;          /* big enough */
 #else
-    int minSum = 300000;
+    int minSum = 2000000;
 #endif
     int maxSum = -1;		/* small enough */
     int minCol = 0;		/* phoudoin: silent compiler! */
@@ -451,7 +451,7 @@ dxt5_rgba_quantize (dword *cc, const byte *lines[], int comps)
 #ifndef YUV
     int minSum = 2000;          /* big enough */
 #else
-    int minSum = 300000;
+    int minSum = 2000000;
 #endif
     int maxSum = -1;		/* small enough */
     int minCol = 0;		/* phoudoin: silent compiler! */

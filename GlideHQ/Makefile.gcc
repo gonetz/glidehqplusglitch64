@@ -40,14 +40,14 @@
 #  Requirements:
 #
 #    Compiler:
-#       GCC 4.3
+#       GCC 4.2
 #
 #    Libraries:
-#       boost  1.39.0   (http://www.boost.org)  bjam --toolset=gcc link=static runtime-link=static variant=release,debug stage
-#       libpng 1.2.35   (http://www.libpng.org) static library
+#       boost  1.41.0   (http://www.boost.org)  bjam --toolset=gcc link=static runtime-link=static variant=release,debug stage
+#       libpng 1.4.1    (http://www.libpng.org) static library
 #       zlib   1.2.3    (http://www.zlib.org)   static library
 #       tc     1.1+                             patched for ARGB input and ATI Radeon workaround
-#
+# 
 
 #
 # GCC does not have SEH (structured exception handling)
@@ -62,8 +62,8 @@ EXT_INC = ./inc
 EXT_LIB = ./lib
 
 # boost library & headers
-BOOST_INC = ../boost_1_42_0
-BOOST_LIB = ../boost_1_42_0/stage/lib
+BOOST_INC = ../boost_1_41_0
+BOOST_LIB = ../boost_1_41_0/stage/lib
 
 CC = g++
 CFLAGS = -Wall -W -pedantic -ansi -Wno-long-long
@@ -78,8 +78,8 @@ CFLAGS += -DDEBUG
 endif
 
 LD = g++
-LDFLAGS = -shared -lstdc++ -lpthread 
-LDLIBS = -lpng -lz $(EXT_LIB)/libdxtn.a $(BOOST_LIB)/libboost_filesystem.a $(BOOST_LIB)/libboost_system.a $(BOOST_LIB)/libboost_thread.a
+LDFLAGS = -shared -lstdc++ -lpthread
+LDLIBS = $(EXT_LIB)/libdxtn.a $(EXT_LIB)/libpng.a $(EXT_LIB)/libz.a $(BOOST_LIB)/libboost_filesystem-gcc42-mt-s.a $(BOOST_LIB)/libboost_system-gcc42-mt-s.a $(BOOST_LIB)/libboost_thread-gcc42-mt-s.a
 
 RM = rm
 

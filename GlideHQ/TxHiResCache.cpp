@@ -917,7 +917,7 @@ TxHiResCache::loadHiResTextures(boost::filesystem::wpath dir_path, boolean repla
         }
         /* compress it! */
         if (dataSize) {
-#if 1 /* TEST: dither before compression for better results with gradients */
+#if 0 /* TEST: dither before compression for better results with gradients */
           tmptex = (uint8 *)malloc(_txUtil->sizeofTx(width, height, destformat));
           if (tmptex) {
             if (_txQuantize->quantize(tex, tmptex, width, height, GR_TEXFMT_ARGB_8888, destformat, 0))

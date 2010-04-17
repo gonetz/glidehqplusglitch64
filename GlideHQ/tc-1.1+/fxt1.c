@@ -152,7 +152,11 @@ fxt1_choose (float vec[][MAX_COMP], int nv,
      * There are probably better algorithms to use (histogram-based).
      */
     int i, j, k;
+#ifndef YUV
     int minSum = 2000; /* big enough */
+#else
+    int minSum = 2000000;
+#endif
     int maxSum = -1; /* small enough */
     int minCol = 0; /* phoudoin: silent compiler! */
     int maxCol = 0; /* phoudoin: silent compiler! */
@@ -174,7 +178,16 @@ fxt1_choose (float vec[][MAX_COMP], int nv,
 	for (i = 0; i < nc; i++) {
 	    key <<= 8;
 	    key |= input[k][i];
+#ifndef YUV
 	    sum += input[k][i];
+#else
+            /* RGB to YUV conversion according to CCIR 601 specs
+             * Y = 0.299R+0.587G+0.114B
+             * U = 0.713(R - Y) = 0.500R-0.419G-0.081B
+             * V = 0.564(B - Y) = -0.169R-0.331G+0.500B
+             */
+            sum = 299 * input[k][RCOMP] + 587 * input[k][GCOMP] +  114 * input[k][BCOMP];
+#endif
         }
 	for (l = 0; l < n; l++) {
 	    if (!hist[l].flag) {
@@ -441,13 +454,21 @@ fxt1_quantize_ALPHA1 (dword *cc,
      * the 4x4 tile and use those as the two representative colors.
      * There are probably better algorithms to use (histogram-based).
      */
+#ifndef YUV
     minSum = 2000; /* big enough */
+#else
+    minSum = 2000000;
+#endif
     maxSum = -1; /* small enough */
     for (k = 0; k < N_TEXELS / 2; k++) {
 	int sum = 0;
+#ifndef YUV
 	for (i = 0; i < n_comp; i++) {
 	    sum += input[k][i];
 	}
+#else
+        sum = 299 * input[k][RCOMP] + 587 * input[k][GCOMP] +  114 * input[k][BCOMP];
+#endif
 	if (minSum > sum) {
 	    minSum = sum;
 	    minColL = k;
@@ -458,13 +479,21 @@ fxt1_quantize_ALPHA1 (dword *cc,
 	}
 	sumL += sum;
     }
+#ifndef YUV
     minSum = 2000; /* big enough */
+#else
+    minSum = 2000000;
+#endif
     maxSum = -1; /* small enough */
     for (; k < N_TEXELS; k++) {
 	int sum = 0;
+#ifndef YUV
 	for (i = 0; i < n_comp; i++) {
 	    sum += input[k][i];
 	}
+#else
+        sum = 299 * input[k][RCOMP] + 587 * input[k][GCOMP] +  114 * input[k][BCOMP];
+#endif
 	if (minSum > sum) {
 	    minSum = sum;
 	    minColR = k;
@@ -577,7 +606,11 @@ fxt1_quantize_HI (dword *cc,
     int i, k;
     dword hihi; /* high quadword: hi dword */
 
+#ifndef YUV
     int minSum = 2000; /* big enough */
+#else
+    int minSum = 2000000;
+#endif
     int maxSum = -1; /* small enough */
     int minCol = 0; /* phoudoin: silent compiler! */
     int maxCol = 0; /* phoudoin: silent compiler! */
@@ -588,9 +621,13 @@ fxt1_quantize_HI (dword *cc,
      */
     for (k = 0; k < n; k++) {
 	int sum = 0;
+#ifndef YUV
 	for (i = 0; i < n_comp; i++) {
 	    sum += reord[k][i];
 	}
+#else
+        sum = 299 * input[k][RCOMP] + 587 * input[k][GCOMP] +  114 * input[k][BCOMP];
+#endif
 	if (minSum > sum) {
 	    minSum = sum;
 	    minCol = k;
@@ -662,14 +699,22 @@ fxt1_quantize_MIXED1 (dword *cc,
      * the 4x4 tile and use those as the two representative colors.
      * There are probably better algorithms to use (histogram-based).
      */
+#ifndef YUV
     minSum = 2000; /* big enough */
+#else
+    minSum = 2000000;
+#endif
     maxSum = -1; /* small enough */
     for (k = 0; k < N_TEXELS / 2; k++) {
 	if (!ISTBLACK(input[k])) {
 	    int sum = 0;
+#ifndef YUV
 	    for (i = 0; i < n_comp; i++) {
 		sum += input[k][i];
 	    }
+#else
+            sum = 299 * input[k][RCOMP] + 587 * input[k][GCOMP] +  114 * input[k][BCOMP];
+#endif
 	    if (minSum > sum) {
 		minSum = sum;
 		minColL = k;
@@ -680,14 +725,22 @@ fxt1_quantize_MIXED1 (dword *cc,
 	    }
 	}
     }
+#ifndef YUV
     minSum = 2000; /* big enough */
+#else
+    minSum = 2000000;
+#endif
     maxSum = -1; /* small enough */
     for (; k < N_TEXELS; k++) {
 	if (!ISTBLACK(input[k])) {
 	    int sum = 0;
+#ifndef YUV
 	    for (i = 0; i < n_comp; i++) {
 		sum += input[k][i];
 	    }
+#else
+            sum = 299 * input[k][RCOMP] + 587 * input[k][GCOMP] +  114 * input[k][BCOMP];
+#endif
 	    if (minSum > sum) {
 		minSum = sum;
 		minColR = k;
@@ -801,13 +854,21 @@ fxt1_quantize_MIXED0 (dword *cc,
      * the 4x4 tile and use those as the two representative colors.
      * There are probably better algorithms to use (histogram-based).
      */
+#ifndef YUV
     minSum = 2000; /* big enough */
+#else
+    minSum = 2000000;
+#endif
     maxSum = -1; /* small enough */
     for (k = 0; k < N_TEXELS / 2; k++) {
 	int sum = 0;
+#ifndef YUV
 	for (i = 0; i < n_comp; i++) {
 	    sum += input[k][i];
 	}
+#else
+        sum = 299 * input[k][RCOMP] + 587 * input[k][GCOMP] +  114 * input[k][BCOMP];
+#endif
 	if (minSum > sum) {
 	    minSum = sum;
 	    minColL = k;
@@ -821,9 +882,13 @@ fxt1_quantize_MIXED0 (dword *cc,
     maxSum = -1; /* small enough */
     for (; k < N_TEXELS; k++) {
 	int sum = 0;
+#ifndef YUV
 	for (i = 0; i < n_comp; i++) {
 	    sum += input[k][i];
 	}
+#else
+        sum = 299 * input[k][RCOMP] + 587 * input[k][GCOMP] +  114 * input[k][BCOMP];
+#endif
 	if (minSum > sum) {
 	    minSum = sum;
 	    minColR = k;

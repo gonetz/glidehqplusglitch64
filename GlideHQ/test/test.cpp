@@ -74,14 +74,14 @@ int main(int argc, char* argv[])
   wchar_t name[21] = L"DEFAULT";
 
   printf("------------------------------------------------------------------\n");
-  printf("  GlideHQ Hires Texture Checker version 1.1\n");
-  printf("  Copyright (C) 2007  Hiroshi Morii   All Rights Reserved\n");
+  printf("  GlideHQ Hires Texture Checker version 1.2\n");
+  printf("  Copyright (C) 2010  Hiroshi Morii   All Rights Reserved\n");
   printf("     email   : koolsmoky(at)users.sourceforge.net\n");
   printf("     website : http://www.3dfxzone.it/koolsmoky\n");
   printf("\n");
   printf("  Glide64 official website : http://glide64.emuxhaven.net\n");
   printf("\n");
-  printf("  Usage: test.exe \"INTERNAL ROM NAME\"\n");
+  printf("  Usage: ghqchk.exe \"INTERNAL ROM NAME\"\n");
   printf("------------------------------------------------------------------\n");
 
   if (argc != 2) return 0;
@@ -103,8 +103,8 @@ int main(int argc, char* argv[])
   //options |= DUMP_TEX;
   options |= RICE_HIRESTEXTURES;
 
-  bret = ext_ghq_init(2048, // max texture width supported by hardware
-                      2048, // max texture height supported by hardware
+  bret = ext_ghq_init(1024, // max texture width supported by hardware
+                      1024, // max texture height supported by hardware
                       32, // max texture bpp supported by hardware
                       options,
                       0, // cache texture to system memory
