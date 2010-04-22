@@ -270,6 +270,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
             texbuf->info.format = GR_TEXFMT_ALPHA_INTENSITY_88;
           else
             texbuf->info.format = GR_TEXFMT_RGB_565;
+          texbuf->center = 0;
           found = TRUE;
           rdp.cur_tex_buf = i;
           rdp.texbufs[i].clear_allowed = FALSE;
@@ -723,12 +724,6 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
       rdp.tbuff_tex->v_shift = 0;
       rdp.tbuff_tex->u_shift = 0;
     }
-    /*
-    if (rdp.timg.format == 0) //RGB
-    rdp.tbuff_tex->info.format = GR_TEXFMT_RGB_565;
-    else  //IA
-    rdp.tbuff_tex->info.format = GR_TEXFMT_ALPHA_INTENSITY_88;
-    */
     FRDP("FindTextureBuffer, found, u_shift: %d,  v_shift: %d, format: %d\n", rdp.tbuff_tex->u_shift, rdp.tbuff_tex->v_shift, rdp.tbuff_tex->info.format);
     return TRUE;
   }
