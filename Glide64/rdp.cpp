@@ -2150,6 +2150,11 @@ static void rdp_fillrect()
   wxUint32 ul_y = (rdp.cmd1 & 0x00000FFF) >> 2;
   wxUint32 lr_x = ((rdp.cmd0 & 0x00FFF000) >> 14) + 1;
   wxUint32 lr_y = ((rdp.cmd0 & 0x00000FFF) >> 2) + 1;
+  if ((ul_x > lr_x) || (ul_y > lr_y))
+  {
+    RDP("Fillrect. Wrong coordinates. Skipped\n");
+    return;
+  }
   int pd_multiplayer = (settings.ucode == ucode_PerfectDark) && (rdp.cycle_mode == 3) && (rdp.fill_color == 0xFFFCFFFC);
   if ((rdp.cimg == rdp.zimg) || (fb_emulation_enabled && rdp.frame_buffers[rdp.ci_count-1].status == ci_zimg) || pd_multiplayer)
   {
@@ -2198,11 +2203,6 @@ static void rdp_fillrect()
   // Update scissor
   if (fullscreen)
     update_scissor ();
-
-  if (ul_x > lr_x)
-    lr_x = ul_x+1;
-  if (ul_y > lr_y)
-    lr_y = ul_y+1;
 
   if (rdp.cur_image && (rdp.cur_image->format != 0) && (rdp.cycle_mode == 3) && (rdp.cur_image->width == lr_x))
   {
