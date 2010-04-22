@@ -530,6 +530,7 @@ typedef struct
 	float v_scale; //used to map vertex u,v coordinates into hires texture
 	CACHE_LUT * cache; //pointer to texture cache item
 	GrTexInfo info;
+  wxUint16 t_mem;
 } TBUFF_COLOR_IMAGE;
 
 typedef struct
@@ -746,6 +747,7 @@ typedef struct
   TEXTURE_BUFFER texbufs[2];
   TBUFF_COLOR_IMAGE * cur_image;  //image currently being drawn
   TBUFF_COLOR_IMAGE * tbuff_tex;  //image, which corresponds to currently selected texture
+  TBUFF_COLOR_IMAGE * aTBuffTex[2]; 
   wxUint8  cur_tex_buf;
   wxUint8  acc_tex_buf;
   int skip_drawing; //rendering is not required. used for frame buffer emulation
@@ -850,16 +852,6 @@ __inline void ConvertCoordsKeep (VERTEX *v, int n)
 // Convert from u0/v0/u1/v1 to the real coordinates based on the tmu they are on
 __inline void ConvertCoordsConvert (VERTEX *v, int n)
 {
-
-  if (rdp.tbuff_tex && rdp.tex != 3)
-  {
-    for (int i=0; i<n; i++)
-    {
-      v[i].u1 = v[i].u0;
-      v[i].v1 = v[i].v0;
-    }
-  }
-
 //  float z;
   for (int i=0; i<n; i++)
   {

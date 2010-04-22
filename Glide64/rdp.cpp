@@ -317,6 +317,7 @@ void rdp_reset ()
   rdp.acc_tex_buf = 0;
   rdp.cur_image = 0;
   rdp.tbuff_tex = 0;
+  rdp.aTBuffTex[0] = rdp.aTBuffTex[1] = 0;
 
   hotkey_info.hk_ref = 90;
   hotkey_info.hk_motionblur = (settings.buff_clear == 0)?0:90;
@@ -1145,27 +1146,36 @@ static void rdp_texrect()
   }
 
   //*
-  if (rdp.tbuff_tex && (settings.frame_buffer & fb_optimize_texrect))
+  if ((rdp.aTBuffTex[0] || rdp.aTBuffTex[1]) && (settings.frame_buffer & fb_optimize_texrect))
   {
-    if (!rdp.tbuff_tex->drawn)
+    RDP("Attempt to optimize texrect\n");
+    TBUFF_COLOR_IMAGE * pFBTex = 0;
+    if (rdp.aTBuffTex[0] && rdp.aTBuffTex[0]->tile == 0)
+      pFBTex = rdp.aTBuffTex[0];
+    else if (rdp.aTBuffTex[1] && rdp.aTBuffTex[1]->tile == 0)
+      pFBTex = rdp.aTBuffTex[1];
+    if (pFBTex)
     {
-      DRAWIMAGE d;
-      d.imageX  = 0;
-      d.imageW  = (wxUint16)rdp.tbuff_tex->width;
-      d.frameX  = (wxUint16)ul_x;
-      d.frameW  = (wxUint16)(rdp.tbuff_tex->width);//(wxUint16)(ul_x + rdp.tbuff_tex->width);//lr_x;
+      if (!pFBTex->drawn)
+      {
+        DRAWIMAGE d;
+        d.imageX  = 0;
+        d.imageW  = (wxUint16)pFBTex->width;
+        d.frameX  = (wxUint16)ul_x;
+        d.frameW  = (wxUint16)(pFBTex->width);
 
-      d.imageY  = 0;
-      d.imageH  = (wxUint16)rdp.tbuff_tex->height;
-      d.frameY  = (wxUint16)ul_y;
-      d.frameH  = (wxUint16)(rdp.tbuff_tex->height);//(ul_y + rdp.tbuff_tex->height);
-      FRDP("texrect. ul_x: %d, ul_y: %d, lr_x: %d, lr_y: %d, width: %d, height: %d\n", ul_x, ul_y, lr_x, lr_y, rdp.tbuff_tex->width, rdp.tbuff_tex->height);
-      d.scaleX  = 1.0f;
-      d.scaleY  = 1.0f;
-      DrawHiresImage(&d, rdp.tbuff_tex->width == rdp.ci_width);
-      rdp.tbuff_tex->drawn = TRUE;
+        d.imageY  = 0;
+        d.imageH  = (wxUint16)pFBTex->height;
+        d.frameY  = (wxUint16)ul_y;
+        d.frameH  = (wxUint16)(pFBTex->height);
+        FRDP("texrect. ul_x: %d, ul_y: %d, lr_x: %d, lr_y: %d, width: %d, height: %d\n", ul_x, ul_y, lr_x, lr_y, pFBTex->width, pFBTex->height);
+        d.scaleX  = 1.0f;
+        d.scaleY  = 1.0f;
+        DrawHiresImage(&d, pFBTex->width == rdp.ci_width);
+        pFBTex->drawn = TRUE;
+      }
+      return;
     }
-    return;
   }
   //*/
   // framebuffer workaround for Zelda: MM LOT
@@ -1303,6 +1313,13 @@ static void rdp_texrect()
   } texUV[2]; //struct for texture coordinates
   //angrylion's macro, helps to cut overflowed values.
   #define SIGN16(x) (((x) & 0x8000) ? ((x) | ~0xffff) : ((x) & 0xffff))
+
+  TBUFF_COLOR_IMAGE * aTBuff[2] = {0, 0};
+  if (rdp.aTBuffTex[0])
+    aTBuff[rdp.aTBuffTex[0]->tile] = rdp.aTBuffTex[0];
+  if (rdp.aTBuffTex[1])
+    aTBuff[rdp.aTBuffTex[1]->tile] = rdp.aTBuffTex[1];
+
   //calculate texture coordinates
   for (int i = 0; i < 2; i++)
   {
@@ -1343,7 +1360,7 @@ static void rdp_texrect()
         }
       }
 
-      if (rdp.tbuff_tex && rdp.tbuff_tex->tile == i) //hwfbe texture
+      if (aTBuff[i]) //hwfbe texture
       {
         float t0_off_x;
         float t0_off_y;
@@ -1357,18 +1374,18 @@ static void rdp_texrect()
           t0_off_x = off_x_i/32.0f;
           t0_off_y = off_y_i/32.0f;
         }
-        t0_off_x += rdp.tbuff_tex->u_shift;// + tile.ul_s; //commented for Paper Mario motion blur
-        t0_off_y += rdp.tbuff_tex->v_shift;// + tile.ul_t;
+        t0_off_x += aTBuff[i]->u_shift;// + tile.ul_s; //commented for Paper Mario motion blur
+        t0_off_y += aTBuff[i]->v_shift;// + tile.ul_t;
         texUV[i].ul_u = t0_off_x * sx;
         texUV[i].ul_v = t0_off_y * sy;
 
         texUV[i].lr_u = texUV[i].ul_u + off_size_x * sx;
         texUV[i].lr_v = texUV[i].ul_v + off_size_y * sy;
 
-        texUV[i].ul_u *= rdp.tbuff_tex->u_scale;
-        texUV[i].ul_v *= rdp.tbuff_tex->v_scale;
-        texUV[i].lr_u *= rdp.tbuff_tex->u_scale;
-        texUV[i].lr_v *= rdp.tbuff_tex->v_scale;
+        texUV[i].ul_u *= aTBuff[i]->u_scale;
+        texUV[i].ul_v *= aTBuff[i]->v_scale;
+        texUV[i].lr_u *= aTBuff[i]->u_scale;
+        texUV[i].lr_v *= aTBuff[i]->v_scale;
         FRDP("tbuff_tex[%d] ul_u: %f, ul_v: %f, lr_u: %f, lr_v: %f\n",
           i, texUV[i].ul_u, texUV[i].ul_v, texUV[i].lr_u, texUV[i].lr_v);
       }
@@ -1463,7 +1480,7 @@ static void rdp_texrect()
     //            FRDP("v[%d]  u0: %f, v0: %f, u1: %f, v1: %f\n", j, vstd[j].u0, vstd[j].v0, vstd[j].u1, vstd[j].v1);
 
 
-    if (!rdp.tbuff_tex && rdp.cur_cache[0]->splits != 1)
+    if (!aTBuff[0] && rdp.cur_cache[0]->splits != 1)
     {
       // ** LARGE TEXTURE HANDLING **
       // *VERY* simple algebra for texrects
@@ -1700,7 +1717,7 @@ static void rdp_setkeygb()
   wxUint32 cG = (rdp.cmd1>>24)&0xFF;
   rdp.SCALE = (rdp.SCALE&0xFF0000FF) | (sG<<16) | (sB<<8);
   rdp.CENTER = (rdp.CENTER&0xFF0000FF) | (cG<<16) | (cB<<8);
-  FRDP("setkeygb. cG=%02lx, sG=%02ls, cB=%02lx, sB=%02ls\n", cG, sG, cB, sB);
+  FRDP("setkeygb. cG=%02lx, sG=%02lx, cB=%02lx, sB=%02lx\n", cG, sG, cB, sB);
 }
 
 static void rdp_setkeyr()
@@ -1709,7 +1726,7 @@ static void rdp_setkeyr()
   wxUint32 cR = (rdp.cmd1>>8)&0xFF;
   rdp.SCALE = (rdp.SCALE&0x00FFFFFF) | (sR<<24);
   rdp.CENTER = (rdp.CENTER&0x00FFFFFF) | (cR<<24);
-  FRDP("setkeyr. cR=%02lx, sR=%02ls\n", cR, sR);
+  FRDP("setkeyr. cR=%02lx, sR=%02lx\n", cR, sR);
 }
 
 static void rdp_setconvert()
@@ -1898,29 +1915,31 @@ static void rdp_settilesize()
 
   rdp.first = 1;
 
-  if (tile == 0 && rdp.tbuff_tex)
-  {
-    //if ((rdp.tiles[tile].size != 2) || ((rdp.timg.width == 1) && (rdp.tbuff_tex->width != (wxUint32)(lr_s+1))))
-    if (((rdp.tiles[tile].format == 0) && (rdp.tiles[tile].size != 2)) || ((rdp.timg.width == 1) && (rdp.tbuff_tex->width != (wxUint32)(lr_s+1))))
-      rdp.tbuff_tex = 0;
-  }
-  if (rdp.tbuff_tex)
-  {
-    if (rdp.tiles[tile].format == 0 && rdp.tbuff_tex->format == 0)
-    {
-      if (!voodoo.tex_UMA && tile == 1 && (wxUint32)rdp.tbuff_tex->tmu != tile)
-        SwapTextureBuffer();
-      rdp.tbuff_tex->tile = tile;
-      rdp.tbuff_tex->info.format = GR_TEXFMT_RGB_565;
-      FRDP ("tbuff_tex: tile: %d\n", tile);
-    }
-    else if (tile == 0)
-    {
-      rdp.tbuff_tex->info.format = GR_TEXFMT_ALPHA_INTENSITY_88;
-    }
-  }
   FRDP ("settilesize: tile: %d, ul_s: %d, ul_t: %d, lr_s: %d, lr_t: %d, f_ul_s: %f, f_ul_t: %f\n",
     tile, ul_s, ul_t, lr_s, lr_t, rdp.tiles[tile].f_ul_s, rdp.tiles[tile].f_ul_t);
+}
+
+static void setTBufTex(wxUint16 t_mem, wxUint32 cnt)
+{
+  FRDP("setTBufTex t_mem=%d, cnt=%d\n", t_mem, cnt);
+  for (int i = 0; i < 2; i++)
+  {
+    if (rdp.aTBuffTex[i] == 0 || (rdp.aTBuffTex[i]->t_mem >= t_mem && rdp.aTBuffTex[i]->t_mem < t_mem + cnt))
+    {
+      if (rdp.tbuff_tex)
+      {
+        rdp.aTBuffTex[i] = rdp.tbuff_tex;
+        rdp.aTBuffTex[i]->t_mem = t_mem;
+        rdp.tbuff_tex = 0;
+        FRDP("rdp.aTBuffTex[%d] tmu=%d t_mem=%d\n", i, rdp.aTBuffTex[i]->tmu, rdp.aTBuffTex[i]->t_mem);
+      }
+      else
+      {
+        rdp.aTBuffTex[i] = 0;
+        FRDP("rdp.aTBuffTex[%d]=0\n", i);
+      }
+    }
+  }
 }
 
 extern "C" void asmLoadBlock(int src, int dst, int off, int dxt, int cnt, int swp);
@@ -2008,6 +2027,9 @@ static void rdp_loadblock()
   FRDP ("loadblock: tile: %d, ul_s: %d, ul_t: %d, lr_s: %d, dxt: %08lx -> %08lx\n",
     tile, ul_s, ul_t, lr_s,
     dxt, _dxt);
+
+  if (fb_hwfbe_enabled)
+    setTBufTex(rdp.tiles[tile].t_mem, cnt);
 }
 
 extern "C" void asmLoadTile(int src, int dst, int width, int height, int line, int off, int end, int swap);
@@ -2105,6 +2127,9 @@ static void rdp_loadtile()
 
   FRDP("loadtile: tile: %d, ul_s: %d, ul_t: %d, lr_s: %d, lr_t: %d\n", tile,
     ul_s, ul_t, lr_s, lr_t);
+
+  if (fb_hwfbe_enabled)
+    setTBufTex(rdp.tiles[tile].t_mem, wid_64*height);
 }
 
 static void rdp_settile()
@@ -2138,6 +2163,20 @@ static void rdp_settile()
     rdp.last_tile, str_format[tile->format], str_size[tile->size], tile->line,
     tile->t_mem, tile->palette, str_cm[(tile->clamp_t<<1)|tile->mirror_t], tile->mask_t,
     tile->shift_t, str_cm[(tile->clamp_s<<1)|tile->mirror_s], tile->mask_s, tile->shift_s);
+
+  if (fb_hwfbe_enabled && rdp.last_tile < rdp.cur_tile + 2)
+  {
+    for (int i = 0; i < 2; i++)
+    {
+      if (rdp.aTBuffTex[i] && rdp.aTBuffTex[i]->t_mem == tile->t_mem)
+      {
+        rdp.aTBuffTex[i]->tile = rdp.last_tile;
+        rdp.aTBuffTex[i]->info.format = tile->format == 0 ? GR_TEXFMT_RGB_565 : GR_TEXFMT_ALPHA_INTENSITY_88;
+        FRDP("rdp.aTBuffTex[%d] tile=%d, format=%s\n", i, rdp.last_tile, tile->format == 0 ? "RGB565" : "Alpha88");
+        break;
+      }
+    }
+  }
 }
 
 //
