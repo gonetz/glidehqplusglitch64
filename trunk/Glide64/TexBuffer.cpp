@@ -270,6 +270,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
             texbuf->info.format = GR_TEXFMT_ALPHA_INTENSITY_88;
           else
             texbuf->info.format = GR_TEXFMT_RGB_565;
+          texbuf->center = 0;
           found = TRUE;
           rdp.cur_tex_buf = i;
           rdp.texbufs[i].clear_allowed = FALSE;
