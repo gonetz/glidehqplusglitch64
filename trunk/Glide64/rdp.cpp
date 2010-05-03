@@ -564,8 +564,8 @@ static void CopyFrameBuffer (GrBuffer_t buffer = GR_BUFFER_BACKBUFFER)
     }
     else
     {
-      float scale_x = (settings.scr_res_x - rdp.offset_x*2.0f)  / rdp.vi_width;
-      float scale_y = (settings.scr_res_y - rdp.offset_y*2.0f) / rdp.vi_height;
+      float scale_x = (settings.scr_res_x - rdp.offset_x*2.0f)  / max(width, rdp.vi_width);
+      float scale_y = (settings.scr_res_y - rdp.offset_y*2.0f) / max(height, rdp.vi_height);
 
       FRDP("width: %d, height: %d, ul_y: %d, lr_y: %d, scale_x: %f, scale_y: %f, ci_width: %d, ci_height: %d\n",width, height, rdp.ci_upper_bound, rdp.ci_lower_bound, scale_x, scale_y, rdp.ci_width, rdp.ci_height);
       GrLfbInfo_t info;
