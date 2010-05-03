@@ -309,12 +309,6 @@ void draw_tri (VERTEX **vtx, wxUint16 linew)
 
   org_vtx = vtx;
 
-  TBUFF_COLOR_IMAGE * aTBuff[2] = {0, 0};
-  if (rdp.aTBuffTex[0])
-    aTBuff[rdp.aTBuffTex[0]->tile] = rdp.aTBuffTex[0];
-  if (rdp.aTBuffTex[1])
-    aTBuff[rdp.aTBuffTex[1]->tile] = rdp.aTBuffTex[1];
-
   for (int i=0; i<3; i++)
   {
     VERTEX *v = vtx[i];
@@ -372,10 +366,10 @@ void draw_tri (VERTEX **vtx, wxUint16 linew)
 
       if (rdp.tex >= 1 && rdp.cur_cache[0])
       {
-        if (aTBuff[0])
+        if (rdp.aTBuffTex[0])
         {
-          v->u0 += aTBuff[0]->u_shift + aTBuff[0]->tile_uls;
-          v->v0 += aTBuff[0]->v_shift + aTBuff[0]->tile_ult;
+          v->u0 += rdp.aTBuffTex[0]->u_shift + rdp.aTBuffTex[0]->tile_uls;
+          v->v0 += rdp.aTBuffTex[0]->v_shift + rdp.aTBuffTex[0]->tile_ult;
         }
 
         if (rdp.tiles[rdp.cur_tile].shift_s)
@@ -393,17 +387,17 @@ void draw_tri (VERTEX **vtx, wxUint16 linew)
             v->v0 /= (float)(1 << rdp.tiles[rdp.cur_tile].shift_t);
         }
 
-        if (aTBuff[0])
+        if (rdp.aTBuffTex[0])
         {
-          if (aTBuff[0]->tile_uls != (int)rdp.tiles[rdp.cur_tile].f_ul_s)
+          if (rdp.aTBuffTex[0]->tile_uls != (int)rdp.tiles[rdp.cur_tile].f_ul_s)
             v->u0 -= rdp.tiles[rdp.cur_tile].f_ul_s;
-          if (aTBuff[0]->tile_ult != (int)rdp.tiles[rdp.cur_tile].f_ul_t || (settings.hacks&hack_Megaman))
+          if (rdp.aTBuffTex[0]->tile_ult != (int)rdp.tiles[rdp.cur_tile].f_ul_t || (settings.hacks&hack_Megaman))
             v->v0 -= rdp.tiles[rdp.cur_tile].f_ul_t; //required for megaman (boss special attack)
-          v->u0 *= aTBuff[0]->u_scale;
-          v->v0 *= aTBuff[0]->v_scale;
-#ifdef EXTREME_LOGGING
+          v->u0 *= rdp.aTBuffTex[0]->u_scale;
+          v->v0 *= rdp.aTBuffTex[0]->v_scale;
+//#ifdef EXTREME_LOGGING
           FRDP("tbuff_tex t0: (%f, %f)->(%f, %f)\n", v->ou, v->ov, v->u0, v->v0);
-#endif
+//#endif
         }
         else
         {
@@ -418,10 +412,10 @@ void draw_tri (VERTEX **vtx, wxUint16 linew)
 
       if (rdp.tex >= 2 && rdp.cur_cache[1])
       {
-        if (aTBuff[1])
+        if (rdp.aTBuffTex[1])
         {
-          v->u1 += aTBuff[1]->u_shift + aTBuff[1]->tile_uls;
-          v->v1 += aTBuff[1]->v_shift + aTBuff[1]->tile_ult;
+          v->u1 += rdp.aTBuffTex[1]->u_shift + rdp.aTBuffTex[1]->tile_uls;
+          v->v1 += rdp.aTBuffTex[1]->v_shift + rdp.aTBuffTex[1]->tile_ult;
         }
         if (rdp.tiles[rdp.cur_tile+1].shift_s)
         {
@@ -438,13 +432,15 @@ void draw_tri (VERTEX **vtx, wxUint16 linew)
             v->v1 /= (float)(1 << rdp.tiles[rdp.cur_tile+1].shift_t);
         }
 
-        if (aTBuff[1])
+        if (rdp.aTBuffTex[1])
         {
-          if (aTBuff[1]->tile_uls != (int)rdp.tiles[rdp.cur_tile].f_ul_s)
+          if (rdp.aTBuffTex[1]->tile_uls != (int)rdp.tiles[rdp.cur_tile].f_ul_s)
             v->u1 -= rdp.tiles[rdp.cur_tile].f_ul_s;
-          v->u1 *= aTBuff[1]->u_scale;
-          v->v1 *= aTBuff[1]->v_scale;
+          v->u1 *= rdp.aTBuffTex[1]->u_scale;
+          v->v1 *= rdp.aTBuffTex[1]->v_scale;
+//#ifdef EXTREME_LOGGING
           FRDP("tbuff_tex t1: (%f, %f)->(%f, %f)\n", v->ou, v->ov, v->u1, v->v1);
+//#endif
         }
         else
         {
@@ -475,7 +471,7 @@ void draw_tri (VERTEX **vtx, wxUint16 linew)
 
   vtx[0]->not_zclipped = vtx[1]->not_zclipped = vtx[2]->not_zclipped = 1;
 
-  if (rdp.cur_cache[0] && (rdp.tex & 1) && (rdp.cur_cache[0]->splits > 1) && !aTBuff[0] && !rdp.clip)
+  if (rdp.cur_cache[0] && (rdp.tex & 1) && (rdp.cur_cache[0]->splits > 1) && !rdp.aTBuffTex[0] && !rdp.clip)
   {
     int index,i,j, min_256,max_256, cur_256,left_256,right_256;
     float percent;
@@ -1885,11 +1881,17 @@ void update ()
     rdp.update |= UPDATE_COMBINE;
   }
 
-  //if (fullscreen)
-  //{
   // Combine MUST go before texture
   if ((rdp.update & UPDATE_COMBINE) && rdp.allow_combine)
   {
+    TBUFF_COLOR_IMAGE * aTBuff[2] = {0, 0};
+    if (rdp.aTBuffTex[0])
+      aTBuff[rdp.aTBuffTex[0]->tile] = rdp.aTBuffTex[0];
+    if (rdp.aTBuffTex[1])
+      aTBuff[rdp.aTBuffTex[1]->tile] = rdp.aTBuffTex[1];
+    rdp.aTBuffTex[0] = aTBuff[0];
+    rdp.aTBuffTex[1] = aTBuff[1];
+
     RDP (" |-+ update_combine\n");
     Combine ();
   }

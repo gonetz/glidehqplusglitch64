@@ -148,6 +148,7 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.v_scale = texbuf.lr_v / (float)(texbuf.height);
   texbuf.cache = 0;
   texbuf.center = 0;
+  texbuf.t_mem = 0;
 
   FRDP("\nAllocateTextureBuffer. width: %d, height: %d, scr_width: %f, scr_height: %f, vi_width: %f, vi_height:%f, scale_x: %f, scale_y: %f, lr_u: %f, lr_v: %f, u_scale: %f, v_scale: %f\n", texbuf.width, texbuf.height, texbuf.scr_width, texbuf.scr_height, rdp.vi_width, rdp.vi_height, rdp.scale_x, rdp.scale_y, texbuf.lr_u, texbuf.lr_v, texbuf.u_scale, texbuf.v_scale);
 
@@ -226,7 +227,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
     if (settings.hacks&hack_PMario) //motion blur effects in Paper Mario
     {
       rdp.cur_tex_buf = rdp.acc_tex_buf;
-      FRDP("read_whole_frame. last allocated bank: %d\n", rdp.acc_tex_buf);
+      FRDP("\nread_whole_frame. last allocated bank: %d\n", rdp.acc_tex_buf);
     }
     else
     {
@@ -271,6 +272,8 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
           else
             texbuf->info.format = GR_TEXFMT_RGB_565;
           texbuf->center = 0;
+          texbuf->t_mem = 0;
+          texbuf->tile = 0;
           found = TRUE;
           rdp.cur_tex_buf = i;
           rdp.texbufs[i].clear_allowed = FALSE;
@@ -665,7 +668,7 @@ int SwapTextureBuffer()
 
 inline wxUint32 CalcCenter(TBUFF_COLOR_IMAGE * pTCI)
 {
-  return *((wxUint32*)(gfx.RDRAM + pTCI->addr + pTCI->height*pTCI->width + pTCI->width));
+  return *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
 }
 
 int FindTextureBuffer(wxUint32 addr, wxUint16 width)
@@ -725,6 +728,7 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
       rdp.tbuff_tex->u_shift = 0;
     }
     FRDP("FindTextureBuffer, found, u_shift: %d,  v_shift: %d, format: %d\n", rdp.tbuff_tex->u_shift, rdp.tbuff_tex->v_shift, rdp.tbuff_tex->info.format);
+    //FRDP("Buffer, addr=%08lx, end_addr=%08lx, width: %d, height: %d\n", rdp.tbuff_tex->addr, rdp.tbuff_tex->end_addr, rdp.tbuff_tex->width, rdp.tbuff_tex->height);
     return TRUE;
   }
   rdp.tbuff_tex = 0;
