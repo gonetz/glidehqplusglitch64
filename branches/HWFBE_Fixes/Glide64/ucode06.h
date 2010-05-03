@@ -564,10 +564,8 @@ void DrawHiresImage(DRAWIMAGE *d, int screensize = FALSE)
     tbuff_tex = &(rdp.texbufs[rdp.cur_tex_buf^1].images[0]);
   else if (rdp.tbuff_tex)
     tbuff_tex = rdp.tbuff_tex;
-  else if (rdp.aTBuffTex[0])
-    tbuff_tex = rdp.aTBuffTex[0];
   else
-    tbuff_tex = rdp.aTBuffTex[1];
+    return;
 
   if (rdp.cycle_mode == 2)
   {

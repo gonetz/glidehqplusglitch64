@@ -905,7 +905,7 @@ void TexCache ()
           mode_s,
           mode_t);
       }
-      if (aTBuff[i])
+      if (aTBuff[i] && (rdp.tex&(i+1)))
         SelectTBuffTex(aTBuff[i]);
     }
   }
