@@ -3353,6 +3353,18 @@ static void cc_t0_mul_prima_mul_shade_add_prim_mul_one_sub_prima ()  //Aded by G
   CC ( ((wxUint8)(col[0]*fac))<<24 | ((wxUint8)(col[1]*fac))<<16 | ((wxUint8)(col[2]*fac))<<8 | fac );
 }
 
+// ** A*(1-B)+C **
+static void cc_t0_mul_1menv_add_prim ()
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+    GR_COMBINE_FACTOR_TEXTURE_RGB,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  CC_PRIM ();
+  SETSHADE_1MENV ();
+  USE_T0 ();
+}
+
 // ** (A+B)*C **
 static void cc_t0_mul_scale_add_prim__mul_shade () //Aded by Gonetz
 {
@@ -6106,17 +6118,6 @@ static void cc_env_sub_shade_mul_enva_add_shade ()
     GR_COMBINE_LOCAL_ITERATED,
     GR_COMBINE_OTHER_CONSTANT);
   cmb.ccolor = rdp.env_color;
-}
-
-static void cc_center_sub_env_mul_t0_add_prim ()
-{
-  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
-    GR_COMBINE_FACTOR_TEXTURE_RGB,
-    GR_COMBINE_LOCAL_ITERATED,
-    GR_COMBINE_OTHER_CONSTANT);
-  CC_C1SUBC2 (rdp.CENTER, rdp.env_color);
-  SETSHADE_PRIM ();
-  USE_T0 ();
 }
 
 //Added by Gonetz
@@ -10734,8 +10735,8 @@ static COMBINER color_cmb_list[] = {
   // (shade-env)*t0+prim
   {0x61546154, cc_shade_sub_env_mul_t0_add_prim},
   // Karts, mario kart
-  //z (center-env)*t0+prim
-  {0x61566156, cc_center_sub_env_mul_t0_add_prim},
+  //z (one-env)*t0+prim
+  {0x61566156, cc_t0_mul_1menv_add_prim},
   // Famista64. Added by Gonetz
   //(t0-0)*t0+prim
   {0x61f161f1, cc_t0_mul_prim},
