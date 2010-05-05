@@ -565,8 +565,8 @@ static void CopyFrameBuffer (GrBuffer_t buffer = GR_BUFFER_BACKBUFFER)
     }
     else
     {
-      float scale_x = (settings.scr_res_x - rdp.offset_x*2.0f)  / rdp.vi_width;
-      float scale_y = (settings.scr_res_y - rdp.offset_y*2.0f) / rdp.vi_height;
+      float scale_x = (settings.scr_res_x - rdp.offset_x*2.0f)  / max(width, rdp.vi_width);
+      float scale_y = (settings.scr_res_y - rdp.offset_y*2.0f) / max(height, rdp.vi_height);
 
       FRDP("width: %d, height: %d, ul_y: %d, lr_y: %d, scale_x: %f, scale_y: %f, ci_width: %d, ci_height: %d\n",width, height, rdp.ci_upper_bound, rdp.ci_lower_bound, scale_x, scale_y, rdp.ci_width, rdp.ci_height);
       GrLfbInfo_t info;
@@ -2189,6 +2189,11 @@ static void rdp_fillrect()
   wxUint32 ul_y = (rdp.cmd1 & 0x00000FFF) >> 2;
   wxUint32 lr_x = ((rdp.cmd0 & 0x00FFF000) >> 14) + 1;
   wxUint32 lr_y = ((rdp.cmd0 & 0x00000FFF) >> 2) + 1;
+  if ((ul_x > lr_x) || (ul_y > lr_y))
+  {
+    RDP("Fillrect. Wrong coordinates. Skipped\n");
+    return;
+  }
   int pd_multiplayer = (settings.ucode == ucode_PerfectDark) && (rdp.cycle_mode == 3) && (rdp.fill_color == 0xFFFCFFFC);
   if ((rdp.cimg == rdp.zimg) || (fb_emulation_enabled && rdp.frame_buffers[rdp.ci_count-1].status == ci_zimg) || pd_multiplayer)
   {
@@ -2237,11 +2242,6 @@ static void rdp_fillrect()
   // Update scissor
   if (fullscreen)
     update_scissor ();
-
-  if (ul_x > lr_x)
-    lr_x = ul_x+1;
-  if (ul_y > lr_y)
-    lr_y = ul_y+1;
 
   if (rdp.cur_image && (rdp.cur_image->format != 0) && (rdp.cycle_mode == 3) && (rdp.cur_image->width == lr_x))
   {
