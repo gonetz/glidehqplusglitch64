@@ -514,7 +514,7 @@ typedef struct
 	wxUint16 format;   //format of color image
 	wxUint8  clear;  //flag. texture buffer must be cleared
 	wxUint8  drawn;  //flag. if equal to 1, this image was already drawn in current frame
-  wxUint32 center; //bytes from the center of the color image
+	wxUint32 crc; //checksum of the color image
 	float scr_width; //width of rendered image
 	float scr_height; //height of rendered image
 	wxUint32 tex_width;  //width of texture buffer

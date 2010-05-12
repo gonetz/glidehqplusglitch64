@@ -44,6 +44,7 @@
 
 #include "Gfx #1.3.h"
 #include "TexBuffer.h"
+#include "CRC.h"
 
 static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
 {
@@ -147,7 +148,7 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.u_scale = texbuf.lr_u / (float)(texbuf.width);
   texbuf.v_scale = texbuf.lr_v / (float)(texbuf.height);
   texbuf.cache = 0;
-  texbuf.center = 0;
+  texbuf.crc = 0;
   texbuf.t_mem = 0;
 
   FRDP("\nAllocateTextureBuffer. width: %d, height: %d, scr_width: %f, scr_height: %f, vi_width: %f, vi_height:%f, scale_x: %f, scale_y: %f, lr_u: %f, lr_v: %f, u_scale: %f, v_scale: %f\n", texbuf.width, texbuf.height, texbuf.scr_width, texbuf.scr_height, rdp.vi_width, rdp.vi_height, rdp.scale_x, rdp.scale_y, texbuf.lr_u, texbuf.lr_v, texbuf.u_scale, texbuf.v_scale);
@@ -271,7 +272,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
             texbuf->info.format = GR_TEXFMT_ALPHA_INTENSITY_88;
           else
             texbuf->info.format = GR_TEXFMT_RGB_565;
-          texbuf->center = 0;
+          texbuf->crc = 0;
           texbuf->t_mem = 0;
           texbuf->tile = 0;
           found = TRUE;
@@ -666,9 +667,16 @@ int SwapTextureBuffer()
   return TRUE;
 }
 
-inline wxUint32 CalcCenter(TBUFF_COLOR_IMAGE * pTCI)
+inline wxUint32 CalcCRC(TBUFF_COLOR_IMAGE * pTCI)
 {
-  return *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
+  wxUint8 * pSrc = gfx.RDRAM + pTCI->addr;
+  const wxUint32 nSize = pTCI->end_addr-pTCI->addr;
+  wxUint32 result = CRC32(0xFFFFFFFF, pSrc, 32);
+  result = CRC32(result, pSrc + (nSize>>1), 32);
+  result = CRC32(result, pSrc + nSize - 32, 32);
+  return result;
+
+  //return *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
 }
 
 int FindTextureBuffer(wxUint32 addr, wxUint16 width)
@@ -687,13 +695,13 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
       if(addr >= rdp.tbuff_tex->addr && addr < rdp.tbuff_tex->end_addr)// && rdp.timg.format == 0)
       {
         bool bCorrect;
-        if (rdp.tbuff_tex->center == 0)
+        if (rdp.tbuff_tex->crc == 0)
         {
-          rdp.tbuff_tex->center = CalcCenter(rdp.tbuff_tex);
+          rdp.tbuff_tex->crc = CalcCRC(rdp.tbuff_tex);
           bCorrect = width == 1 || rdp.tbuff_tex->width == width || (rdp.tbuff_tex->width > 320 && rdp.tbuff_tex->width == width*2);
         }
         else
-          bCorrect = rdp.tbuff_tex->center == CalcCenter(rdp.tbuff_tex);
+          bCorrect = rdp.tbuff_tex->crc == CalcCRC(rdp.tbuff_tex);
         if (bCorrect)
         {
           shift = addr - rdp.tbuff_tex->addr;
