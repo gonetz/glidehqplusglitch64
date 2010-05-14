@@ -1146,33 +1146,28 @@ static void rdp_texrect()
   }
 
   //*
-  if ((rdp.aTBuffTex[0] || rdp.aTBuffTex[1]) && (settings.frame_buffer & fb_optimize_texrect))
+  if (rdp.tbuff_tex && (settings.frame_buffer & fb_optimize_texrect))
   {
     RDP("Attempt to optimize texrect\n");
-    TBUFF_COLOR_IMAGE * pFBTex = 0;
-    if (rdp.aTBuffTex[0] && rdp.aTBuffTex[0]->tile == 0)
-      pFBTex = rdp.aTBuffTex[0];
-    else if (rdp.aTBuffTex[1] && rdp.aTBuffTex[1]->tile == 0)
-      pFBTex = rdp.aTBuffTex[1];
-    if (pFBTex)
+    if (rdp.tbuff_tex)
     {
-      if (!pFBTex->drawn)
+      if (!rdp.tbuff_tex->drawn)
       {
         DRAWIMAGE d;
         d.imageX  = 0;
-        d.imageW  = (wxUint16)pFBTex->width;
+        d.imageW  = (wxUint16)rdp.tbuff_tex->width;
         d.frameX  = (wxUint16)ul_x;
-        d.frameW  = (wxUint16)(pFBTex->width);
+        d.frameW  = (wxUint16)(rdp.tbuff_tex->width);
 
         d.imageY  = 0;
-        d.imageH  = (wxUint16)pFBTex->height;
+        d.imageH  = (wxUint16)rdp.tbuff_tex->height;
         d.frameY  = (wxUint16)ul_y;
-        d.frameH  = (wxUint16)(pFBTex->height);
-        FRDP("texrect. ul_x: %d, ul_y: %d, lr_x: %d, lr_y: %d, width: %d, height: %d\n", ul_x, ul_y, lr_x, lr_y, pFBTex->width, pFBTex->height);
+        d.frameH  = (wxUint16)(rdp.tbuff_tex->height);
+        FRDP("texrect. ul_x: %d, ul_y: %d, lr_x: %d, lr_y: %d, width: %d, height: %d\n", ul_x, ul_y, lr_x, lr_y, rdp.tbuff_tex->width, rdp.tbuff_tex->height);
         d.scaleX  = 1.0f;
         d.scaleY  = 1.0f;
-        DrawHiresImage(&d, pFBTex->width == rdp.ci_width);
-        pFBTex->drawn = TRUE;
+        DrawHiresImage(&d, rdp.tbuff_tex->width == rdp.ci_width);
+        rdp.tbuff_tex->drawn = TRUE;
       }
       return;
     }
@@ -1314,12 +1309,6 @@ static void rdp_texrect()
   //angrylion's macro, helps to cut overflowed values.
   #define SIGN16(x) (((x) & 0x8000) ? ((x) | ~0xffff) : ((x) & 0xffff))
 
-  TBUFF_COLOR_IMAGE * aTBuff[2] = {0, 0};
-  if (rdp.aTBuffTex[0])
-    aTBuff[rdp.aTBuffTex[0]->tile] = rdp.aTBuffTex[0];
-  if (rdp.aTBuffTex[1])
-    aTBuff[rdp.aTBuffTex[1]->tile] = rdp.aTBuffTex[1];
-
   //calculate texture coordinates
   for (int i = 0; i < 2; i++)
   {
@@ -1360,7 +1349,7 @@ static void rdp_texrect()
         }
       }
 
-      if (aTBuff[i]) //hwfbe texture
+      if (rdp.aTBuffTex[i]) //hwfbe texture
       {
         float t0_off_x;
         float t0_off_y;
@@ -1374,18 +1363,18 @@ static void rdp_texrect()
           t0_off_x = off_x_i/32.0f;
           t0_off_y = off_y_i/32.0f;
         }
-        t0_off_x += aTBuff[i]->u_shift;// + tile.ul_s; //commented for Paper Mario motion blur
-        t0_off_y += aTBuff[i]->v_shift;// + tile.ul_t;
+        t0_off_x += rdp.aTBuffTex[i]->u_shift;// + tile.ul_s; //commented for Paper Mario motion blur
+        t0_off_y += rdp.aTBuffTex[i]->v_shift;// + tile.ul_t;
         texUV[i].ul_u = t0_off_x * sx;
         texUV[i].ul_v = t0_off_y * sy;
 
         texUV[i].lr_u = texUV[i].ul_u + off_size_x * sx;
         texUV[i].lr_v = texUV[i].ul_v + off_size_y * sy;
 
-        texUV[i].ul_u *= aTBuff[i]->u_scale;
-        texUV[i].ul_v *= aTBuff[i]->v_scale;
-        texUV[i].lr_u *= aTBuff[i]->u_scale;
-        texUV[i].lr_v *= aTBuff[i]->v_scale;
+        texUV[i].ul_u *= rdp.aTBuffTex[i]->u_scale;
+        texUV[i].ul_v *= rdp.aTBuffTex[i]->v_scale;
+        texUV[i].lr_u *= rdp.aTBuffTex[i]->u_scale;
+        texUV[i].lr_v *= rdp.aTBuffTex[i]->v_scale;
         FRDP("tbuff_tex[%d] ul_u: %f, ul_v: %f, lr_u: %f, lr_v: %f\n",
           i, texUV[i].ul_u, texUV[i].ul_v, texUV[i].lr_u, texUV[i].lr_v);
       }
@@ -1480,7 +1469,7 @@ static void rdp_texrect()
     //            FRDP("v[%d]  u0: %f, v0: %f, u1: %f, v1: %f\n", j, vstd[j].u0, vstd[j].v0, vstd[j].u1, vstd[j].v1);
 
 
-    if (!aTBuff[0] && rdp.cur_cache[0]->splits != 1)
+    if (!rdp.aTBuffTex[0] && rdp.cur_cache[0]->splits != 1)
     {
       // ** LARGE TEXTURE HANDLING **
       // *VERY* simple algebra for texrects
@@ -1861,6 +1850,25 @@ static void rdp_loadtlut()
   load_palette (rdp.timg.addr, start, count);
 
   rdp.timg.addr += count << 1;
+
+  if (rdp.tbuff_tex) //paranoid check.
+  {
+    //the buffer is definitely wrong, as there must be no CI frame buffers
+    //find and remove it
+    for (int i = 0; i < voodoo.num_tmu; i++)
+    {
+      for (int j = 0; j < rdp.texbufs[i].count; j++)
+      {
+        if (&(rdp.texbufs[i].images[j]) == rdp.tbuff_tex)
+        {
+          rdp.texbufs[i].count--;
+          if (j < rdp.texbufs[i].count)
+            memcpy(&(rdp.texbufs[i].images[j]), &(rdp.texbufs[i].images[j+1]), sizeof(TBUFF_COLOR_IMAGE)*(rdp.texbufs[i].count-j));
+          return;
+        }
+      }
+    }
+  }
 }
 
 int tile_set = 0;
@@ -1922,15 +1930,22 @@ static void rdp_settilesize()
 static void setTBufTex(wxUint16 t_mem, wxUint32 cnt)
 {
   FRDP("setTBufTex t_mem=%d, cnt=%d\n", t_mem, cnt);
+  TBUFF_COLOR_IMAGE * pTbufTex = rdp.tbuff_tex;
   for (int i = 0; i < 2; i++)
   {
-    if (rdp.aTBuffTex[i] == 0 || (rdp.aTBuffTex[i]->t_mem >= t_mem && rdp.aTBuffTex[i]->t_mem < t_mem + cnt))
+    RDP("Before: ");
+    if (rdp.aTBuffTex[i]) {
+      FRDP("rdp.aTBuffTex[%d]: tmu=%d t_mem=%d tile=%d\n", i, rdp.aTBuffTex[i]->tmu, rdp.aTBuffTex[i]->t_mem, rdp.aTBuffTex[i]->tile);
+    } else {
+      FRDP("rdp.aTBuffTex[%d]=0\n", i);
+    }
+    if ((rdp.aTBuffTex[i] == 0 && rdp.aTBuffTex[i^1] != pTbufTex) || (rdp.aTBuffTex[i] && rdp.aTBuffTex[i]->t_mem >= t_mem && rdp.aTBuffTex[i]->t_mem < t_mem + cnt))
     {
-      if (rdp.tbuff_tex)
+      if (pTbufTex)
       {
-        rdp.aTBuffTex[i] = rdp.tbuff_tex;
+        rdp.aTBuffTex[i] = pTbufTex;
         rdp.aTBuffTex[i]->t_mem = t_mem;
-        rdp.tbuff_tex = 0;
+        pTbufTex = 0;
         FRDP("rdp.aTBuffTex[%d] tmu=%d t_mem=%d\n", i, rdp.aTBuffTex[i]->tmu, rdp.aTBuffTex[i]->t_mem);
       }
       else
@@ -2168,12 +2183,17 @@ static void rdp_settile()
   {
     for (int i = 0; i < 2; i++)
     {
-      if (rdp.aTBuffTex[i] && rdp.aTBuffTex[i]->t_mem == tile->t_mem)
+      if (rdp.aTBuffTex[i])
       {
-        rdp.aTBuffTex[i]->tile = rdp.last_tile;
-        rdp.aTBuffTex[i]->info.format = tile->format == 0 ? GR_TEXFMT_RGB_565 : GR_TEXFMT_ALPHA_INTENSITY_88;
-        FRDP("rdp.aTBuffTex[%d] tile=%d, format=%s\n", i, rdp.last_tile, tile->format == 0 ? "RGB565" : "Alpha88");
-        break;
+        if (rdp.aTBuffTex[i]->t_mem == tile->t_mem)
+        {
+          rdp.aTBuffTex[i]->tile = rdp.last_tile;
+          rdp.aTBuffTex[i]->info.format = tile->format == 0 ? GR_TEXFMT_RGB_565 : GR_TEXFMT_ALPHA_INTENSITY_88;
+          FRDP("rdp.aTBuffTex[%d] tile=%d, format=%s\n", i, rdp.last_tile, tile->format == 0 ? "RGB565" : "Alpha88");
+          break;
+        }
+        else if (rdp.aTBuffTex[i]->tile == rdp.last_tile) //wrong! t_mem must be the same
+          rdp.aTBuffTex[i] = 0;
       }
     }
   }
