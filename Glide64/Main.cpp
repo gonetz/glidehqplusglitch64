@@ -539,6 +539,7 @@ void ReadSpecialSettings (const char * name)
   int hires_buf_clear = ini->Read(_T("hires_buf_clear"), -1);
   int read_alpha = ini->Read(_T("fb_read_alpha"), -1);
   int useless_is_useless = ini->Read(_T("useless_is_useless"), -1);
+  settings.fb_crc_mode = (SETTINGS::FBCRCMODE)ini->Read(_T("fb_crc_mode"), 1);
 
   if (optimize_texrect > 0) settings.frame_buffer |= fb_optimize_texrect;
   else if (optimize_texrect == 0) settings.frame_buffer &= ~fb_optimize_texrect;

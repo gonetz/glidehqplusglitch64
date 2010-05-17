@@ -234,6 +234,10 @@ typedef struct {
   #define fb_depth_render_enabled ((settings.frame_buffer&fb_depth_render)>0)
 
   wxUint32 frame_buffer;
+  enum FBCRCMODE {
+    fbcrcNone = 0,
+    fbcrcFast = 1,
+    fbcrcSafe = 2} fb_crc_mode;
 
 #ifdef TEXTURE_FILTER
   //Texture filtering options
