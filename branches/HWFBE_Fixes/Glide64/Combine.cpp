@@ -7672,7 +7672,7 @@ static void ac_t0_add_env () //Aded by Gonetz
   CA_ENV ();
   A_USE_T0 ();
 }
-/*
+
 static void ac_t1_add_env ()  //Added by Gonetz
 {
 ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
@@ -7682,7 +7682,7 @@ GR_COMBINE_OTHER_TEXTURE);
 CA_ENV ();
 A_USE_T1 ();
 }
-*/
+
 static void ac__t0_add_t1__add_prim () //Aded by Gonetz
 {
   ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
@@ -12897,8 +12897,8 @@ static COMBINER alpha_cmb_list[] = {
   {0x0aab0eb8, ac_t1_mul_env},
   // zelda 2 [Ogy]. Added by Gonetz
   // (1-0)*t1+env, (0-0)*0+cmb
-  {0x0abe0abe, ac_one},
-  //    {0x0abe0abe, ac_t1_add_env},
+  //{0x0abe0abe, ac_one},
+  {0x0abe0abe, ac_t1_add_env},
   // arena, Pokemon Stadium 2. Added by Gonetz
   // (1-t0)*prim+env, (cmb-0)*shade+0
   {0x0ace0f38, ac_one_sub_t0_mul_prim_mul_shade},
