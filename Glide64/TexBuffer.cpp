@@ -676,7 +676,7 @@ inline wxUint32 CalcCRC(TBUFF_COLOR_IMAGE * pTCI)
   {
     wxUint8 * pSrc = gfx.RDRAM + pTCI->addr;
     const wxUint32 nSize = pTCI->end_addr-pTCI->addr;
-    wxUint32 result = CRC32(0xFFFFFFFF, pSrc, 32);
+    result = CRC32(0xFFFFFFFF, pSrc, 32);
     result = CRC32(result, pSrc + (nSize>>1), 32);
     result = CRC32(result, pSrc + nSize - 32, 32);
   }
