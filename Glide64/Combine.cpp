@@ -1327,18 +1327,18 @@ static void cc__t0_add_t1__mul_shade ()
 
 static void cc__t0_mul_shade__add__t1_mul_shade ()
 {
-  if (settings.hacks&hack_Zelda)
-  {
-    cc__t0_add_t1__mul_shade ();
-    return;
-  }
   //combiner is used in Spiderman. It seems that t0 is used instead of t1
   if (cmb.combine_ext)
   {
-    CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
-      GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
       GR_CMBX_ITRGB, 0,
       GR_CMBX_ZERO, 0);
+    cmb.tex |= 1;
+    CCMBEXT(GR_CMBX_ITRGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_ZERO, 1,
+      GR_CMBX_B, 0);
   }
   else
   {
@@ -1346,8 +1346,8 @@ static void cc__t0_mul_shade__add__t1_mul_shade ()
       GR_COMBINE_FACTOR_LOCAL,
       GR_COMBINE_LOCAL_ITERATED,
       GR_COMBINE_OTHER_TEXTURE);
+    USE_T0 ();
   }
-  USE_T0 ();
 }
 
 static void cc__t0_mul_prim__inter_env_using_enva ()
@@ -11696,7 +11696,7 @@ static COMBINER color_cmb_list[] = {
   // (t0-0)*shade+0, (env-cmb)*prim+cmb
   {0xe4f10305, cc_t0_mul_one_sub_prim_mul_shade_add_prim_mul_env},
   // magic bubble, zelda2. Added by Gonetz
-  // (t0-0)*shade+0, (t1-0)*shade+0
+  // (t0-0)*shade+0, (t1-0)*shade+cmb
   {0xe4f104f2, cc__t0_mul_shade__add__t1_mul_shade},
   // bike select, xg2. Added by Gonetz
   // (t0-0)*shade+0, (1-cmb)*env+cmb  ** INC **
@@ -13712,6 +13712,7 @@ void CombineBlender ()
       }
       break;
 
+    case 0x0150: //spiderman
     case 0x0d18: //clr_in * a_fog + clr_mem * (1-a)
       A_BLEND (GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA);
       if (rdp.cycle2 != 0x01ff1fff)
