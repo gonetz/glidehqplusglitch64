@@ -97,7 +97,7 @@ msgstr "時計を24時間制で表示する"
 
 #: Config.cpp:117
 msgid "Transparent text background"
-msgstr "画面表示を透過させる"
+msgstr "テキスト表示の背景を透過させる"
 
 #: Config.cpp:118
 msgid ""
@@ -254,7 +254,7 @@ msgstr "ハイレゾテクスチャ"
 
 #: Config.cpp:201
 msgid "Common"
-msgstr "一般"
+msgstr "共通設定"
 
 #: Config.cpp:202
 msgid "Presets"
@@ -351,7 +351,7 @@ msgstr "別の方法でCRC計算処理を行う"
 
 #: Config.cpp:246
 msgid "Use alpha channel fully"
-msgstr "アルファチャンネルを全てに使用する"
+msgstr "高精度アルファチャンネルを使用する"
 
 #: Config.cpp:247
 msgid "Texture dumping/editing mode"
@@ -411,7 +411,7 @@ msgstr "ログを rdp.txt に出力(遅くなります！)"
 
 #: Config.cpp:286
 msgid "Unknown combiners as red"
-msgstr ""
+msgstr "不明なコンバイナを赤で表示する"
 
 #: Config.cpp:287
 msgid "Log clear every frame"
@@ -419,7 +419,7 @@ msgstr "フレーム毎にログを消去する"
 
 #: Config.cpp:288
 msgid "Combiner logging"
-msgstr ""
+msgstr "コンバイナをログ出力"
 
 #: Config.cpp:289
 msgid "Run (+log) in window"
@@ -427,7 +427,7 @@ msgstr "ウィンドウ内で実行する（ログ付き）"
 
 #: Config.cpp:290
 msgid "Cmb. clear every frame"
-msgstr ""
+msgstr "コンバイナをフレーム毎にクリア"
 
 #: Config.cpp:291
 msgid "Error log (rdp_e.txt)"
@@ -466,7 +466,7 @@ msgid ""
 "[Recommended: 640x480, 800x600, 1024x768]"
 msgstr ""
 "【ウインドウ表示時解像度】\n"
-"ウインドウ時の解像度を選択するオプションです。（3dfx製のビデオカードの場合はフルスクリーン時）\n"
+"ウインドウ表示時の解像度を選択するオプションです。（3dfx製のビデオカードの場合はフルスクリーン時）\n"
 "[推奨設定: 640x480, 800x600, 1024x768]"
 
 #: Config.cpp:490
@@ -483,7 +483,7 @@ msgstr ""
 msgid "Select a format, in which screen shots will be saved"
 msgstr ""
 "選択したフォーマットでスクリーンショットが保存されます。\n"
-"【BMP】がもっとも高画質です。"
+""
 
 #: Config.cpp:499
 msgid ""
@@ -516,7 +516,7 @@ msgid ""
 msgstr ""
 "【VI/s カウンタ】\n"
 "有効にすると画面左下にVI/sカウンタを表示します。 \n"
-"これはFPSカウンタに似ていますが、NTSCのゲームの場合 60 VI/s 、PALの場合は 50 VI/s がフルスピードとして測定されます。"
+"これはFPSカウンタに似ていますが、NTSCのゲームの場合 60 VI/s 、PALの場合は 50 VI/sがフルスピードに相当します。"
 
 #: Config.cpp:504
 #, c-format
@@ -527,7 +527,7 @@ msgid ""
 "[Recommended: your preference]"
 msgstr ""
 "【実機速度比】\n"
-"有効にすると画面左下にN64実機と比較してどのくらいの速度でエミュレート出来ているかを％表示します。"
+"有効にすると画面左下にN64実機との比較速度を％表示します。"
 
 #: Config.cpp:506
 msgid ""
@@ -550,8 +550,8 @@ msgid ""
 "If this is checked, all on-screen messages will have a transparent background.  Otherwise, it will have a solid black background.\n"
 "[Recommended: your preference]"
 msgstr ""
-"【画面表示を透過させる】\n"
-"有効にすると全ての画面表示が透過処理されます。無効の場合、黒背景上で表示されます。"
+"【背景透過テキスト表示】\n"
+"有効にするとテキスト表示の背景が透過処理されます。無効の場合、黒背景上で表示されます。"
 
 #: Config.cpp:513
 msgid ""
@@ -621,12 +621,12 @@ msgid ""
 "[Recommended: video card and game dependant]"
 msgstr ""
 "【フレームバッファオブジェクトを使用する】\n"
-"有効にすると、フレームバッファエフェクトのレンダリング方式としてOpenGLのフレームバッファオブジェクト拡張が使用されます。\n"
+"有効にすると、フレームバッファエフェクトのレンダリング方式としてOpenGLのフレームバッファオブジェクトが使用されます。\n"
 "このオプションは使用しているビデオカードとゲームタイトルに依存します。\n"
-"NVIDIA製のビデオカードは【無効】にしておくほうが良く、ATI製の場合は【有効】にしたほうが良いようです。\n"
-"また、いくつかのフレームバッファエフェクトは一つの方式でしか動かないので、その場合どちらのカードでも問題ありません。\n"
-"ほとんどの場合で、無効に設定するとエミュレーション精度が向上します。（例：バイオハザード2）.\n"
-"また有効に設定するとわずかにエミュレーション速度が向上するようです。\n"
+"NVIDIA製のビデオカードは【無効】ATI製は【有効】にしたほうが良いようですが、\n"
+"有効にしないと動作しないフレームバッファエフェクトがあります。またその逆もあります。\n"
+"有効にするとエミュレーション速度が向上するようです。\n"
+"無効にするとエミュレーション精度が向上します。（例：バイオハザード2）.\n"
 "[推奨設定： ビデオカードとゲームタイトルに依存]"
 
 #: Config.cpp:577
@@ -1031,8 +1031,8 @@ msgid ""
 "For older and badly designed texture packs it can cause unwanted black borders.\n"
 "[Recommended: texture pack dependant]"
 msgstr ""
-"【アルファチャンネルを全てに使用する】\n"
-"無効の場合、16ビットのRGBAテクスチャは RiceVideo 形式（1ビットをアルファチャンネルに使用）として読み込まれます。\n"
+"【高精度アルファチャンネルを使用する】\n"
+"無効の場合、16ビットのRGBAテクスチャは RiceVideo 形式（1ビットをアルファチャンネル使用）として読み込まれます。\n"
 "有効の場合、GlideHQ はハイレゾテクスチャがどのようにアルファチャンネルを使用しているかを検出してそのフォーマットに合わせるようにします。\n"
 "これはテクスチャデザイナーに、N64オリジナルのフォーマットに関係なく、自由にアルファチャンネルを使用させるものです。\n"
 "古かったりできの悪いテクスチャパックでは黒枠が表示される場合があります。\n"
