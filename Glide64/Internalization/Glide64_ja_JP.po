@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-22 08:12+1300\n"
-"PO-Revision-Date: 2010-06-09 02:00+0900\n"
-"Last-Translator: Spica <test@testmail.com>\n"
+"POT-Creation-Date: 2010-06-15 18:19+0700\n"
+"PO-Revision-Date: 2010-06-15 18:31+0700\n"
+"Last-Translator: Sergey V. Lipskiy <lipski@ac-sw.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -481,9 +481,7 @@ msgstr ""
 
 #: Config.cpp:492
 msgid "Select a format, in which screen shots will be saved"
-msgstr ""
-"選択したフォーマットでスクリーンショットが保存されます。\n"
-""
+msgstr "選択したフォーマットでスクリーンショットが保存されます。\n"
 
 #: Config.cpp:499
 msgid ""
@@ -697,7 +695,7 @@ msgid ""
 "Most N64 games use 4:3 aspect ratio, but some support widescreen too.\n"
 "You may select appropriate aspect here and set widescreen mode in game settings.\n"
 "In \"Stretch\" mode the output will be stretched to the entire screen,\n"
-"other modes may add black boarders if necessary"
+"other modes may add black borders if necessary"
 msgstr ""
 "【アスペクト比】\n"
 "多くのN64のゲームでは4:3の比率が使われていますが、ワイドスクリーンをサポートしているソフトも存在します。\n"
@@ -899,7 +897,7 @@ msgid ""
 "by the enhanced textures, will be greatly reduced.\n"
 "This minimizes texture RAM usage,\n"
 "decreasing the number of texture swaps to the GFX hardware leading to performance gains.\n"
-"However, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradtion of small size textures and color banding of gradient colored textures.\n"
+"However, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradation of small size textures and color banding of gradient colored textures.\n"
 "[Recommended: off]"
 msgstr ""
 "【テクスチャ圧縮を有効にする】\n"
@@ -930,7 +928,7 @@ msgstr ""
 #: Config.cpp:641
 msgid ""
 "Hi-res pack format:\n"
-"Chose which method is to be used for loading Hi-res texture packs.\n"
+"Choose which method is to be used for loading Hi-res texture packs.\n"
 "Only Rice's format is available currently.\n"
 "Leave on \"None\" if you will not be needing to load hi-res packs.\n"
 "[Recommended: Rice's format. Default: \"None\"]"
@@ -1191,15 +1189,15 @@ msgstr ""
 msgid "Glide64 settings"
 msgstr "Glide64 の設定"
 
-#: Config.cpp:1284
+#: Config.cpp:1289
 msgid "About Glide64"
 msgstr "Glide64 について"
 
-#: Config.cpp:1317
+#: Config.cpp:1322
 msgid "authors:"
 msgstr "開発チーム"
 
-#: Config.cpp:1321
+#: Config.cpp:1326
 msgid ""
 "Dave2001. Original author and former main developer.\n"
 "He founded Glide64 project on Dec. 29th, 2001.\n"
@@ -1209,39 +1207,39 @@ msgstr ""
 "He founded Glide64 project on Dec. 29th, 2001.\n"
 "Left the project at fall of 2002.\n"
 
-#: Config.cpp:1327
+#: Config.cpp:1332
 msgid ""
 "Gugaman. Developer. Joined the project at winter 2002\n"
 " and left it at fall 2002."
 msgstr ""
 "Gugaman. Developer. Joined the project at winter 2002\n"
 " and left it at fall 2002."
-
-#: Config.cpp:1333
-msgid ""
-"Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\n"
-"Main developer since fall of 2002."
-msgstr ""
-"Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\n"
-"Main developer since fall of 2002."
 
 #: Config.cpp:1338
+msgid ""
+"Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\n"
+"Main developer since fall of 2002."
+msgstr ""
+"Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\n"
+"Main developer since fall of 2002."
+
+#: Config.cpp:1343
 msgid "Hiroshi 'KoolSmoky' Morii, Joined the project in 2007. "
 msgstr "Hiroshi 'KoolSmoky' Morii, Joined the project in 2007. "
 
-#: Config.cpp:1341
+#: Config.cpp:1346
 msgid "Glitch64 (the wrapper) authors:"
 msgstr "Glitch64 (the wrapper) 開発チーム"
 
-#: Config.cpp:1365
+#: Config.cpp:1370
 msgid "GlideHQ author:"
 msgstr "GlideHQ 作者："
 
-#: Config.cpp:1372
+#: Config.cpp:1377
 msgid "beta tester:"
 msgstr "ベータテスター："
 
-#: Config.cpp:1379
+#: Config.cpp:1384
 msgid ""
 "special thanks to:\n"
 " Orkin, Rice, Daniel Borca, Legend.\n"
