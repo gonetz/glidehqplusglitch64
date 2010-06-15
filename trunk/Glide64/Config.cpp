@@ -588,7 +588,7 @@ void ConfigNotebook::set_properties()
     cmbLOD->SetToolTip(tooltip);
     cmbLOD->SetSelection(settings.lodmode);
     cmbAspect->SetSelection(settings.aspectmode);
-    tooltip = _("Aspect ratio of the output.\nMost N64 games use 4:3 aspect ratio, but some support widescreen too.\nYou may select appropriate aspect here and set widescreen mode in game settings.\nIn \"Stretch\" mode the output will be stretched to the entire screen,\nother modes may add black boarders if necessary");
+    tooltip = _("Aspect ratio of the output.\nMost N64 games use 4:3 aspect ratio, but some support widescreen too.\nYou may select appropriate aspect here and set widescreen mode in game settings.\nIn \"Stretch\" mode the output will be stretched to the entire screen,\nother modes may add black borders if necessary");
     cmbAspect->SetToolTip(tooltip);
     lblAspect->SetToolTip(tooltip);
     cbxFog->SetToolTip(_("Fog enabled\nSets fog emulation on//off.\n[Recommended: on]"));
@@ -632,13 +632,13 @@ void ConfigNotebook::set_properties()
     spinEnhCacheSize->SetValue(settings.ghq_cache_size);
     cbxEnhIgnoreBG->SetToolTip(_("Ignore Backgrounds:\nIt is used to skip enhancement for long narrow textures, usually used for backgrounds.\nThis may save texture memory greatly and increase performance.\n[Recommended: on (off for 'Store' mode)]"));
     cbxEnhIgnoreBG->SetValue(settings.ghq_enht_nobg>0);
-    tooltip = _("Texture compression:\nTextures will be compressed using selected texture compression method.\nThe overall compression ratio is about 1/6 for FXT1 and 1/4 for S3TC.\nIn addition to saving space on the texture cache,\nthe space occupied on the GFX hardware's texture RAM,\nby the enhanced textures, will be greatly reduced.\nThis minimizes texture RAM usage,\ndecreasing the number of texture swaps to the GFX hardware leading to performance gains.\nHowever, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradtion of small size textures and color banding of gradient colored textures.\n[Recommended: off]");
+    tooltip = _("Texture compression:\nTextures will be compressed using selected texture compression method.\nThe overall compression ratio is about 1/6 for FXT1 and 1/4 for S3TC.\nIn addition to saving space on the texture cache,\nthe space occupied on the GFX hardware's texture RAM,\nby the enhanced textures, will be greatly reduced.\nThis minimizes texture RAM usage,\ndecreasing the number of texture swaps to the GFX hardware leading to performance gains.\nHowever, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradation of small size textures and color banding of gradient colored textures.\n[Recommended: off]");
     cbxEnhTexCompression->SetToolTip(tooltip);
     cbxHrsTexCompression->SetToolTip(tooltip);
     cbxEnhTexCompression->SetValue(settings.ghq_enht_cmpr>0);
     cbxEnhCompressCache->SetToolTip(_("Compress texture cache:\nMemory will be compressed so that more textures can be held in the texture cache.\nThe compression ratio varies with each texture,\nbut 1/5 of the original size would be a modest approximation.\nThey will be decompressed on-the-fly, before being downloaded to the gfx hardware.\nThis option will still help save memory space even when using texture compression.\n[Recommended: on]"));
     cbxEnhCompressCache->SetValue(settings.ghq_enht_gz>0);
-    tooltip = _("Hi-res pack format:\nChose which method is to be used for loading Hi-res texture packs.\nOnly Rice's format is available currently.\nLeave on \"None\" if you will not be needing to load hi-res packs.\n[Recommended: Rice's format. Default: \"None\"]");
+    tooltip = _("Hi-res pack format:\nChoose which method is to be used for loading Hi-res texture packs.\nOnly Rice's format is available currently.\nLeave on \"None\" if you will not be needing to load hi-res packs.\n[Recommended: Rice's format. Default: \"None\"]");
     lblHrsFormat->SetToolTip(tooltip);
     cmbHrsFormat->SetToolTip(tooltip);
     cmbHrsFormat->SetSelection(settings.ghq_hirs);
