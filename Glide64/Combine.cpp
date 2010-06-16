@@ -3132,14 +3132,15 @@ static void cc_t0_mul_prima_mul_shade ()
   USE_T0 ();
 }
 
-static void cc_t0_mul_one_sub_prim_mul_shade ()
+static void cc_t1_mul__one_sub_prim_mul_shade_add_prim ()
 {
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
     GR_COMBINE_FACTOR_LOCAL,
     GR_COMBINE_LOCAL_ITERATED,
     GR_COMBINE_OTHER_TEXTURE);
   MULSHADE_1MPRIM ();
-  USE_T0 ();
+  ADDSHADE_PRIM ();
+  USE_T1 ();
 }
 
 static void cc_t0_mul_one_sub_env_mul_shade ()
@@ -10778,7 +10779,7 @@ static COMBINER color_cmb_list[] = {
   {0x64356435, cc_env_sub_prim_mul_shade_add_prim},
   // xg2. Added by Gonetz
   // (1-prim)*shade+prim, (t0-0)*cmb+0  ** INC **
-  {0x6436e0f1, cc_t0_mul_one_sub_prim_mul_shade},
+  {0x6436e0f1, cc_t1_mul__one_sub_prim_mul_shade_add_prim},
   // Intro, CBFD. Added by Gonetz
   // (t0-env)*shade+prim
   {0x64516451, cc_t0_sub_env_mul_shade_add_prim},

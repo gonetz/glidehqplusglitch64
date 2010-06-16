@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-22 08:12+1300\n"
+"POT-Creation-Date: 2010-06-15 18:19+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -645,7 +645,7 @@ msgid ""
 "You may select appropriate aspect here and set widescreen mode in game "
 "settings.\n"
 "In \"Stretch\" mode the output will be stretched to the entire screen,\n"
-"other modes may add black boarders if necessary"
+"other modes may add black borders if necessary"
 msgstr ""
 
 #: Config.cpp:594
@@ -800,7 +800,7 @@ msgid ""
 "decreasing the number of texture swaps to the GFX hardware leading to "
 "performance gains.\n"
 "However, due to the nature of lossy compression of FXT1 and S3TC, using this "
-"option can sometimes lead to quality degradtion of small size textures and "
+"option can sometimes lead to quality degradation of small size textures and "
 "color banding of gradient colored textures.\n"
 "[Recommended: off]"
 msgstr ""
@@ -822,7 +822,7 @@ msgstr ""
 #: Config.cpp:641
 msgid ""
 "Hi-res pack format:\n"
-"Chose which method is to be used for loading Hi-res texture packs.\n"
+"Choose which method is to be used for loading Hi-res texture packs.\n"
 "Only Rice's format is available currently.\n"
 "Leave on \"None\" if you will not be needing to load hi-res packs.\n"
 "[Recommended: Rice's format. Default: \"None\"]"
@@ -1061,50 +1061,50 @@ msgstr ""
 msgid "Glide64 settings"
 msgstr ""
 
-#: Config.cpp:1284
+#: Config.cpp:1289
 msgid "About Glide64"
 msgstr ""
 
-#: Config.cpp:1317
+#: Config.cpp:1322
 msgid "authors:"
 msgstr ""
 
-#: Config.cpp:1321
+#: Config.cpp:1326
 msgid ""
 "Dave2001. Original author and former main developer.\n"
 "He founded Glide64 project on Dec. 29th, 2001.\n"
 "Left the project at fall of 2002.\n"
 msgstr ""
 
-#: Config.cpp:1327
+#: Config.cpp:1332
 msgid ""
 "Gugaman. Developer. Joined the project at winter 2002\n"
 " and left it at fall 2002."
 msgstr ""
 
-#: Config.cpp:1333
+#: Config.cpp:1338
 msgid ""
 "Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\n"
 "Main developer since fall of 2002."
 msgstr ""
 
-#: Config.cpp:1338
+#: Config.cpp:1343
 msgid "Hiroshi 'KoolSmoky' Morii, Joined the project in 2007. "
 msgstr ""
 
-#: Config.cpp:1341
+#: Config.cpp:1346
 msgid "Glitch64 (the wrapper) authors:"
 msgstr ""
 
-#: Config.cpp:1365
+#: Config.cpp:1370
 msgid "GlideHQ author:"
 msgstr ""
 
-#: Config.cpp:1372
+#: Config.cpp:1377
 msgid "beta tester:"
 msgstr ""
 
-#: Config.cpp:1379
+#: Config.cpp:1384
 msgid ""
 "special thanks to:\n"
 " Orkin, Rice, Daniel Borca, Legend.\n"
