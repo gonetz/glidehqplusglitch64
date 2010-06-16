@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-03-22 08:12+1300\n"
-"PO-Revision-Date: 2010-03-22 23:22+1300\n"
-"Last-Translator: Gonetz <gonetz@ngs.ru>\n"
+"POT-Creation-Date: 2010-06-15 18:19+0700\n"
+"PO-Revision-Date: 2010-06-15 18:40+0700\n"
+"Last-Translator: Sergey V. Lipskiy <lipski@ac-sw.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -721,7 +721,7 @@ msgid ""
 "Most N64 games use 4:3 aspect ratio, but some support widescreen too.\n"
 "You may select appropriate aspect here and set widescreen mode in game settings.\n"
 "In \"Stretch\" mode the output will be stretched to the entire screen,\n"
-"other modes may add black boarders if necessary"
+"other modes may add black borders if necessary"
 msgstr ""
 "Соотношение размеров кадра.\n"
 "Большинство игр на N64 используют соотношение размеров кадра 4:3,\n"
@@ -937,7 +937,7 @@ msgid ""
 "by the enhanced textures, will be greatly reduced.\n"
 "This minimizes texture RAM usage,\n"
 "decreasing the number of texture swaps to the GFX hardware leading to performance gains.\n"
-"However, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradtion of small size textures and color banding of gradient colored textures.\n"
+"However, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradation of small size textures and color banding of gradient colored textures.\n"
 "[Recommended: off]"
 msgstr ""
 "Компрессия текстур:\n"
@@ -971,7 +971,7 @@ msgstr ""
 #: Config.cpp:641
 msgid ""
 "Hi-res pack format:\n"
-"Chose which method is to be used for loading Hi-res texture packs.\n"
+"Choose which method is to be used for loading Hi-res texture packs.\n"
 "Only Rice's format is available currently.\n"
 "Leave on \"None\" if you will not be needing to load hi-res packs.\n"
 "[Recommended: Rice's format. Default: \"None\"]"
@@ -1230,15 +1230,15 @@ msgstr ""
 msgid "Glide64 settings"
 msgstr "Настройки Glide64"
 
-#: Config.cpp:1284
+#: Config.cpp:1289
 msgid "About Glide64"
 msgstr "Сведения о Glide64"
 
-#: Config.cpp:1317
+#: Config.cpp:1322
 msgid "authors:"
 msgstr "авторы:"
 
-#: Config.cpp:1321
+#: Config.cpp:1326
 msgid ""
 "Dave2001. Original author and former main developer.\n"
 "He founded Glide64 project on Dec. 29th, 2001.\n"
@@ -1248,7 +1248,7 @@ msgstr ""
 "проекта. Основал проект Glide64 29 Декабря, 2001 г.\n"
 "Покинул проект осенью 2002.\n"
 
-#: Config.cpp:1327
+#: Config.cpp:1332
 msgid ""
 "Gugaman. Developer. Joined the project at winter 2002\n"
 " and left it at fall 2002."
@@ -1256,7 +1256,7 @@ msgstr ""
 "Gugaman. Разработчик. Пришёл в проект зимой 2002 г.,\n"
 "покинул проект осенью 2002 г."
 
-#: Config.cpp:1333
+#: Config.cpp:1338
 msgid ""
 "Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\n"
 "Main developer since fall of 2002."
@@ -1264,23 +1264,23 @@ msgstr ""
 "Сергей 'Gonetz' Липский. Пришёл в проект зимой 2002 г.\n"
 "Основной разработчик с осени 2002 г."
 
-#: Config.cpp:1338
+#: Config.cpp:1343
 msgid "Hiroshi 'KoolSmoky' Morii, Joined the project in 2007. "
 msgstr "Hiroshi 'KoolSmoky' Morii, пришёл в проект в 2007 г. "
 
-#: Config.cpp:1341
+#: Config.cpp:1346
 msgid "Glitch64 (the wrapper) authors:"
 msgstr "авторы Glitch64 (glide3x wrapper):"
 
-#: Config.cpp:1365
+#: Config.cpp:1370
 msgid "GlideHQ author:"
 msgstr "автор GlideHQ:"
 
-#: Config.cpp:1372
+#: Config.cpp:1377
 msgid "beta tester:"
 msgstr "бета тестер:"
 
-#: Config.cpp:1379
+#: Config.cpp:1384
 msgid ""
 "special thanks to:\n"
 " Orkin, Rice, Daniel Borca, Legend.\n"
@@ -1294,10 +1294,8 @@ msgstr ""
 
 #~ msgid "Gfx cannot be drawn in windowed mode"
 #~ msgstr "Плагин не может выводить графику в оконном режиме"
-
 #~ msgid "Press Alt+Enter to switch to fullscreen"
 #~ msgstr "Нажмите Alt+Enter для переключения в оконный режим."
-
 #~ msgid ""
 #~ "Buffer clear on every frame\n"
 #~ "If this option is checked, the buffer will be cleared (screen initialized "
@@ -1310,3 +1308,4 @@ msgstr ""
 #~ "Очистка буфера каждого кадра\n"
 #~ "Если включено, буфер кадра будет очищаться (заливаться чёрным)\n"
 #~ "в начале отрисовки каждого кадра. "
+
