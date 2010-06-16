@@ -499,10 +499,10 @@ typedef enum {
 typedef struct
 {
 	wxUint32 addr;   //color image address
-	wxUint32 format;
-	wxUint32 size;
-	wxUint32 width;
-	wxUint32 height;
+	wxUint8 format;
+	wxUint8 size;
+	wxUint16 width;
+	wxUint16 height;
 	CI_STATUS status;
 	int   changed;
 } COLOR_IMAGE;
@@ -515,7 +515,8 @@ typedef struct
 	wxUint32 tex_addr; //address in video memory
 	wxUint32 width;    //width of color image
 	wxUint32 height;   //height of color image
-	wxUint16 format;   //format of color image
+	wxUint8  format;   //format of color image
+	wxUint8  size;   //format of color image
 	wxUint8  clear;  //flag. texture buffer must be cleared
 	wxUint8  drawn;  //flag. if equal to 1, this image was already drawn in current frame
 	wxUint32 crc; //checksum of the color image

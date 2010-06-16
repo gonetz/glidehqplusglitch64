@@ -46,6 +46,24 @@
 #include "TexBuffer.h"
 #include "CRC.h"
 
+static wxUint32 CalcCRC(const TBUFF_COLOR_IMAGE * pTCI)
+{
+  wxUint32 result = 0;
+  if (settings.fb_crc_mode == SETTINGS::fbcrcFast)
+    result = *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
+  else if (settings.fb_crc_mode == SETTINGS::fbcrcSafe)
+  {
+    wxUint8 * pSrc = gfx.RDRAM + pTCI->addr;
+    const wxUint32 nSize = pTCI->end_addr-pTCI->addr;
+    result = CRC32(0xFFFFFFFF, pSrc, 32);
+    result = CRC32(result, pSrc + (nSize>>1), 32);
+    result = CRC32(result, pSrc + nSize - 32, 32);
+  }
+  return result;
+
+  //return *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
+}
+
 static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
 {
   TBUFF_COLOR_IMAGE texbuf;
@@ -53,7 +71,8 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.end_addr = cimage.addr + ((cimage.width*cimage.height)<<cimage.size>>1);
   texbuf.width = cimage.width;
   texbuf.height = cimage.height;
-  texbuf.format = (wxUint16)cimage.format;
+  texbuf.format = cimage.format;
+  texbuf.size = cimage.size;
   texbuf.scr_width = min(cimage.width * rdp.scale_x, settings.scr_res_x);
   float height = min(rdp.vi_height,cimage.height);
   if (cimage.status == ci_copy_self || (cimage.status == ci_copy && cimage.width == rdp.frame_buffers[rdp.main_ci_index].width))
@@ -216,7 +235,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   wxUint32 addr = cimage.addr;
   if ((settings.hacks&hack_Banjo2) && cimage.status == ci_copy_self)
     addr = rdp.frame_buffers[rdp.copy_ci_index].addr;
-  wxUint32 end_addr = addr + cimage.width*cimage.height*cimage.size;
+  wxUint32 end_addr = addr + ((cimage.width*cimage.height)<<cimage.size>>1);
   if (rdp.motionblur)
   {
 //    if (cimage.format != 0)
@@ -320,6 +339,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   }
 
   rdp.acc_tex_buf = rdp.cur_tex_buf;
+  texbuf->crc = (settings.frame_buffer&fb_ref) ? 0 : CalcCRC(texbuf);
   rdp.cur_image = texbuf;
   grRenderBuffer( GR_BUFFER_TEXTUREBUFFER_EXT );
   grTextureBufferExt( rdp.cur_image->tmu, rdp.cur_image->tex_addr, rdp.cur_image->info.smallLodLog2, rdp.cur_image->info.largeLodLog2,
@@ -475,9 +495,10 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
 {
   if (!fullscreen)
     return FALSE;
-  RDP("CopyTextureBuffer. ");
+  FRDP("CopyTextureBuffer from %08x to %08x\n", fb_from.addr, fb_to.addr);
   if (rdp.cur_image)
   {
+    rdp.cur_image->crc = 0;
     if (rdp.cur_image->addr == fb_to.addr)
       return CloseTextureBuffer(TRUE);
     rdp.tbuff_tex = rdp.cur_image;
@@ -492,6 +513,7 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
     RDP("Can't open new buffer.\n");
     return CloseTextureBuffer(TRUE);
   }
+  rdp.tbuff_tex->crc = 0;
   GrTextureFormat_t buf_format = rdp.tbuff_tex->info.format;
   rdp.tbuff_tex->info.format = GR_TEXFMT_RGB_565;
   TexBufSetupCombiner(TRUE);
@@ -667,24 +689,6 @@ int SwapTextureBuffer()
   return TRUE;
 }
 
-inline wxUint32 CalcCRC(TBUFF_COLOR_IMAGE * pTCI)
-{
-  wxUint32 result = 0;
-  if (settings.fb_crc_mode == SETTINGS::fbcrcFast)
-    result = *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
-  else if (settings.fb_crc_mode == SETTINGS::fbcrcSafe)
-  {
-    wxUint8 * pSrc = gfx.RDRAM + pTCI->addr;
-    const wxUint32 nSize = pTCI->end_addr-pTCI->addr;
-    result = CRC32(0xFFFFFFFF, pSrc, 32);
-    result = CRC32(result, pSrc + (nSize>>1), 32);
-    result = CRC32(result, pSrc + nSize - 32, 32);
-  }
-  return result;
-
-  //return *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
-}
-
 int FindTextureBuffer(wxUint32 addr, wxUint16 width)
 {
   if (rdp.skip_drawing)
@@ -741,7 +745,7 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
       rdp.tbuff_tex->v_shift = 0;
       rdp.tbuff_tex->u_shift = 0;
     }
-    FRDP("FindTextureBuffer, found, u_shift: %d,  v_shift: %d, format: %d\n", rdp.tbuff_tex->u_shift, rdp.tbuff_tex->v_shift, rdp.tbuff_tex->info.format);
+    FRDP("FindTextureBuffer, found, u_shift: %d,  v_shift: %d, format: %s\n", rdp.tbuff_tex->u_shift, rdp.tbuff_tex->v_shift, str_format[rdp.tbuff_tex->format]);
     //FRDP("Buffer, addr=%08lx, end_addr=%08lx, width: %d, height: %d\n", rdp.tbuff_tex->addr, rdp.tbuff_tex->end_addr, rdp.tbuff_tex->width, rdp.tbuff_tex->height);
     return TRUE;
   }

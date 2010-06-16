@@ -2187,9 +2187,14 @@ static void rdp_settile()
       {
         if (rdp.aTBuffTex[i]->t_mem == tile->t_mem)
         {
-          rdp.aTBuffTex[i]->tile = rdp.last_tile;
-          rdp.aTBuffTex[i]->info.format = tile->format == 0 ? GR_TEXFMT_RGB_565 : GR_TEXFMT_ALPHA_INTENSITY_88;
-          FRDP("rdp.aTBuffTex[%d] tile=%d, format=%s\n", i, rdp.last_tile, tile->format == 0 ? "RGB565" : "Alpha88");
+          if (rdp.aTBuffTex[i]->size == tile->size)
+          {
+            rdp.aTBuffTex[i]->tile = rdp.last_tile;
+            rdp.aTBuffTex[i]->info.format = tile->format == 0 ? GR_TEXFMT_RGB_565 : GR_TEXFMT_ALPHA_INTENSITY_88;
+            FRDP("rdp.aTBuffTex[%d] tile=%d, format=%s\n", i, rdp.last_tile, tile->format == 0 ? "RGB565" : "Alpha88");
+          }
+          else
+            rdp.aTBuffTex[i] = 0;
           break;
         }
         else if (rdp.aTBuffTex[i]->tile == rdp.last_tile) //wrong! t_mem must be the same

@@ -118,7 +118,7 @@ static void fb_setscissor()
     rdp.scissor_o.ul_x = (wxUint32)(((rdp.cmd0 & 0x00FFF000) >> 14));
     rdp.scissor_o.lr_x = (wxUint32)(((rdp.cmd1 & 0x00FFF000) >> 14));
     COLOR_IMAGE & cur_fb = rdp.frame_buffers[rdp.ci_count-1];
-    if (rdp.scissor_o.lr_x - rdp.scissor_o.ul_x > (cur_fb.width >> 1))
+    if ((wxUint16)(rdp.scissor_o.lr_x - rdp.scissor_o.ul_x) > (cur_fb.width >> 1))
     {
       if (cur_fb.height == 0 || (cur_fb.width >= rdp.scissor_o.lr_x-1 && cur_fb.width <= rdp.scissor_o.lr_x+1)) 
         cur_fb.height = rdp.scissor_o.lr_y;
