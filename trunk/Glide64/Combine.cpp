@@ -9565,15 +9565,25 @@ static void ac__t0_inter_t1_using_enva__mul_primlod ()
   A_T0_INTER_T1_USING_FACTOR (factor);
 }
 
-static void ac__t0_inter_t1_using_enva__mul_prim_mul_shade ()
+static void ac__t1_mul_enva_add_t0__sub_prim_mul_shade ()
 {
-  ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
-    GR_COMBINE_FACTOR_LOCAL,
-    GR_COMBINE_LOCAL_ITERATED,
-    GR_COMBINE_OTHER_TEXTURE);
-  MULSHADE_A_PRIM ();
-  wxUint8 factor = (wxUint8)(rdp.env_color&0xFF);
-  A_T0_INTER_T1_USING_FACTOR (factor);
+  if (cmb.combine_ext)
+  {
+    ACMBEXT(GR_CMBX_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_ALPHA, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ITALPHA, 0,
+      GR_CMBX_ZERO, 0);
+    CA_PRIM ();
+  }
+  else
+  {
+    ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
+      GR_COMBINE_FACTOR_LOCAL,
+      GR_COMBINE_LOCAL_ITERATED,
+      GR_COMBINE_OTHER_TEXTURE);
+    MULSHADE_A_PRIM ();
+  }
+  A_T1_MUL_ENVA_ADD_T0 ();
 }
 
 //Added by Gonetz
@@ -12360,7 +12370,7 @@ static COMBINER alpha_cmb_list[] = {
   {0x037a0ef8, ac__t1_mul_enva_add_t0__mul_prim},
   // Scary face move, pokemon stadium 2
   // (t1-0)*env+t0, (cmb-prim)*shade+0
-  {0x037a0f18, ac__t0_inter_t1_using_enva__mul_prim_mul_shade},
+  {0x037a0f18, ac__t1_mul_enva_add_t0__sub_prim_mul_shade},
   // Saria's song, zelda
   // (t1-0)*env+t0, (cmb-0)*shade+0
   {0x037a0f38, ac__t1_mul_enva_add_t0__mul_shade},
