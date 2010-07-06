@@ -7254,6 +7254,35 @@ static void cc__prim_inter_env_using_t0__mul_shade ()
   USE_T0 ();
 }
 
+static void cc__prim_inter_one_using_env__mul_shade ()
+{
+  // (one-prim)*env+prim, (cmb-0)*shade+0
+  if ((rdp.prim_color&0xFFFFFF00) == 0)
+  {
+    cc_env_mul_shade ();
+    return;
+  }
+  if ((rdp.env_color&0xFFFFFF00) == 0)
+  {
+    cc_prim_mul_shade ();
+    return;
+  }
+  if ((rdp.prim_color&0xFFFFFF00) == 0xFFFFFF00 || (rdp.env_color&0xFFFFFF00) == 0xFFFFFF00)
+  {
+    cc_shade ();
+    return;
+  }
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_LOCAL,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_CONSTANT);
+  CC_1SUBPRIM ();
+  CC_C1MULC2 (cmb.ccolor, rdp.env_color);
+  cmb.ccolor=(wxUint8)( min(255, (int)((cmb.ccolor & 0xFF000000) >> 24) + (int)((rdp.prim_color & 0xFF000000) >> 24)) ) << 24 |
+  (wxUint8)( min(255, (int)((cmb.ccolor & 0x00FF0000) >> 16) + (int)((rdp.prim_color & 0x00FF0000) >> 16)) ) << 16 | 
+  (wxUint8)( min(255, (int)((cmb.ccolor & 0x0000FF00) >>  8) + (int)((rdp.prim_color & 0x0000FF00) >>  8)) ) <<  8 ;
+}
+
 static void cc__env_inter_prim_using_t0a__mul_t0 ()
 {
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
@@ -10750,8 +10779,8 @@ static COMBINER color_cmb_list[] = {
   //    {0x6531e4f0, cc_t0_mul_env_mul_shade},
   {0x6531e4f0, cc__prim_inter_t0_using_env__mul_shade},
   // Dragonfly feet, banjo kazooie
-  // (1-prim)*env+prim, (cmb-0)*shade+0       ** INC **
-  {0x6536e4f0, cc_env_mul_shade},
+  // (1-prim)*env+prim, (cmb-0)*shade+0
+  {0x6536e4f0, cc__prim_inter_one_using_env__mul_shade},
   // Lava piranha atack, Paper Mario
   // (t1-k4)*env+prim       ** INC **
   {0x65726572, cc_t1_mul_env_add_prim},
