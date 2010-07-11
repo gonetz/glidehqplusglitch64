@@ -224,113 +224,33 @@ void rdp_reset ()
 {
   reset = 1;
 
-  rdp.model_i = 0;
-  rdp.LLE = FALSE;
-
-  rdp.n_cached[0] = 0;
-  rdp.n_cached[1] = 0;
-  rdp.cur_cache[0] = 0;
-  rdp.cur_cache[1] = 0;
-  rdp.c_a0  = 0;
-  rdp.c_b0  = 0;
-  rdp.c_c0  = 0;
-  rdp.c_d0  = 0;
-  rdp.c_Aa0 = 0;
-  rdp.c_Ab0 = 0;
-  rdp.c_Ac0 = 0;
-  rdp.c_Ad0 = 0;
-
-  rdp.c_a1  = 0;
-  rdp.c_b1  = 0;
-  rdp.c_c1  = 0;
-  rdp.c_d1  = 0;
-  rdp.c_Aa1 = 0;
-  rdp.c_Ab1 = 0;
-  rdp.c_Ac1 = 0;
-  rdp.c_Ad1 = 0;
-
-  rdp.K4 = rdp.K5 = 0;
-  rdp.SCALE = rdp.CENTER = 0;
-
-  int i;
-  // Clear the palette CRC
-  for (i=0; i<16; i++)
-    rdp.pal_8_crc[i] = 0;
-
-  // Clear the palettes
-  for (i=0; i<256; i++)
-    rdp.pal_8[i] = 0;
-
-#ifdef TEXTURE_FILTER
-  for (i=0; i<512; i++)
-    rdp.pal_8_rice[i] = 0;
-#endif
-
-  rdp.tlut_mode = 0;
-
-  // Clear all segments ** VERY IMPORTANT FOR ZELDA **
-  for (i=0; i<16; i++)
-    rdp.segment[i] = 0;
-
-  for (i=0; i<512; i++)
-    rdp.addr[i] = 0;
+  //clear the structure
+  memset(&rdp.vi_width, 0, sizeof(rdp)-sizeof(rdp.RomName));
 
   // set all vertex numbers
-  for (i=0; i<MAX_VTX; i++)
+  for (int i=0; i<MAX_VTX; i++)
     rdp.vtx[i].number = i;
 
   rdp.scissor_o.ul_x = 0;
   rdp.scissor_o.ul_y = 0;
   rdp.scissor_o.lr_x = 320;
   rdp.scissor_o.lr_y = 240;
-  rdp.num_lights = 0;
   rdp.lookat[0][0] = rdp.lookat[1][1] = 1.0f;
   rdp.lookat[0][1] = rdp.lookat[0][2] = rdp.lookat[1][0] = rdp.lookat[1][2] = 0.0f;
-  rdp.texrecting = 0;
-  rdp.rm = 0;
-  rdp.render_mode_changed = 0;
-  rdp.othermode_h = 0;
-  rdp.othermode_l = 0;
 
-  rdp.tex_ctr = 0;
-
-  rdp.tex = 0;
-
-  rdp.cimg = 0;
-  rdp.ocimg = 0;
-  rdp.zimg = 0;
-  rdp.ci_width = 0;
-  rdp.ci_size = 0;
   rdp.cycle_mode = 2;
-  rdp.persp_supported = FALSE;
-  rdp.force_wrap = FALSE;
-
   rdp.allow_combine = 1;
   rdp.fog_mode = RDP::fog_enabled;
-  rdp.skip_drawing = FALSE;
-
-  memset(rdp.frame_buffers, 0, sizeof(rdp.frame_buffers));
-  rdp.main_ci_index = 0;
   rdp.maincimg[0].addr = rdp.maincimg[1].addr = rdp.last_drawn_ci_addr = 0x7FFFFFFF;
-  rdp.read_previous_ci = FALSE;
-  rdp.cur_tex_buf = 0;
-  rdp.acc_tex_buf = 0;
-  rdp.cur_image = 0;
-  rdp.tbuff_tex = 0;
 
   hotkey_info.hk_ref = 90;
   hotkey_info.hk_motionblur = (settings.buff_clear == 0)?0:90;
   hotkey_info.hk_filtering = hotkey_info.hk_motionblur;
 
-  rdp.offset_x_bak = 0;
-  rdp.offset_y_bak = 0;
-
   CheckKeyPressed(G64_VK_BACK, 1); //BACK
   CheckKeyPressed(G64_VK_B, 1);
   CheckKeyPressed(G64_VK_V, 1);
 
-  for (i = 0; i < voodoo.num_tmu; i++)
-    rdp.texbufs[i].count = 0;
   rdp.vi_org_reg = *gfx.VI_ORIGIN_REG;
   rdp.view_scale[0] = 0.0f;
   rdp.view_scale[1] = 0.0f;
