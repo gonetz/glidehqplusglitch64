@@ -308,6 +308,7 @@ void rdp_reset ()
   rdp.allow_combine = 1;
   rdp.fog_mode = RDP::fog_enabled;
   rdp.skip_drawing = FALSE;
+  rdp.flags = 0;
 
   memset(rdp.frame_buffers, 0, sizeof(rdp.frame_buffers));
   rdp.main_ci_index = 0;
