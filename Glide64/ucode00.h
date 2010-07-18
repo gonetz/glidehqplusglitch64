@@ -219,7 +219,7 @@ void modelview_push ()
   if (rdp.model_i == rdp.model_stack_size)
   {
     RDP_E ("** Model matrix stack overflow ** too many pushes\n");
-    RDP ("** Model matrix stack overflow ** too many pushes\n");
+    LRDP("** Model matrix stack overflow ** too many pushes\n");
     return;
   }
   
@@ -236,7 +236,7 @@ void modelview_pop (int num = 1)
   else
   {
     RDP_E ("** Model matrix stack error ** too many pops\n");
-    RDP ("** Model matrix stack error ** too many pops\n");
+    LRDP("** Model matrix stack error ** too many pops\n");
     return;
   }
   memcpy (rdp.model, rdp.model_stack[rdp.model_i], 64);
@@ -291,7 +291,7 @@ void load_matrix (float m[4][4], wxUint32 addr)
 //
 static void uc0_matrix()
 {
-  RDP("uc0:matrix ");
+  LRDP("uc0:matrix ");
   
   // Use segment offset to get the address
   wxUint32 addr = segoffset(rdp.cmd1) & 0x00FFFFFF;
@@ -303,35 +303,35 @@ static void uc0_matrix()
   switch (command)
   {
   case 0: // modelview mul nopush
-    RDP ("modelview mul\n");
+    LRDP("modelview mul\n");
     modelview_mul (m);
     break;
     
   case 1: // projection mul nopush
   case 5: // projection mul push, can't push projection
-    RDP ("projection mul\n");
+    LRDP("projection mul\n");
     projection_mul (m);
     break;
     
   case 2: // modelview load nopush
-    RDP ("modelview load\n");
+    LRDP("modelview load\n");
     modelview_load (m);
     break;
     
   case 3: // projection load nopush
   case 7: // projection load push, can't push projection
-    RDP ("projection load\n");
+    LRDP("projection load\n");
     projection_load (m);
     
     break;
     
   case 4: // modelview mul push
-    RDP ("modelview mul push\n");
+    LRDP("modelview mul push\n");
     modelview_mul_push (m);
     break;
     
   case 6: // modelview load push
-    RDP ("modelview load push\n");
+    LRDP("modelview load push\n");
     modelview_load_push (m);
     break;
     
@@ -361,7 +361,7 @@ static void uc0_matrix()
 //
 static void uc0_movemem()
 {
-  RDP("uc0:movemem ");
+  LRDP("uc0:movemem ");
   
   wxUint32 i,a;
   
@@ -480,17 +480,17 @@ static void uc0_movemem()
     //next 3 command should never appear since they will be skipped in previous command
   case 0x98:
     RDP_E ("uc0:movemem matrix 0 - ERROR!\n");
-    RDP ("matrix 0 - IGNORED\n");
+    LRDP("matrix 0 - IGNORED\n");
     break;
     
   case 0x9A:
     RDP_E ("uc0:movemem matrix 1 - ERROR!\n");
-    RDP ("matrix 1 - IGNORED\n");
+    LRDP("matrix 1 - IGNORED\n");
     break;
     
   case 0x9C:
     RDP_E ("uc0:movemem matrix 2 - ERROR!\n");
-    RDP ("matrix 2 - IGNORED\n");
+    LRDP("matrix 2 - IGNORED\n");
     break;
     
   default:
@@ -507,7 +507,7 @@ static void uc0_displaylist()
   wxUint32 addr = segoffset(rdp.cmd1) & 0x00FFFFFF;
   
   // This fixes partially Gauntlet: Legends
-  if (addr == rdp.pc[rdp.pc_i] - 8) { RDP ("display list not executed!\n"); return; }
+  if (addr == rdp.pc[rdp.pc_i] - 8) { LRDP("display list not executed!\n"); return; }
   
   wxUint32 push = (rdp.cmd0 >> 16) & 0xFF; // push the old location?
   
@@ -519,7 +519,7 @@ static void uc0_displaylist()
   case 0: // push
     if (rdp.pc_i >= 9) {
       RDP_E ("** DL stack overflow **");
-      RDP ("** DL stack overflow **\n");
+      LRDP("** DL stack overflow **\n");
       return;
     }
     rdp.pc_i ++;  // go to the next PC in the stack
@@ -532,7 +532,7 @@ static void uc0_displaylist()
     
   default:
     RDP_E("Unknown displaylist operation\n");
-    RDP ("Unknown displaylist operation\n");
+    LRDP("Unknown displaylist operation\n");
   }
 }
 
@@ -571,11 +571,11 @@ static void uc0_tri1()
 //
 static void uc0_enddl()
 {
-  RDP("uc0:enddl\n");
+  LRDP("uc0:enddl\n");
   
   if (rdp.pc_i == 0)
   {
-    RDP ("RDP end\n");
+    LRDP("RDP end\n");
     
     // Halt execution here
     rdp.halt = 1;
@@ -613,13 +613,13 @@ static void uc0_culldl()
       return;
   }
   
-  RDP (" - ");  // specify that the enddl is not a real command
+  LRDP(" - ");  // specify that the enddl is not a real command
   uc0_enddl ();
 }
 
 static void uc0_popmatrix()
 {
-  RDP("uc0:popmatrix\n");
+  LRDP("uc0:popmatrix\n");
   
   wxUint32 param = rdp.cmd1;
   
@@ -708,7 +708,7 @@ static void uc0_modifyvtx(wxUint8 where, wxUint16 vtx, wxUint32 val)
     break;
     
   default:
-    RDP("UNKNOWN\n");
+    LRDP("UNKNOWN\n");
     break;
   }
 }
@@ -718,14 +718,14 @@ static void uc0_modifyvtx(wxUint8 where, wxUint16 vtx, wxUint32 val)
 //
 static void uc0_moveword()
 {
-  RDP("uc0:moveword ");
+  LRDP("uc0:moveword ");
   
   // Find which command this is (lowest byte of cmd0)
   switch (rdp.cmd0 & 0xFF)
   {
   case 0x00:
     RDP_E ("uc0:moveword matrix - IGNORED\n");
-    RDP ("matrix - IGNORED\n");
+    LRDP("matrix - IGNORED\n");
     break;
     
   case 0x02:
@@ -782,7 +782,7 @@ static void uc0_moveword()
     break;
     
   case 0x0e:
-    RDP ("perspnorm - IGNORED\n");
+    LRDP("perspnorm - IGNORED\n");
     break;
     
   default:
@@ -820,7 +820,7 @@ static void uc0_texture()
   }
   else
   {
-    RDP("uc0:texture skipped b/c of off\n");
+    LRDP("uc0:texture skipped b/c of off\n");
     rdp.tiles[tile].on = 0;
   }
 }
@@ -828,7 +828,7 @@ static void uc0_texture()
 
 static void uc0_setothermode_h()
 {
-  RDP ("uc0:setothermode_h: ");
+  LRDP("uc0:setothermode_h: ");
   
   int shift, len;
   if ((settings.ucode == ucode_F3DEX2) || (settings.ucode == ucode_CBFD))
@@ -893,7 +893,7 @@ static void uc0_setothermode_h()
 
 static void uc0_setothermode_l()
 {
-  RDP("uc0:setothermode_l ");
+  LRDP("uc0:setothermode_l ");
   
   int shift, len;
   if ((settings.ucode == ucode_F3DEX2) || (settings.ucode == ucode_CBFD))
@@ -1044,7 +1044,7 @@ static void uc0_tri4 ()
   // c0: 0000 0123, c1: 456789ab
   // becomes: 405 617 829 a3b
   
-  RDP ("uc0:tri4");
+  LRDP("uc0:tri4");
   FRDP(" #%d, #%d, #%d, #%d - %d, %d, %d - %d, %d, %d - %d, %d, %d - %d, %d, %d\n", rdp.tri_n, rdp.tri_n+1, rdp.tri_n+2, rdp.tri_n+3,
     (rdp.cmd1 >> 28) & 0xF,
     (rdp.cmd0 >> 12) & 0xF,

@@ -47,7 +47,7 @@ wxUint32 pd_col_addr = 0;
 
 static void uc7_colorbase ()
 {
-	RDP("uc7_colorbase\n");
+	LRDP("uc7_colorbase\n");
 	pd_col_addr = segoffset(rdp.cmd1);
 }
 
