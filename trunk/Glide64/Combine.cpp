@@ -13560,7 +13560,7 @@ void Combine ()
   else
     color_cmb_list[current].func();
 
-  RDP (" | |- Color done\n");
+  LRDP(" | |- Color done\n");
 
   // Now again for alpha
   current = 0x7FFFFFFF;
@@ -13636,7 +13636,7 @@ void Combine ()
     ac_t0();
   }
 
-  RDP (" | |- Alpha done\n");
+  LRDP(" | |- Alpha done\n");
 #endif // FASTSEARCH
 
   CombineBlender ();
@@ -13670,7 +13670,7 @@ void Combine ()
 
   cmb.shade_mod_hash = (rdp.cmb_flags + rdp.cmb_flags_2) * (rdp.prim_color + rdp.env_color + rdp.K5);
 
-  RDP (" | + Combine end\n");
+  LRDP(" | + Combine end\n");
 }
 
 void CombineBlender ()

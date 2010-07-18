@@ -230,7 +230,7 @@ static wxUint32 uc9_load_object (wxUint32 zHeader, wxUint32 * rdpcmds)
 
 static void uc9_object ()
 {
-  RDP ("uc9:object\n");
+  LRDP("uc9:object\n");
   wxUint32 rdpcmds[3] = {0, 0, 0};
   wxUint32 cmd1 = rdp.cmd1;
   wxUint32 zHeader = segoffset(rdp.cmd0);
@@ -243,7 +243,7 @@ static void uc9_object ()
 
 static void uc9_mix ()
 {
-  RDP ("uc9:mix IGNORED\n");
+  LRDP("uc9:mix IGNORED\n");
 }
 
 static void uc9_fmlight ()
@@ -349,22 +349,22 @@ static void uc9_light ()
 
 static void uc9_mtxtrnsp ()
 {
-  RDP ("uc9:mtxtrnsp - ignored\n");
+  LRDP("uc9:mtxtrnsp - ignored\n");
   /*
-  RDP ("uc9:mtxtrnsp ");
+  LRDP("uc9:mtxtrnsp ");
   M44 *s;
   switch (rdp.cmd1&0xF) {
   case 4:
     s = (M44*)rdp.model;
-    RDP("Model\n");
+    LRDP("Model\n");
     break;
   case 6:
     s = (M44*)rdp.proj;
-    RDP("Proj\n");
+    LRDP("Proj\n");
     break;
   case 8:
     s = (M44*)rdp.combined;
-    RDP("Comb\n");
+    LRDP("Comb\n");
     break;
   }
   float m = *s[1][0];
@@ -381,7 +381,7 @@ static void uc9_mtxtrnsp ()
 
 static void uc9_mtxcat ()
 {
-  RDP ("uc9:mtxcat ");
+  LRDP("uc9:mtxcat ");
   M44 *s;
   M44 *t;
   wxUint32 S = rdp.cmd0&0xF;
@@ -390,28 +390,28 @@ static void uc9_mtxcat ()
   switch (S) {
   case 4:
     s = (M44*)rdp.model;
-    RDP("Model * ");
+    LRDP("Model * ");
     break;
   case 6:
     s = (M44*)rdp.proj;
-    RDP("Proj * ");
+    LRDP("Proj * ");
     break;
   case 8:
     s = (M44*)rdp.combined;
-    RDP("Comb * ");
+    LRDP("Comb * ");
     break;
   }
   switch (T) {
   case 4:
     t = (M44*)rdp.model;
-    RDP("Model -> ");
+    LRDP("Model -> ");
     break;
   case 6:
     t = (M44*)rdp.proj;
-    RDP("Proj -> ");
+    LRDP("Proj -> ");
     break;
   case 8:
-    RDP("Comb -> ");
+    LRDP("Comb -> ");
     t = (M44*)rdp.combined;
     break;
   }
@@ -421,15 +421,15 @@ static void uc9_mtxcat ()
   switch (D) {
   case 4:
     memcpy (rdp.model, m, 64);;
-    RDP("Model\n");
+    LRDP("Model\n");
     break;
   case 6:
     memcpy (rdp.proj, m, 64);;
-    RDP("Proj\n");
+    LRDP("Proj\n");
     break;
   case 8:
     memcpy (rdp.combined, m, 64);;
-    RDP("Comb\n");
+    LRDP("Comb\n");
     break;
   }
 #ifdef EXTREME_LOGGING
@@ -516,27 +516,27 @@ static void uc9_mult_mpmtx ()
 
 static void uc9_link_subdl ()
 {
-  RDP ("uc9:link_subdl IGNORED\n");
+  LRDP("uc9:link_subdl IGNORED\n");
 }
 
 static void uc9_set_subdl ()
 {
-  RDP ("uc9:set_subdl IGNORED\n");
+  LRDP("uc9:set_subdl IGNORED\n");
 }
 
 static void uc9_wait_signal ()
 {
-  RDP ("uc9:wait_signal IGNORED\n");
+  LRDP("uc9:wait_signal IGNORED\n");
 }
 
 static void uc9_send_signal ()
 {
-  RDP ("uc9:send_signal IGNORED\n");
+  LRDP("uc9:send_signal IGNORED\n");
 }
 
 void uc9_movemem ()
 {
-  RDP ("uc9:movemem\n");
+  LRDP("uc9:movemem\n");
   int idx = rdp.cmd0 & 0x0E;
   int ofs = ((rdp.cmd0>>6)&0x1ff)<<3;
   int len = (1 + ((rdp.cmd0>>15)&0x1ff))<<3;
@@ -570,15 +570,15 @@ void uc9_movemem ()
       switch (idx)
       {
       case 4:  // model matrix
-        RDP ("Modelview load\n");
+        LRDP("Modelview load\n");
         modelview_load (m);
         break;
       case 6:  // projection matrix
-        RDP ("Projection load\n");
+        LRDP("Projection load\n");
         projection_load (m);
         break;
       case 8:  // projection matrix
-        RDP ("Combined load\n");
+        LRDP("Combined load\n");
         rdp.update &= ~UPDATE_MULT_MAT;
         memcpy (rdp.combined, m, 64);;
         break;
@@ -601,7 +601,7 @@ void uc9_movemem ()
     break;
 
   case 10:
-    RDP("Othermode - IGNORED\n");
+    LRDP("Othermode - IGNORED\n");
     break;
 
   case 12:   // VIEWPORT

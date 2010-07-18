@@ -113,7 +113,7 @@ void calc_linear (VERTEX *v)
 
 void calc_sphere (VERTEX *v)
 {
-//  RDP("calc_sphere\n");
+//  LRDP("calc_sphere\n");
   DECLAREALIGN16VAR(vec[3]);
   int s_scale, t_scale;
   if (settings.hacks&hack_Chopper)

@@ -121,7 +121,7 @@ static void uc2_vertex ()
   if (v0 < 0)
   {
     RDP_E ("** ERROR: uc2:vertex v0 < 0\n");
-    RDP ("** ERROR: uc2:vertex v0 < 0\n");
+    LRDP("** ERROR: uc2:vertex v0 < 0\n");
     return;
   }
 
@@ -263,7 +263,7 @@ static void uc2_culldl ()
       return;
   }
 
-  RDP (" - ");  // specify that the enddl is not a real command
+  LRDP(" - ");  // specify that the enddl is not a real command
   uc0_enddl ();
 }
 
@@ -278,7 +278,7 @@ static void uc2_tri1()
   }
   if (rdp.skip_drawing)
   {
-    RDP("uc2:tri1. skipped\n");
+    LRDP("uc2:tri1. skipped\n");
     return;
   }
 
@@ -318,11 +318,11 @@ static void uc2_quad ()
 
   if (rdp.skip_drawing)
   {
-    RDP("uc2_quad. skipped\n");
+    LRDP("uc2_quad. skipped\n");
     return;
   }
 
-  RDP("uc2:quad");
+  LRDP("uc2:quad");
 
   FRDP(" #%d, #%d - %d, %d, %d - %d, %d, %d\n", rdp.tri_n, rdp.tri_n+1,
     ((rdp.cmd0 >> 17) & 0x7F),
@@ -374,17 +374,17 @@ static void uc2_line3d ()
 
 static void uc2_special3 ()
 {
-  RDP ("uc2:special3\n");
+  LRDP("uc2:special3\n");
 }
 
 static void uc2_special2 ()
 {
-  RDP ("uc2:special2\n");
+  LRDP("uc2:special2\n");
 }
 
 static void uc2_dma_io ()
 {
-  RDP ("uc2:dma_io\n");
+  LRDP("uc2:dma_io\n");
 }
 
 static void uc2_pop_matrix ()
@@ -490,7 +490,7 @@ static void uc2_matrix ()
     uc6_obj_rectangle_r();
     return;
   }
-  RDP ("uc2:matrix\n");
+  LRDP("uc2:matrix\n");
 
   DECLAREALIGN16VAR(m[4][4]);
   load_matrix(m, segoffset(rdp.cmd1));
@@ -499,34 +499,34 @@ static void uc2_matrix ()
   switch (command)
   {
   case 0: // modelview mul nopush
-    RDP ("modelview mul\n");
+    LRDP("modelview mul\n");
     modelview_mul (m);
     break;
 
   case 1: // modelview mul push
-    RDP ("modelview mul push\n");
+    LRDP("modelview mul push\n");
     modelview_mul_push (m);
     break;
 
   case 2: // modelview load nopush
-    RDP ("modelview load\n");
+    LRDP("modelview load\n");
     modelview_load (m);
     break;
 
   case 3: // modelview load push
-    RDP ("modelview load push\n");
+    LRDP("modelview load push\n");
     modelview_load_push (m);
     break;
 
   case 4: // projection mul nopush
   case 5: // projection mul push, can't push projection
-    RDP ("projection mul\n");
+    LRDP("projection mul\n");
     projection_mul (m);
     break;
 
   case 6: // projection load nopush
   case 7: // projection load push, can't push projection
-    RDP ("projection load\n");
+    LRDP("projection load\n");
     projection_load (m);
     break;
 
@@ -600,7 +600,7 @@ static void uc2_moveword ()
         rdp.combined[index_y][index_x+1] = (short)(rdp.cmd1&0xFFFF);
       }
 
-      RDP ("matrix\n");
+      LRDP("matrix\n");
     }
     break;
 
@@ -655,11 +655,11 @@ static void uc2_moveword ()
 
   case 0x0c:
     RDP_E ("uc2:moveword forcemtx - IGNORED\n");
-    RDP ("forcemtx - IGNORED\n");
+    LRDP("forcemtx - IGNORED\n");
     break;
 
   case 0x0e:
-    RDP ("perspnorm - IGNORED\n");
+    LRDP("perspnorm - IGNORED\n");
     break;
 
   default:
@@ -788,12 +788,12 @@ static void uc2_movemem ()
 
 static void uc2_load_ucode ()
 {
-  RDP ("uc2:load_ucode\n");
+  LRDP("uc2:load_ucode\n");
 }
 
 static void uc2_rdphalf_2 ()
 {
-  RDP ("uc2:rdphalf_2\n");
+  LRDP("uc2:rdphalf_2\n");
 }
 
 static void uc2_dlist_cnt ()
@@ -806,7 +806,7 @@ static void uc2_dlist_cnt ()
 
   if (rdp.pc_i >= 9) {
     RDP_E ("** DL stack overflow **\n");
-    RDP ("** DL stack overflow **\n");
+    LRDP("** DL stack overflow **\n");
     return;
   }
   rdp.pc_i ++;  // go to the next PC in the stack

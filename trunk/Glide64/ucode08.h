@@ -64,7 +64,7 @@ static void uc8_vertex ()
 	if (v0 < 0)
 	{
 		RDP_E ("** ERROR: uc2:vertex v0 < 0\n");
-		RDP ("** ERROR: uc2:vertex v0 < 0\n");
+		LRDP("** ERROR: uc2:vertex v0 < 0\n");
 		return;
 	}
 	//*
@@ -278,11 +278,11 @@ static void uc8_moveword ()
 
 	case 0x0c:
 		RDP_E ("uc8:moveword forcemtx - IGNORED\n");
-		RDP ("forcemtx - IGNORED\n");
+		LRDP("forcemtx - IGNORED\n");
 		break;
 
 	case 0x0e:
-		RDP ("perspnorm - IGNORED\n");
+		LRDP("perspnorm - IGNORED\n");
 		break;
 
 	case 0x10:  // moveword coord mod
@@ -454,7 +454,7 @@ static void uc8_tri4() //by Gugaman Apr 19 2002
 {
     if (rdp.skip_drawing)
     {
-		RDP("uc8:tri4. skipped\n");
+		LRDP("uc8:tri4. skipped\n");
 		return;
     }
 
