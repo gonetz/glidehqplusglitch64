@@ -270,7 +270,7 @@ static void uc5_dl_in_mem ()
 
   if (rdp.pc_i >= 9) {
     RDP_E ("** DL stack overflow **\n");
-    RDP ("** DL stack overflow **\n");
+    LRDP("** DL stack overflow **\n");
     return;
   }
   rdp.pc_i ++;  // go to the next PC in the stack
@@ -280,7 +280,7 @@ static void uc5_dl_in_mem ()
 
 static void uc5_moveword()
 {
-  RDP("uc5:moveword ");
+  LRDP("uc5:moveword ");
 
   // Find which command this is (lowest byte of cmd0)
   switch (rdp.cmd0 & 0xFF)

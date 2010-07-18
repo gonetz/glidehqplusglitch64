@@ -56,7 +56,7 @@ static void uc1_tri1()
 {
   if (rdp.skip_drawing)
   {
-    RDP("uc1:tri1. skipped\n");
+    LRDP("uc1:tri1. skipped\n");
     return;
   }
   FRDP("uc1:tri1 #%d - %d, %d, %d - %08lx - %08lx\n", rdp.tri_n,
@@ -77,10 +77,10 @@ static void uc1_tri2 ()
 {
   if (rdp.skip_drawing)
   {
-    RDP("uc1:tri2. skipped\n");
+    LRDP("uc1:tri2. skipped\n");
     return;
   }
-  RDP ("uc1:tri2");
+  LRDP("uc1:tri2");
   
   FRDP(" #%d, #%d - %d, %d, %d - %d, %d, %d\n", rdp.tri_n, rdp.tri_n+1,
     ((rdp.cmd0 >> 17) & 0x7F),
@@ -146,7 +146,7 @@ wxUint32 branch_dl = 0;
 
 static void uc1_rdphalf_1()
 {
-  RDP ("uc1:rdphalf_1\n");
+  LRDP("uc1:rdphalf_1\n");
   branch_dl = rdp.cmd1;
   rdphalf_1();
 }

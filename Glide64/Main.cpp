@@ -885,6 +885,7 @@ int InitGfx (int evoodoo_using_window)
   LOG ("InitGfx ()\n");
 
   debugging = FALSE;
+  rdp_reset ();
 
   char strConfigWrapperExt[] = "grConfigWrapperExt";
   GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress(strConfigWrapperExt);
@@ -1126,7 +1127,6 @@ int InitGfx (int evoodoo_using_window)
   ChangeSize ();
 
   guLoadTextures ();
-  rdp_reset ();
   ClearCache ();
 
   grCullMode (GR_CULL_DISABLE);
@@ -1578,7 +1578,6 @@ that there is a waiting interrupt.
 int CALL InitiateGFX (GFX_INFO Gfx_Info)
 {
   LOG ("InitiateGFX (*)\n");
-  // Do *NOT* put this in rdp_reset or it could be set after the screen is initialized
   voodoo.num_tmu = 2;
 
   // Assume scale of 1 for debug purposes
@@ -1695,6 +1694,7 @@ void CALL RomOpen (void)
   no_dlist = TRUE;
   romopen = TRUE;
   ucode_error_report = TRUE;	// allowed to report ucode errors
+  rdp_reset ();
 
   // Get the country code & translate to NTSC(0) or PAL(1)
   wxUint16 code = ((wxUint16*)gfx.HEADER)[0x1F^1];
@@ -1719,8 +1719,6 @@ void CALL RomOpen (void)
 
   rdp.RomName = wxString::FromAscii(name);
   ReadSpecialSettings (name);
-
-  rdp_reset ();
   ClearCache ();
 
   CheckDRAMSize();
@@ -1776,14 +1774,14 @@ void CALL ShowCFB (void)
 
 void drawViRegBG()
 {
-  RDP("drawViRegBG\n");
+  LRDP("drawViRegBG\n");
   wxUint32 VIwidth = *gfx.VI_WIDTH_REG;
   FB_TO_SCREEN_INFO fb_info;
   fb_info.width  = VIwidth;
   fb_info.height = (wxUint32)rdp.vi_height;
   if (fb_info.height == 0) 
   {
-    RDP("Image height = 0 - skipping\n");
+    LRDP("Image height = 0 - skipping\n");
     return;
   }
   fb_info.ul_x = 0;
@@ -1903,7 +1901,7 @@ void CALL UpdateScreen (void)
   wxUint32 limit = (settings.hacks&hack_Lego) ? 15 : 30;
   if ((settings.frame_buffer&fb_cpu_write_hack) && (update_screen_count > limit) && (rdp.last_bg == 0))
   {
-    RDP("DirectCPUWrite hack!\n");
+    LRDP("DirectCPUWrite hack!\n");
     update_screen_count = 0;
     no_dlist = TRUE;
     ClearCache ();
@@ -1917,9 +1915,9 @@ void CALL UpdateScreen (void)
     if( *gfx.VI_ORIGIN_REG  > width )
     {
       ChangeSize ();
-      RDP("ChangeSize done\n");
+      LRDP("ChangeSize done\n");
       DrawFrameBuffer();
-      RDP("DrawFrameBuffer done\n");
+      LRDP("DrawFrameBuffer done\n");
       rdp.updatescreen = 1;
       newSwapBuffers ();
     }
@@ -1976,7 +1974,7 @@ void newSwapBuffers()
   {
     rdp.updatescreen = 0;
 
-    RDP ("swapped\n");
+    LRDP("swapped\n");
 
     // Allow access to the whole screen
     if (fullscreen)

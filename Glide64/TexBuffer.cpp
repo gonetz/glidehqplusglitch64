@@ -296,22 +296,22 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   }
   else
   {
-    RDP ("  not searched");
+    LRDP("  not searched");
   }
 
   if (!found)
   {
-    RDP ("  not found");
+    LRDP("  not found");
     texbuf = AllocateTextureBuffer(cimage);
   }
   else
   {
-    RDP ("  found");
+    LRDP("  found");
   }
 
   if (!texbuf)
   {
-    RDP("  KO\n");
+    LRDP("  KO\n");
     return FALSE;
   }
 
@@ -416,7 +416,7 @@ int CloseTextureBuffer(int draw)
 {
   if (!fullscreen || !rdp.cur_image)
   {
-    RDP("CloseTextureBuffer KO\n");
+    LRDP("CloseTextureBuffer KO\n");
     return FALSE;
   }
   grRenderBuffer( GR_BUFFER_BACKBUFFER );
@@ -426,7 +426,7 @@ int CloseTextureBuffer(int draw)
   rdp.update |= UPDATE_VIEWPORT | UPDATE_SCISSOR;
   if (!draw)
   {
-    RDP("CloseTextureBuffer no draw, OK\n");
+    LRDP("CloseTextureBuffer no draw, OK\n");
     rdp.cur_image = 0;
     return TRUE;
   }
@@ -462,7 +462,7 @@ int CloseTextureBuffer(int draw)
   {
     grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
   }
-  RDP("CloseTextureBuffer draw, OK\n");
+  LRDP("CloseTextureBuffer draw, OK\n");
   rdp.tbuff_tex = 0;
   return TRUE;
 }
@@ -471,7 +471,7 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
 {
   if (!fullscreen)
     return FALSE;
-  RDP("CopyTextureBuffer. ");
+  LRDP("CopyTextureBuffer. ");
   if (rdp.cur_image)
   {
     if (rdp.cur_image->addr == fb_to.addr)
@@ -480,12 +480,12 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
   }
   else if (!FindTextureBuffer(fb_from.addr, (wxUint16)fb_from.width))
   {
-    RDP("Can't find 'from' buffer.\n");
+    LRDP("Can't find 'from' buffer.\n");
     return FALSE;
   }
   if (!OpenTextureBuffer(fb_to))
   {
-    RDP("Can't open new buffer.\n");
+    LRDP("Can't open new buffer.\n");
     return CloseTextureBuffer(TRUE);
   }
   GrTextureFormat_t buf_format = rdp.tbuff_tex->info.format;
@@ -526,7 +526,7 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
   rdp.update |= UPDATE_VIEWPORT | UPDATE_SCISSOR;
   if (settings.fog && (rdp.flags & FOG_ENABLED))
     grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
-  RDP("CopyTextureBuffer draw, OK\n");
+  LRDP("CopyTextureBuffer draw, OK\n");
   rdp.tbuff_tex = 0;
   rdp.cur_image = 0;
   return TRUE;
@@ -536,7 +536,7 @@ int CopyDepthBuffer()
 {
   if (!fullscreen)
     return FALSE;
-  RDP("CopyDepthBuffer. ");
+  LRDP("CopyDepthBuffer. ");
   float bound = 1024.0f;
   GrLOD_t LOD = GR_LOD_LOG2_1024;
   if (settings.scr_res_x > 1024)
@@ -583,7 +583,7 @@ int CopyDepthBuffer()
   rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE | UPDATE_TEXTURE | UPDATE_ALPHA_COMPARE;
   if (settings.fog && (rdp.flags & FOG_ENABLED))
     grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
-  RDP("CopyDepthBuffer draw, OK\n");
+  LRDP("CopyDepthBuffer draw, OK\n");
   rdp.tbuff_tex = 0;
   return TRUE;
 }
@@ -592,7 +592,7 @@ int SwapTextureBuffer()
 {
   if (!fullscreen || !rdp.tbuff_tex)
     return FALSE;
-  RDP("SwapTextureBuffer.");
+  LRDP("SwapTextureBuffer.");
   COLOR_IMAGE ci;
   ci.addr = rdp.tbuff_tex->addr;
   ci.format = rdp.tbuff_tex->format;
@@ -604,7 +604,7 @@ int SwapTextureBuffer()
   TBUFF_COLOR_IMAGE * texbuf = AllocateTextureBuffer(ci);
   if (!texbuf)
   {
-    RDP("Failed!\n");
+    LRDP("Failed!\n");
     return FALSE;
   }
   TexBufSetupCombiner();
@@ -659,7 +659,7 @@ int SwapTextureBuffer()
   {
     grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
   }
-  RDP("SwapTextureBuffer draw, OK\n");
+  LRDP("SwapTextureBuffer draw, OK\n");
   return TRUE;
 }
 
@@ -734,6 +734,6 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
     return TRUE;
   }
   rdp.tbuff_tex = 0;
-  RDP("FindTextureBuffer, not found\n");
+  LRDP("FindTextureBuffer, not found\n");
   return FALSE;
 }

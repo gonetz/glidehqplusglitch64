@@ -74,7 +74,7 @@ int cull_tri(VERTEX **v) // type changed to VERTEX** [Dave2001]
 
   if (v[0]->scr_off & v[1]->scr_off & v[2]->scr_off)
   {
-    RDP (" clipped\n");
+    LRDP (" clipped\n");
     return TRUE;
   }
 
@@ -117,13 +117,13 @@ int cull_tri(VERTEX **v) // type changed to VERTEX** [Dave2001]
 
   if ((iarea & 0x7FFFFFFF) == 0)
   {
-	  RDP (" zero area triangles\n");
+	  LRDP (" zero area triangles\n");
       return TRUE;
   }
 
   if ((rdp.flags & CULLMASK) && ((int)(iarea ^ mode)) >= 0)
   {
-	  RDP (" culled\n");
+	  LRDP (" culled\n");
       return TRUE;
   }
 #else
@@ -140,7 +140,7 @@ int cull_tri(VERTEX **v) // type changed to VERTEX** [Dave2001]
     //    if ((x1*y2 - y1*x2) < 0.0f) //counter-clockwise, positive
     if ((y1*x2-x1*y2) < 0.0f) //counter-clockwise, positive
     {
-      RDP (" culled!\n");
+      LRDP (" culled!\n");
       return TRUE;
     }
     return FALSE;
@@ -148,7 +148,7 @@ int cull_tri(VERTEX **v) // type changed to VERTEX** [Dave2001]
     //    if ((x1*y2 - y1*x2) >= 0.0f) //clockwise, negative
     if ((y1*x2-x1*y2) >= 0.0f) //clockwise, negative
     {
-      RDP (" culled!\n");
+      LRDP (" culled!\n");
       return TRUE;
     }
     return FALSE;
@@ -1805,7 +1805,7 @@ typedef struct
 
 void update ()
 {
-  RDP ("-+ update called\n");
+  LRDP ("-+ update called\n");
   // Check for rendermode changes
   // Z buffer
   if (rdp.render_mode_changed & 0x00000C30)
@@ -1884,7 +1884,7 @@ void update ()
   // Combine MUST go before texture
   if ((rdp.update & UPDATE_COMBINE) && rdp.allow_combine)
   {
-    RDP (" |-+ update_combine\n");
+    LRDP (" |-+ update_combine\n");
     Combine ();
   }
 
@@ -1917,7 +1917,7 @@ void update ()
         else
         {
           grDepthBiasLevel (-4);//-16);
-          RDP("depth bias: -4");
+          LRDP("depth bias: -4");
         }
       }
       else
@@ -1984,7 +1984,7 @@ void update ()
           {
             grAlphaTestFunction (GR_CMP_GEQUAL);
             grAlphaTestReferenceValue (0x20);//0xA0);
-            RDP (" |- alpha compare: 0x20\n");
+            LRDP (" |- alpha compare: 0x20\n");
           }
           else
           {
@@ -1997,21 +1997,21 @@ void update ()
             else
             {
               grAlphaTestReferenceValue (0x00);
-              RDP (" |- alpha compare: 0x00\n");
+              LRDP (" |- alpha compare: 0x00\n");
             }
           }
         }
         else
         {
           grAlphaTestFunction (GR_CMP_ALWAYS);
-          RDP (" |- alpha compare: none\n");
+          LRDP (" |- alpha compare: none\n");
         }
       }
       if (rdp.acmp == 3)
       {
         if (grStippleModeExt)
         {
-          RDP (" |- alpha compare: dither\n");
+          LRDP (" |- alpha compare: dither\n");
           grStippleModeExt(settings.stipple_mode);
           //			    grStippleModeExt(GR_STIPPLE_PATTERN);
         }
@@ -2020,7 +2020,7 @@ void update ()
       {
         if (grStippleModeExt)
         {
-          //RDP (" |- alpha compare: dither disabled\n");
+          //LRDP (" |- alpha compare: dither disabled\n");
           grStippleModeExt(GR_STIPPLE_DISABLE);
         }
       }
@@ -2062,11 +2062,11 @@ void update ()
           grFogColorValue(rdp.fog_color);
           grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
           rdp.fog_mode = RDP::fog_enabled;
-          RDP("fog enabled \n");
+          LRDP("fog enabled \n");
         }
         else
         {
-          RDP("fog disabled in blender\n");
+          LRDP("fog disabled in blender\n");
           rdp.fog_mode = RDP::fog_disabled;
           grFogMode (GR_FOG_DISABLE);
         }
@@ -2076,18 +2076,18 @@ void update ()
         grFogColorValue(rdp.fog_color);
         grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
         rdp.fog_mode = RDP::fog_blend;
-        RDP("fog blend \n");
+        LRDP("fog blend \n");
       }
       else if (blender == 0x04d1)
       {
         grFogColorValue(rdp.fog_color);
         grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
         rdp.fog_mode = RDP::fog_blend_inverse;
-        RDP("fog blend \n");
+        LRDP("fog blend \n");
       }
       else
       {
-        RDP("fog disabled\n");
+        LRDP("fog disabled\n");
         rdp.fog_mode = RDP::fog_disabled;
         grFogMode (GR_FOG_DISABLE);
       }
@@ -2122,7 +2122,7 @@ void update ()
   if (rdp.update & UPDATE_SCISSOR)
     update_scissor ();
 
-  RDP (" + update end\n");
+  LRDP (" + update end\n");
 }
 
 void set_message_combiner ()

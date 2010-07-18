@@ -91,7 +91,7 @@ static void fb_bg_copy ()
     }
     else 
     {
-      RDP("motion blur!\n");
+      LRDP("motion blur!\n");
       rdp.motionblur = TRUE;
     }
     
@@ -214,7 +214,7 @@ static void fb_settextureimage()
             if ((rdp.main_ci_last_tex_addr >= cur_fb.addr) && 
               (rdp.main_ci_last_tex_addr < (cur_fb.addr + cur_fb.width*cur_fb.height*cur_fb.size)))
             {
-              RDP("motion blur!\n");
+              LRDP("motion blur!\n");
               rdp.motionblur = TRUE;
             }
             else 
@@ -256,7 +256,7 @@ static void fb_settextureimage()
           FRDP("rdp.frame_buffers[%d].status = ci_old_copy 1, addr:%08lx\n", rdp.ci_count-1, rdp.last_drawn_ci_addr);
         }
         rdp.read_previous_ci = TRUE;
-        RDP("read_previous_ci = TRUE\n");
+        LRDP("read_previous_ci = TRUE\n");
       }
       else if ((addr >= rdp.last_drawn_ci_addr) && (addr < (rdp.last_drawn_ci_addr + rdp.maincimg[0].width*rdp.maincimg[0].height*2))) 
       {
@@ -266,7 +266,7 @@ static void fb_settextureimage()
           FRDP("rdp.frame_buffers[%d].status = ci_old_copy 2, addr:%08lx\n", rdp.ci_count-1, rdp.last_drawn_ci_addr);
         }
         rdp.read_previous_ci = TRUE;
-        RDP("read_previous_ci = TRUE\n");
+        LRDP("read_previous_ci = TRUE\n");
       }
     }	
     else if (fb_hwfbe_enabled && (cur_fb.status == ci_main))
