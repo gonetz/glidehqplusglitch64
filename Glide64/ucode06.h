@@ -789,6 +789,17 @@ static void uc6_bg_1cyc ()
       RDP("uc6:bg_1cyc skipped\n");
     }
   }
+  else if (d.imageX + (wxUint16)(d.frameW*d.scaleX) >= d.imageW)
+  {
+    DRAWIMAGE d1 = d;
+    d1.frameW = (d.imageW - d.imageX - 1) / d.scaleX;
+    DrawImage (&d1);
+    DRAWIMAGE d2 = d;
+    d2.frameX = d.frameX + d1.frameW;
+    d2.frameW = d.frameW - d1.frameW;
+    d2.imageX = 0;
+    DrawImage (&d2);
+  }
   else
     DrawImage (&d);
 }
