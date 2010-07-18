@@ -161,7 +161,7 @@ void DrawDepthImage (DRAWIMAGE *d)
     return;
   if (d->imageH > d->imageW)
     return;
-  RDP("Depth image write\n");
+  LRDP("Depth image write\n");
   if (fb_hwfbe_enabled)
   {
     DrawHiresDepthImage(d);
@@ -349,14 +349,14 @@ void DrawImage (DRAWIMAGE *d)
       // USES the z-buffer.  Otherwise it returns bad (unset) values for lot and telescope
       //in zelda:mm.
     {
-      RDP("Background uses depth compare\n");
+      LRDP("Background uses depth compare\n");
       Z = ScaleZ(rdp.prim_depth);
       grDepthBufferFunction (GR_CMP_LEQUAL);
       grDepthMask (FXTRUE);
     }
     else
     {
-      RDP("Background not uses depth compare\n");
+      LRDP("Background not uses depth compare\n");
       grDepthBufferFunction (GR_CMP_ALWAYS);
       grDepthMask (FXFALSE);
     }
@@ -513,7 +513,7 @@ void DrawImage (DRAWIMAGE *d)
       else
       {
         rdp.tri_n += 2;
-        RDP("Clipped!\n");
+        LRDP("Clipped!\n");
       }
 
       // increment whatever caused this split
@@ -577,13 +577,13 @@ void DrawHiresImage(DRAWIMAGE *d, int screensize = FALSE)
   float Z = 1.0f;
   if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030)) 
   {
-    RDP("Background uses depth compare\n");
+    LRDP("Background uses depth compare\n");
     Z = ScaleZ(rdp.prim_depth);
     grDepthBufferFunction (GR_CMP_LEQUAL);
   }
   else
   {
-    RDP("Background not uses depth compare\n");
+    LRDP("Background not uses depth compare\n");
     grDepthBufferFunction (GR_CMP_ALWAYS);
   }
   grDepthMask (FXFALSE);
@@ -741,7 +741,7 @@ static void uc6_bg_1cyc ()
 {
   if (rdp.skip_drawing)
   {
-    RDP("bg_1cyc skipped\n");
+    LRDP("bg_1cyc skipped\n");
     return;
   }
   FRDP ("uc6:bg_1cyc #%d, #%d\n", rdp.tri_n, rdp.tri_n+1);
@@ -792,18 +792,31 @@ static void uc6_bg_1cyc ()
       DrawImage (&d);
     else        
     {
-      RDP("uc6:bg_1cyc skipped\n");
+      LRDP("uc6:bg_1cyc skipped\n");
     }
   }
+  else if (d.imageX + d.frameW*d.scaleX > d.imageW)
+  {
+    DRAWIMAGE d1 = d;
+    d1.frameW = (d.imageW - d.imageX - 1) / d.scaleX;
+    DrawImage (&d1);
+    DRAWIMAGE d2 = d;
+    d2.frameX = d.frameX + d1.frameW;
+    d2.frameW = d.frameW - d1.frameW;
+    d2.imageX = 0;
+    DrawImage (&d2);
+  }
   else
+  {
     DrawImage (&d);
+  }
 }
 
 static void uc6_bg_copy ()
 {
   if (rdp.skip_drawing)
   {
-    RDP("bg_copy skipped\n");
+    LRDP("bg_copy skipped\n");
     return;
   }
   FRDP ("uc6:bg_copy #%d, #%d\n", rdp.tri_n, rdp.tri_n+1);
@@ -851,7 +864,7 @@ static void uc6_bg_copy ()
       DrawImage (&d);
     else        
     {
-      RDP("uc6:bg_copy skipped\n");
+      LRDP("uc6:bg_copy skipped\n");
     }
   }
   else
@@ -1033,14 +1046,14 @@ static float set_sprite_combine_mode ()
     grFogMode (GR_FOG_DISABLE);
     if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030))  
     {
-      RDP("Sprite uses depth compare\n");
+      LRDP("Sprite uses depth compare\n");
       Z = rdp.prim_depth;
       grDepthBufferFunction (GR_CMP_LEQUAL);
       grDepthMask (FXTRUE);
     }
     else
     {
-      RDP("Sprite not uses depth compare\n");
+      LRDP("Sprite not uses depth compare\n");
       grDepthBufferFunction (GR_CMP_ALWAYS);
       grDepthMask (FXFALSE);
     }
@@ -1121,7 +1134,7 @@ static void uc6_draw_polygons (VERTEX v[4])
 
 static void uc6_obj_rectangle ()
 {
-  //    RDP ("uc6:obj_rectangle\n");
+  //    LRDP("uc6:obj_rectangle\n");
 
   wxUint32 addr = segoffset(rdp.cmd1) >> 1;
 
@@ -1156,7 +1169,7 @@ static void uc6_obj_rectangle ()
   }
   if (!rdp.s2dex_tex_loaded)
   {
-    RDP("Texture was not loaded! return\n");
+    LRDP("Texture was not loaded! return\n");
     return;
   }
 
@@ -1334,7 +1347,7 @@ static void uc6_obj_sprite ()
 
 static void uc6_obj_movemem ()
 {
-  RDP ("uc6:obj_movemem\n");
+  LRDP("uc6:obj_movemem\n");
 
   int index = rdp.cmd0 & 0xFFFF;
   wxUint32 addr = segoffset(rdp.cmd1) >> 1;
@@ -1365,13 +1378,13 @@ static void uc6_obj_movemem ()
 
 static void uc6_select_dl ()
 {
-  RDP ("uc6:select_dl\n");
+  LRDP("uc6:select_dl\n");
   RDP_E ("uc6:select_dl\n");
 }
 
 static void uc6_obj_rendermode ()
 {
-  RDP ("uc6:obj_rendermode\n");
+  LRDP("uc6:obj_rendermode\n");
   RDP_E ("uc6:obj_rendermode\n");
 }
 
@@ -1549,7 +1562,7 @@ static void uc6_obj_rectangle_r ()
 
 static void uc6_obj_loadtxtr ()
 {
-  RDP ("uc6:obj_loadtxtr ");
+  LRDP("uc6:obj_loadtxtr ");
   rdp.s2dex_tex_loaded = TRUE;
   rdp.update |= UPDATE_TEXTURE;
 
@@ -1611,7 +1624,7 @@ static void uc6_obj_loadtxtr ()
 
 static void uc6_obj_ldtx_sprite ()
 {
-  RDP ("uc6:obj_ldtx_sprite\n");
+  LRDP("uc6:obj_ldtx_sprite\n");
 
   wxUint32 addr = rdp.cmd1;
   uc6_obj_loadtxtr ();
@@ -1621,7 +1634,7 @@ static void uc6_obj_ldtx_sprite ()
 
 static void uc6_obj_ldtx_rect ()
 {
-  RDP ("uc6:obj_ldtx_rect\n");
+  LRDP("uc6:obj_ldtx_rect\n");
 
   wxUint32 addr = rdp.cmd1;
   uc6_obj_loadtxtr ();
@@ -1631,7 +1644,7 @@ static void uc6_obj_ldtx_rect ()
 
 static void uc6_ldtx_rect_r ()
 {
-  RDP ("uc6:ldtx_rect_r\n");
+  LRDP("uc6:ldtx_rect_r\n");
 
   wxUint32 addr = rdp.cmd1;
   uc6_obj_loadtxtr ();
@@ -1641,7 +1654,7 @@ static void uc6_ldtx_rect_r ()
 
 static void uc6_loaducode ()
 {
-  RDP ("uc6:load_ucode\n");
+  LRDP("uc6:load_ucode\n");
   RDP_E ("uc6:load_ucode\n");
 
   // copy the microcode data

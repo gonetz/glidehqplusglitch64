@@ -187,7 +187,7 @@ static void t3d_vertex(wxUint32 addr, wxUint32 v0, wxUint32 n)
 
 static void t3dLoadObject(wxUint32 pstate, wxUint32 pvtx, wxUint32 ptri)
 {
-  RDP("Loading Turbo3D object\n");
+  LRDP("Loading Turbo3D object\n");
   t3dState *ostate = (t3dState*)&gfx.RDRAM[segoffset(pstate)];
   rdp.cur_tile = (ostate->textureState)&7;
   FRDP("tile: %d\n", rdp.cur_tile);
@@ -250,7 +250,7 @@ static void t3dLoadObject(wxUint32 pstate, wxUint32 pvtx, wxUint32 ptri)
 
 static void Turbo3D()
 {
-  RDP("Start Turbo3D microcode\n");
+  LRDP("Start Turbo3D microcode\n");
   settings.ucode = ucode_Fast3D;
   wxUint32 a = 0, pgstate = 0, pstate = 0, pvtx = 0, ptri = 0;
   do {

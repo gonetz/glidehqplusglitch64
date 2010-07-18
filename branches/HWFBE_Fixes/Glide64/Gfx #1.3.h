@@ -208,15 +208,15 @@ extern std::ofstream rdp_log;
 #define CLOSE_RDP_LOG() EXT("CLOSE_RDP_LOG ()\n"); if (settings.logging && log_open) { rdp_log.close (); log_open=FALSE; }
 
 #ifdef LOGNOTKEY
-#define RDP(x) EXT("RDP (...)\n"); if (settings.logging && log_open) { if (!CheckKeyPressed(LOGKEY,0x8000)) { rdp_log << x; rdp_log.flush(); } }
+#define LRDP(x) EXT("RDP (...)\n"); if (settings.logging && log_open) { if (!CheckKeyPressed(LOGKEY,0x8000)) { rdp_log << x; rdp_log.flush(); } }
 #else
-#define RDP(x) EXT("RDP (...)\n"); if (settings.logging && log_open) { rdp_log << x; rdp_log.flush(); }
+#define LRDP(x) EXT("RDP (...)\n"); if (settings.logging && log_open) { rdp_log << x; rdp_log.flush(); }
 #endif
 
 #else
 #define OPEN_RDP_LOG()
 #define CLOSE_RDP_LOG()
-#define RDP(x)
+#define LRDP(x)
 #endif
 
 
@@ -244,7 +244,7 @@ __inline void FRDP (const char *fmt, ...)
 	va_list ap;
 	va_start(ap, fmt);
 	vsprintf(out_buf, fmt, ap);
-	RDP (out_buf);
+	LRDP (out_buf);
 	va_end(ap);
 #endif
 }

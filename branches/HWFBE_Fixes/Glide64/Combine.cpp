@@ -7304,6 +7304,35 @@ static void cc__prim_inter_env_using_t0__mul_shade ()
   USE_T0 ();
 }
 
+static void cc__prim_inter_one_using_env__mul_shade ()
+{
+  // (one-prim)*env+prim, (cmb-0)*shade+0
+  if ((rdp.prim_color&0xFFFFFF00) == 0)
+  {
+    cc_env_mul_shade ();
+    return;
+  }
+  if ((rdp.env_color&0xFFFFFF00) == 0)
+  {
+    cc_prim_mul_shade ();
+    return;
+  }
+  if ((rdp.prim_color&0xFFFFFF00) == 0xFFFFFF00 || (rdp.env_color&0xFFFFFF00) == 0xFFFFFF00)
+  {
+    cc_shade ();
+    return;
+  }
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_LOCAL,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_CONSTANT);
+  CC_1SUBPRIM ();
+  CC_C1MULC2 (cmb.ccolor, rdp.env_color);
+  cmb.ccolor=(wxUint8)( min(255, (int)((cmb.ccolor & 0xFF000000) >> 24) + (int)((rdp.prim_color & 0xFF000000) >> 24)) ) << 24 |
+  (wxUint8)( min(255, (int)((cmb.ccolor & 0x00FF0000) >> 16) + (int)((rdp.prim_color & 0x00FF0000) >> 16)) ) << 16 | 
+  (wxUint8)( min(255, (int)((cmb.ccolor & 0x0000FF00) >>  8) + (int)((rdp.prim_color & 0x0000FF00) >>  8)) ) <<  8 ;
+}
+
 static void cc__env_inter_prim_using_t0a__mul_t0 ()
 {
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
@@ -9625,15 +9654,25 @@ static void ac__t0_inter_t1_using_enva__mul_primlod ()
   A_T0_INTER_T1_USING_FACTOR (factor);
 }
 
-static void ac__t0_inter_t1_using_enva__mul_prim_mul_shade ()
+static void ac__t1_mul_enva_add_t0__sub_prim_mul_shade ()
 {
-  ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
-    GR_COMBINE_FACTOR_LOCAL,
-    GR_COMBINE_LOCAL_ITERATED,
-    GR_COMBINE_OTHER_TEXTURE);
-  MULSHADE_A_PRIM ();
-  wxUint8 factor = (wxUint8)(rdp.env_color&0xFF);
-  A_T0_INTER_T1_USING_FACTOR (factor);
+  if (cmb.combine_ext)
+  {
+    ACMBEXT(GR_CMBX_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_ALPHA, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ITALPHA, 0,
+      GR_CMBX_ZERO, 0);
+    CA_PRIM ();
+  }
+  else
+  {
+    ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
+      GR_COMBINE_FACTOR_LOCAL,
+      GR_COMBINE_LOCAL_ITERATED,
+      GR_COMBINE_OTHER_TEXTURE);
+    MULSHADE_A_PRIM ();
+  }
+  A_T1_MUL_ENVA_ADD_T0 ();
 }
 
 //Added by Gonetz
@@ -10800,8 +10839,8 @@ static COMBINER color_cmb_list[] = {
   //    {0x6531e4f0, cc_t0_mul_env_mul_shade},
   {0x6531e4f0, cc__prim_inter_t0_using_env__mul_shade},
   // Dragonfly feet, banjo kazooie
-  // (1-prim)*env+prim, (cmb-0)*shade+0       ** INC **
-  {0x6536e4f0, cc_env_mul_shade},
+  // (1-prim)*env+prim, (cmb-0)*shade+0
+  {0x6536e4f0, cc__prim_inter_one_using_env__mul_shade},
   // Lava piranha atack, Paper Mario
   // (t1-k4)*env+prim       ** INC **
   {0x65726572, cc_t1_mul_env_add_prim},
@@ -12420,7 +12459,7 @@ static COMBINER alpha_cmb_list[] = {
   {0x037a0ef8, ac__t1_mul_enva_add_t0__mul_prim},
   // Scary face move, pokemon stadium 2
   // (t1-0)*env+t0, (cmb-prim)*shade+0
-  {0x037a0f18, ac__t0_inter_t1_using_enva__mul_prim_mul_shade},
+  {0x037a0f18, ac__t1_mul_enva_add_t0__sub_prim_mul_shade},
   // Saria's song, zelda
   // (t1-0)*env+t0, (cmb-0)*shade+0
   {0x037a0f38, ac__t1_mul_enva_add_t0__mul_shade},
@@ -13581,7 +13620,7 @@ void Combine ()
   else
     color_cmb_list[current].func();
 
-  RDP (" | |- Color done\n");
+  LRDP(" | |- Color done\n");
 
   // Now again for alpha
   current = 0x7FFFFFFF;
@@ -13657,7 +13696,7 @@ void Combine ()
     ac_t0();
   }
 
-  RDP (" | |- Alpha done\n");
+  LRDP(" | |- Alpha done\n");
 #endif // FASTSEARCH
 
   CombineBlender ();
@@ -13730,7 +13769,7 @@ void Combine ()
   }
   cmb.shade_mod_hash = (rdp.cmb_flags + rdp.cmb_flags_2) * (rdp.prim_color + rdp.env_color + rdp.K5);
 
-  RDP (" | + Combine end\n");
+  LRDP(" | + Combine end\n");
 }
 
 void CombineBlender ()

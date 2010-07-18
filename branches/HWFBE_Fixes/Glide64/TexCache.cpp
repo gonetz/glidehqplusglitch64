@@ -284,7 +284,7 @@ void GetTexInfo (int id, int tile)
     info->splits = 1;
   }
 
-  RDP (" | | |-+ Texture approved:\n");
+  LRDP(" | | |-+ Texture approved:\n");
   FRDP (" | | | |- tmem: %08lx\n", rdp.tiles[tile].t_mem);
   FRDP (" | | | |- load width: %d\n", width);
   FRDP (" | | | |- load height: %d\n", height);
@@ -292,7 +292,7 @@ void GetTexInfo (int id, int tile)
   FRDP (" | | | |- actual height: %d\n", rdp.tiles[tile].height);
   FRDP (" | | | |- size: %d\n", rdp.tiles[tile].size);
   FRDP (" | | | +- format: %d\n", rdp.tiles[tile].format);
-  RDP (" | | |- Calculating CRC... ");
+  LRDP(" | | |- Calculating CRC... ");
 
   // ** CRC CHECK
 
@@ -311,7 +311,7 @@ void GetTexInfo (int id, int tile)
   // Texture too big for tmem & needs to wrap? (trees in mm)
   if (rdp.tiles[tile].t_mem + min(height, tile_height) * (rdp.tiles[tile].line<<3) > 4096)
   {
-    RDP ("TEXTURE WRAPS TMEM!!! ");
+    LRDP("TEXTURE WRAPS TMEM!!! ");
 
     // calculate the y value that intersects at 4096 bytes
     int y = (4096 - rdp.tiles[tile].t_mem) / (rdp.tiles[tile].line<<3);
@@ -325,7 +325,7 @@ void GetTexInfo (int id, int tile)
     rdp.tiles[tile].mask_t = shift;
 
     // restart the function
-    RDP ("restarting...\n");
+    LRDP("restarting...\n");
     GetTexInfo (id, tile);
     return;
   }
@@ -384,7 +384,7 @@ void GetTexInfo (int id, int tile)
   info->flags = flags;
 
   // Search the texture cache for this texture
-  RDP (" | | |-+ Checking cache...\n");
+  LRDP(" | | |-+ Checking cache...\n");
 
   CACHE_LUT *cache;
 
@@ -443,7 +443,7 @@ void GetTexInfo (int id, int tile)
     node = node->pNext;
   }
 
-  RDP (" | | | +- Done.\n | | +- GetTexInfo end\n");
+  LRDP(" | | | +- Done.\n | | +- GetTexInfo end\n");
 }
 
 //****************************************************************
@@ -477,7 +477,7 @@ static void SelectTBuffTex(TBUFF_COLOR_IMAGE * pTBuffTex)
 int SwapTextureBuffer();
 void TexCache ()
 {
-  RDP (" |-+ TexCache called\n");
+  LRDP(" |-+ TexCache called\n");
 
 #ifdef TEXTURE_FILTER /* Hiroshi Morii <koolsmoky@users.sourceforge.net> */ // POSTNAPALM
   if (settings.ghq_use && settings.ghq_hirs_dump) {
@@ -687,7 +687,7 @@ void TexCache ()
       // Now actually combine
       if (cmb.cmb_ext_use)
       {
-        RDP (" | | | |- combiner extension\n");
+        LRDP(" | | | |- combiner extension\n");
         if (!(cmb.cmb_ext_use & COMBINE_EXT_COLOR))
           ColorCombinerToExtension ();
         if (!(cmb.cmb_ext_use & COMBINE_EXT_ALPHA))
@@ -716,7 +716,7 @@ void TexCache ()
     {
       if (cmb.tex_cmb_ext_use)
       {
-        RDP (" | | | |- combiner extension tmu1\n");
+        LRDP(" | | | |- combiner extension tmu1\n");
         if (!(cmb.tex_cmb_ext_use & TEX_COMBINE_EXT_COLOR))
           TexColorCombinerToExtension (GR_TMU1);
         if (!(cmb.tex_cmb_ext_use & TEX_COMBINE_EXT_ALPHA))
@@ -744,7 +744,7 @@ void TexCache ()
     {
       if (cmb.tex_cmb_ext_use)
       {
-        RDP (" | | | |- combiner extension tmu0\n");
+        LRDP(" | | | |- combiner extension tmu0\n");
         if (!(cmb.tex_cmb_ext_use & TEX_COMBINE_EXT_COLOR))
           TexColorCombinerToExtension (GR_TMU0);
         if (!(cmb.tex_cmb_ext_use & TEX_COMBINE_EXT_ALPHA))
@@ -774,7 +774,7 @@ void TexCache ()
   {
     if (aTBuff[0] && aTBuff[0]->cache)
     {
-      RDP (" | |- Hires tex T0 found in cache.\n");
+      LRDP(" | |- Hires tex T0 found in cache.\n");
       if (fullscreen)
       {
         rdp.cur_cache[0] = aTBuff[0]->cache;
@@ -784,7 +784,7 @@ void TexCache ()
     }
     else if (tex_found[0][tmu_0] != -1)
     {
-      RDP (" | |- T0 found in cache.\n");
+      LRDP(" | |- T0 found in cache.\n");
       if (fullscreen)
       {
         CACHE_LUT *cache = voodoo.tex_UMA?&rdp.cache[0][tex_found[0][0]]:&rdp.cache[tmu_0][tex_found[0][tmu_0]];
@@ -805,7 +805,7 @@ void TexCache ()
   {
     if (aTBuff[1] && aTBuff[1]->cache)
     {
-      RDP (" | |- Hires tex T1 found in cache.\n");
+      LRDP(" | |- Hires tex T1 found in cache.\n");
       if (fullscreen)
       {
         rdp.cur_cache[1] = aTBuff[1]->cache;
@@ -815,7 +815,7 @@ void TexCache ()
     }
     else if (tex_found[1][tmu_1] != -1)
     {
-      RDP (" | |- T1 found in cache.\n");
+      LRDP(" | |- T1 found in cache.\n");
       if (fullscreen)
       {
         CACHE_LUT *cache = voodoo.tex_UMA?&rdp.cache[0][tex_found[1][0]]:&rdp.cache[tmu_1][tex_found[1][tmu_1]];
@@ -910,7 +910,7 @@ void TexCache ()
     }
   }
 
-  RDP (" | +- TexCache End\n");
+  LRDP(" | +- TexCache End\n");
 }
 
 
@@ -970,7 +970,7 @@ void LoadTex (int id, int tmu)
   // Clear the cache if it's full
   if (rdp.n_cached[tmu] >= MAX_CACHE)
   {
-    RDP ("Cache count reached, clearing...\n");
+    LRDP("Cache count reached, clearing...\n");
     ClearCache ();
     if (id == 1 && rdp.tex == 3)
       LoadTex (0, rdp.t0);
@@ -1751,7 +1751,7 @@ void LoadTex (int id, int tmu)
       // Check for end of memory (too many textures to fit, clear cache)
       if (voodoo.tmem_ptr[tmu]+texture_size >= voodoo.tex_max_addr[tmu])
       {
-        RDP ("Cache size reached, clearing...\n");
+        LRDP("Cache size reached, clearing...\n");
         ClearCache ();
 
         if (id == 1 && rdp.tex == 3)
@@ -1774,5 +1774,5 @@ void LoadTex (int id, int tmu)
         t_info);
     }
 
-    RDP (" | | +- LoadTex end\n");
+    LRDP(" | | +- LoadTex end\n");
 }

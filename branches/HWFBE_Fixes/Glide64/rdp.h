@@ -550,10 +550,7 @@ typedef struct
 
 #define NUMTEXBUF 92
 
-typedef struct
-{
-  wxString RomName;
-
+struct RDP_Base{
   float vi_width;
   float vi_height;
 
@@ -630,17 +627,6 @@ typedef struct
   int acmp; // 0 = none, 1 = threshold, 2 = dither
   int zsrc; // 0 = pixel, 1 = prim
 
-  // Clipping
-  int clip;     // clipping flags
-  VERTEX vtx1[256]; // copy vertex buffer #1 (used for clipping)
-  VERTEX vtx2[256]; // copy vertex buffer #2
-  VERTEX *vtxbuf;   // current vertex buffer (reset to vtx, used to determine current
-            //   vertex buffer)
-  VERTEX *vtxbuf2;
-  int n_global;   // Used to pass the number of vertices from clip_z to clip_tri
-
-  int vtx_buffer;
-
   // Matrices
   DECLAREALIGN16VAR(model[4][4]);
   DECLAREALIGN16VAR(proj[4][4]);
@@ -664,11 +650,6 @@ typedef struct
   int     mipmap_level;
   int     last_tile;   // last tile set
   int     last_tile_size;   // last tile size set
-
-  CACHE_LUT cache[MAX_TMU][MAX_CACHE];
-  CACHE_LUT *cur_cache[2];
-  wxUint32   cur_cache_n[2];
-  int     n_cached[MAX_TMU];
 
   int     t0, t1;
   int     best_tex; // if no 2-tmus, which texture? (0 or 1)
@@ -713,11 +694,7 @@ typedef struct
 
   int first;
 
-  // Vertices
-  VERTEX vtx[MAX_VTX];
-  int v0, vn;
-
-  wxUint32 tex_ctr;    // same as above, incremented every time textures are updated
+  wxUint32 tex_ctr;    // incremented every time textures are updated
 
   int allow_combine; // allow combine updating?
 
@@ -736,7 +713,6 @@ typedef struct
   wxUint8 texrecting;
 
   //frame buffer related slots. Added by Gonetz
-  COLOR_IMAGE frame_buffers[NUMTEXBUF+2];
   wxUint32 cimg, ocimg, zimg, tmpzimg, vi_org_reg;
   COLOR_IMAGE maincimg[2];
   wxUint32 last_drawn_ci_addr;
@@ -766,8 +742,36 @@ typedef struct
     fog_blend_inverse
     }
   fog_mode;
+};
 
-} RDP;
+struct RDP : public RDP_Base
+{
+  // Clipping
+  int clip;     // clipping flags
+  VERTEX *vtx1; //[256] copy vertex buffer #1 (used for clipping)
+  VERTEX *vtx2; //[256] copy vertex buffer #2
+  VERTEX *vtxbuf;   // current vertex buffer (reset to vtx, used to determine current vertex buffer)
+  VERTEX *vtxbuf2;
+  int n_global;   // Used to pass the number of vertices from clip_z to clip_tri
+  int vtx_buffer;
+
+  CACHE_LUT *cache[MAX_TMU]; //[MAX_CACHE]
+  CACHE_LUT *cur_cache[MAX_TMU];
+  wxUint32   cur_cache_n[MAX_TMU];
+  int     n_cached[MAX_TMU];
+
+  // Vertices
+  VERTEX *vtx; //[MAX_VTX]
+  int v0, vn;
+
+  COLOR_IMAGE *frame_buffers; //[NUMTEXBUF+2]
+
+  wxString RomName;
+
+  RDP();
+  ~RDP();
+  void Reset();
+};
 
 
 void SetWireframeCol ();
