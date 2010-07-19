@@ -1806,12 +1806,6 @@ void drawViRegBG()
     fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<1);
     fb_info.size   = 2;
   }
-  wxUint32 image_end_addr = fb_info.addr + ((fb_info.width*fb_info.height)<<fb_info.size>>1);
-  if (image_end_addr > BMASK+1)
-  {
-    FRDP("Image is out of RDRAM bounds: %d\n", image_end_addr);
-    return;
-  }
   rdp.last_bg = fb_info.addr;
 
   bool drawn = DrawFrameBufferToScreen(fb_info);
