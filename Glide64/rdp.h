@@ -719,7 +719,6 @@ struct RDP_Base{
   wxUint32 ci_upper_bound, ci_lower_bound;
   int  motionblur, fb_drawn, fb_drawn_front, read_previous_ci, read_whole_frame;
   CI_STATUS ci_status;
-  TEXTURE_BUFFER texbufs[2];
   TBUFF_COLOR_IMAGE * cur_image;  //image currently being drawn
   TBUFF_COLOR_IMAGE * tbuff_tex;  //image, which corresponds to currently selected texture
   wxUint8  cur_tex_buf;
@@ -758,6 +757,7 @@ struct RDP : public RDP_Base
   int v0, vn;
 
   COLOR_IMAGE *frame_buffers; //[NUMTEXBUF+2]
+  TEXTURE_BUFFER texbufs[2];
 
   wxString RomName;
 
