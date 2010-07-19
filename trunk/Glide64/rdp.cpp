@@ -240,6 +240,7 @@ void RDP::Reset()
 
   cycle_mode = 2;
   allow_combine = 1;
+  rdp.update = UPDATE_SCISSOR | UPDATE_COMBINE | UPDATE_ZBUF_ENABLED | UPDATE_CULL_MODE;
   fog_mode = RDP::fog_enabled;
   maincimg[0].addr = maincimg[1].addr = last_drawn_ci_addr = 0x7FFFFFFF;
 
