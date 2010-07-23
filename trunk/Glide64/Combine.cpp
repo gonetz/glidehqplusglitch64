@@ -10733,8 +10733,9 @@ static COMBINER color_cmb_list[] = {
   // (env-prim)*t1+prim
   {0x62356235, cc_env_sub_prim_mul_t1_add_prim},
   // Pokemon Stadium 2, [gokuss4]. Added by Gonetz
-  // (env-prim)*t1+prim, (cmb-0)*t1+0  ** INC **
-  {0x6235e2f0, cc_env_sub_prim_mul_t1_add_prim},
+  // (env-prim)*t1+prim, (cmb-0)*t1+0
+  // Hack alert!
+  {0x6235e2f0, cc_t1},
   // bike trace, xg2 intro. Added by Gonetz
   // (1-prim)*t1+prim
   {0x62366236, cc_one_sub_prim_mul_t1_add_prim},
