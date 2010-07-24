@@ -555,9 +555,6 @@ struct RDP_Base{
   float scale_x, scale_1024, scale_x_bak;
   float scale_y, scale_768, scale_y_bak;
 
-  wxUint32 res_scale_x;
-  wxUint32 res_scale_y;
-
   float view_scale[3];
   float view_trans[3];
   float clip_min_x, clip_max_x, clip_min_y, clip_max_y;
