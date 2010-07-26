@@ -13756,7 +13756,7 @@ void CombineBlender ()
     case 0x0150: //spiderman
     case 0x0d18: //clr_in * a_fog + clr_mem * (1-a)
       A_BLEND (GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA);
-      if (rdp.cycle2 != 0x01ff1fff)
+      if (rdp.cycle_mode == 1 && rdp.cycle2 != 0x01ff1fff)
       {
         wxUint32 prim = rdp.prim_color;
         rdp.prim_color = rdp.fog_color;
