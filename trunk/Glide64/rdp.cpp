@@ -3309,7 +3309,7 @@ void DetectFrameBufferUsage ()
     rdp.read_whole_frame = TRUE;
   if (rdp.read_whole_frame)
   {
-    if (fb_hwfbe_enabled && !(settings.frame_buffer&fb_ignore_previous))
+    if (fb_hwfbe_enabled)
     {
       if (rdp.read_previous_ci && !previous_ci_was_read && (settings.swapmode != 2) && (settings.ucode != ucode_PerfectDark))
       {
@@ -3374,10 +3374,7 @@ void DetectFrameBufferUsage ()
   rdp.ci_count = 0;
   if (settings.hacks&hack_Banjo2)
     rdp.cur_tex_buf = 0;
-  if (settings.frame_buffer&fb_ignore_previous)
-    rdp.read_whole_frame = FALSE;
-  else
-    rdp.maincimg[0] = rdp.frame_buffers[rdp.main_ci_index];
+  rdp.maincimg[0] = rdp.frame_buffers[rdp.main_ci_index];
   //    rdp.scale_x = rdp.scale_x_bak;
   //    rdp.scale_y = rdp.scale_y_bak;
   LRDP("DetectFrameBufferUsage End\n");

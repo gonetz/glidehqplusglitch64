@@ -222,7 +222,6 @@ typedef struct {
   #define  fb_depth_render         (1<<6)   //enable software depth render
   #define  fb_optimize_texrect     (1<<7)   //fast texrect rendering with hwfbe
   #define  fb_ignore_aux_copy      (1<<8)   //do not copy auxilary frame buffers
-  #define  fb_ignore_previous      (1<<9)   //do not check of previous frame usage
   #define  fb_useless_is_useless   (1<<10)  //
   #define  fb_get_info             (1<<11)  //get frame buffer info
   #define  fb_read_back_to_screen  (1<<12)  //render N64 frame buffer to screen
