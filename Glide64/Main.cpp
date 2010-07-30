@@ -535,7 +535,6 @@ void ReadSpecialSettings (const char * name)
   //frame buffer
   int optimize_texrect = ini->Read(_T("optimize_texrect"), -1);
   int ignore_aux_copy = ini->Read(_T("ignore_aux_copy"), -1);
-  int ignore_previous = ini->Read(_T("ignore_previous"), -1);
   int hires_buf_clear = ini->Read(_T("hires_buf_clear"), -1);
   int read_alpha = ini->Read(_T("fb_read_alpha"), -1);
   int useless_is_useless = ini->Read(_T("useless_is_useless"), -1);
@@ -546,8 +545,6 @@ void ReadSpecialSettings (const char * name)
   else if (ignore_aux_copy == 0) settings.frame_buffer &= ~fb_ignore_aux_copy;
   if (hires_buf_clear > 0) settings.frame_buffer |= fb_hwfbe_buf_clear;
   else if (hires_buf_clear == 0) settings.frame_buffer &= ~fb_hwfbe_buf_clear;
-  if (ignore_previous > 0) settings.frame_buffer |= fb_ignore_previous;
-  else if (ignore_previous == 0) settings.frame_buffer &= ~fb_ignore_previous;
   if (read_alpha > 0) settings.frame_buffer |= fb_read_alpha;
   else if (read_alpha == 0) settings.frame_buffer &= ~fb_read_alpha;
   if (useless_is_useless > 0) settings.frame_buffer |= fb_useless_is_useless;
