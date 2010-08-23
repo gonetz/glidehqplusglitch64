@@ -123,9 +123,9 @@ const char *str_offon[] = { "OFF", "ON" };
 const char *str_cull[] = { "DISABLE", "FRONT", "BACK", "BOTH" };
 
 // I=intensity probably
-const char *str_format[]   = { "RGBA", "YUV", "CI", "IA", "I", "?", "?", "?" };
-const char *str_size[]     = { "4bit", "8bit", "16bit", "32bit" };
-const char *str_cm[]       = { "WRAP/NO CLAMP", "MIRROR/NO CLAMP", "WRAP/CLAMP", "MIRROR/CLAMP" };
+const char *str_format[] = { "RGBA", "YUV", "CI", "IA", "I", "?", "?", "?" };
+const char *str_size[]   = { "4bit", "8bit", "16bit", "32bit" };
+const char *str_cm[]     = { "WRAP/NO CLAMP", "MIRROR/NO CLAMP", "WRAP/CLAMP", "MIRROR/CLAMP" };
 const char *str_lod[]    = { "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048" };
 const char *str_aspect[] = { "1x8", "1x4", "1x2", "1x1", "2x1", "4x1", "8x1" };
 
@@ -133,7 +133,9 @@ const char *str_filter[] = { "Point Sampled", "Average (box)", "Bilinear" };
 
 const char *str_tlut[]   = { "TT_NONE", "TT_UNKNOWN", "TT_RGBA_16", "TT_IA_16" };
 
-const char *CIStatus[] = { "ci_main", "ci_zimg", "ci_unknown",  "ci_useless",
+const char *str_dither[] = { "Pattern", "~Pattern", "Noise", "None" };
+
+const char *CIStatus[]   = { "ci_main", "ci_zimg", "ci_unknown",  "ci_useless",
                             "ci_old_copy", "ci_copy", "ci_copy_self",
                             "ci_zcopy", "ci_aux", "ci_aux_copy" };
 

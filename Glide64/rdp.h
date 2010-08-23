@@ -616,6 +616,7 @@ struct RDP_Base{
   // othermode_l flags
   int acmp; // 0 = none, 1 = threshold, 2 = dither
   int zsrc; // 0 = pixel, 1 = prim
+  wxUint8 alpha_dither_mode;
 
   // Matrices
   DECLAREALIGN16VAR(model[4][4]);

@@ -852,6 +852,18 @@ static void uc0_setothermode_h()
   rdp.othermode_h &= ~mask;
   rdp.othermode_h |= rdp.cmd1;
   
+  if (mask & 0x00000030)  // alpha dither mode
+  {
+    rdp.alpha_dither_mode = (rdp.othermode_h >> 4) & 0x3;
+    FRDP ("alpha dither mode: %s\n", str_dither[rdp.alpha_dither_mode]);
+  }
+
+  if (mask & 0x000000C0)  // rgb dither mode
+  {
+    wxUint32 dither_mode = (rdp.othermode_h >> 6) & 0x3;
+    FRDP ("rgb dither mode: %s\n", str_dither[dither_mode]);
+  }
+
   if (mask & 0x00003000)  // filter mode
   {
     rdp.filter_mode = (int)((rdp.othermode_h & 0x00003000) >> 12);
@@ -884,7 +896,7 @@ static void uc0_setothermode_h()
     FRDP ("Persp_en: %d\n", rdp.Persp_en);
   }
   
-  wxUint32 unk = mask & 0xFFCF0FFF;
+  wxUint32 unk = mask & 0x0FFC60F0F;
   if (unk)  // unknown portions, LARGE
   {
     FRDP ("UNKNOWN PORTIONS: shift: %d, len: %d, unknowns: %08lx\n", shift, len, unk);
