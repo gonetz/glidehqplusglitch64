@@ -2007,7 +2007,7 @@ void update ()
           LRDP (" |- alpha compare: none\n");
         }
       }
-      if (rdp.acmp == 3)
+      if (rdp.acmp == 3 && rdp.alpha_dither_mode != 3 && rdp.cycle_mode < 2)
       {
         if (grStippleModeExt)
         {
