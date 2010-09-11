@@ -1360,12 +1360,12 @@ static void rdp_texrect()
   // DO NOT SET CLAMP MODE HERE
 
   float Z = 1.0f;
-  if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030))  // othermode check makes sure it
+  if (rdp.othermode_l & 0x00000030)  // othermode check makes sure it
     // USES the z-buffer.  Otherwise it returns bad (unset) values for lot and telescope
     //in zelda:mm.
   {
     FRDP ("prim_depth = %d\n", rdp.prim_depth);
-    Z = rdp.prim_depth;
+    Z = rdp.zsrc == 1 ? rdp.prim_depth : 0;
     Z = ScaleZ(Z);
 
     if (rdp.othermode_l & 0x10)

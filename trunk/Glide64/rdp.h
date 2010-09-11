@@ -295,6 +295,7 @@ typedef struct {
   int force_calc_sphere; //use spheric mapping only, Ridge Racer 64
   int pal230;    //set special scale for PAL games
   int correct_viewport; //correct viewport values
+  int n64_z_scale; //scale vertex z value before writing to depth buffer, as N64 does.
 
   //Special game hacks
   #define  hack_ASB         (1<<0)   //All-Star Baseball games
@@ -860,7 +861,6 @@ __inline void ConvertCoordsConvert (VERTEX *v, int n)
     }
   }
 
-//  float z;
   for (int i=0; i<n; i++)
   {
     v[i].uc(rdp.t0) = v[i].u0;
@@ -885,20 +885,6 @@ __inline void AddOffset (VERTEX *v, int n)
     v[i].x += rdp.offset_x;
     v[i].y += rdp.offset_y;
   }
-}
-
-__inline float ScaleZ(float z)
-{
-//  z *= 2.0f;
-//  if (z > 65535.0f) return 65535.0f;
-//  return (z / 65535.0f) * z;
-//  if (z  < 4096.0f) return z * 0.25f;
-//  z = (z / 16384.0f) * z;
-
-  if (z  < 0.0f) return 0.0f;
-  z *= 1.9f;
-  if (z > 65534.0f) return 65534.0f;
-  return z;
 }
 
 __inline void CalculateFog (VERTEX *v)
