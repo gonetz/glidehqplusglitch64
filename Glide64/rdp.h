@@ -293,7 +293,6 @@ typedef struct {
   int adjust_aspect; //adjust screen aspect for wide screen mode
   int force_depth_compare; //NFL Quarterback Club 99 and All-Star Baseball 2000
   int force_calc_sphere; //use spheric mapping only, Ridge Racer 64
-  int increase_primdepth;  //increase prim_depth value for texrects
   int pal230;    //set special scale for PAL games
   int correct_viewport; //correct viewport values
 

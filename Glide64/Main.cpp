@@ -515,7 +515,6 @@ void ReadSpecialSettings (const char * name)
     settings.depth_bias = -depth_bias;
   ini->Read(_T("increase_texrect_edge"), &(settings.increase_texrect_edge));
   ini->Read(_T("decrease_fillrect_edge"), &(settings.decrease_fillrect_edge));
-  ini->Read(_T("increase_primdepth"), &(settings.increase_primdepth));
   if (ini->Read(_T("texrect_compare_less"), -1) == 1) settings.texrect_compare_func = GR_CMP_LESS;
   else settings.texrect_compare_func = GR_CMP_LEQUAL;
   if (ini->Read(_T("texture_correction"), -1) == 0) settings.texture_correction = 0;
