@@ -59,6 +59,8 @@ void update_scissor ();
 
 void set_message_combiner ();
 
+float ScaleZ(float z);
+
 // positional and texel coordinate clipping
 #define CCLIP(ux,lx,ut,lt,uc,lc) \
 		if (ux > lx || lx < uc || ux > lc) { rdp.tri_n += 2; return; } \

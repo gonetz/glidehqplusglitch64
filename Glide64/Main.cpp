@@ -444,10 +444,7 @@ void ReadSpecialSettings (const char * name)
   else if (strstr(name, (const char *)"All") && strstr(name, (const char *)"Star") && strstr(name, (const char *)"Baseball"))
     settings.hacks |= hack_ASB;
   else if (strstr(name, (const char *)"Beetle") || strstr(name, (const char *)"BEETLE") || strstr(name, (const char *)"HSV"))
-  {
     settings.hacks |= hack_BAR;
-    ZLUT_init();
-  }
   else if (strstr(name, (const char *)"I S S 64") || strstr(name, (const char *)"J WORLD SOCCER3") || strstr(name, (const char *)"PERFECT STRIKER"))
     settings.hacks |= hack_ISS64;
   else if (strstr(name, (const char *)"MARIOKART64"))
@@ -457,10 +454,7 @@ void ReadSpecialSettings (const char * name)
   else if (strstr(name, (const char *)"CHOPPER_ATTACK") || strstr(name, (const char *)"WILD CHOPPERS"))
     settings.hacks |= hack_Chopper;
   else if (strstr(name, (const char *)"Resident Evil II") || strstr(name, (const char *)"BioHazard II"))
-  {
     settings.hacks |= hack_RE2;
-    ZLUT_init();
-  }
   else if (strstr(name, (const char *)"YOSHI STORY"))
     settings.hacks |= hack_Yoshi;
   else if (strstr(name, (const char *)"F-Zero X") || strstr(name, (const char *)"F-ZERO X"))
@@ -530,6 +524,9 @@ void ReadSpecialSettings (const char * name)
   ini->Read(_T("clip_zmax"), &(settings.clip_zmax));
   ini->Read(_T("fast_crc"), &(settings.fast_crc));
   ini->Read(_T("adjust_aspect"), &(settings.adjust_aspect), 1);
+  ini->Read(_T("n64_z_scale"), &(settings.n64_z_scale));
+  if (settings.n64_z_scale)
+    ZLUT_init();
 
   //frame buffer
   int optimize_texrect = ini->Read(_T("optimize_texrect"), -1);

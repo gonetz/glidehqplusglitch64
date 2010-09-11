@@ -1019,6 +1019,21 @@ static void CalculateLOD(VERTEX *v, int n)
   FRDP("CalculateLOD factor: %f, tile: %d, lod_fraction: %f\n", (float)lodFactor, lod_tile, lod_fraction);
 }
 
+float ScaleZ(float z)
+{
+  if (settings.n64_z_scale)
+  {
+    int iz = (int)(z*8.0f+0.5f);
+    if (iz < 0) iz = 0;
+    else if (iz >= 0x40000) iz = 0x40000 - 1;
+    return (float)zLUT[iz];
+  }
+  if (z  < 0.0f) return 0.0f;
+  z *= 1.9f;
+  if (z > 65534.0f) return 65534.0f;
+  return z;
+}
+
 static void DepthBuffer(VERTEX * vtx, int n)
 {
   if (fb_depth_render_enabled && !(settings.hacks&hack_RE2) && dzdx && (rdp.flags & ZBUF_UPDATE))
@@ -1043,17 +1058,6 @@ static void DepthBuffer(VERTEX * vtx, int n)
       }
     }
     Rasterize(v, n, dzdx);
-  }
-  if ((settings.hacks&hack_RE2) || ((settings.hacks&hack_BAR) && fb_hwfbe_enabled && !evoodoo))
-  {
-    for(int i=0; i<n; i++)
-    {
-      int fz = (int)(vtx[i].z*8.0f+0.5f);
-      if (fz < 0) fz = 0;
-      else if (fz >= 0x40000) fz = 0x40000 - 1;
-      vtx[i].z = (float)zLUT[fz];
-    }
-    return;
   }
   for(int i=0; i<n; i++)
     vtx[i].z = ScaleZ(vtx[i].z);
