@@ -1366,8 +1366,6 @@ static void rdp_texrect()
   {
     FRDP ("prim_depth = %d\n", rdp.prim_depth);
     Z = rdp.prim_depth;
-    if (settings.increase_primdepth)
-      Z += 8.0f;
     Z = ScaleZ(Z);
 
     if (rdp.othermode_l & 0x10)
