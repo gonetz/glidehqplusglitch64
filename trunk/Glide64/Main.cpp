@@ -1013,7 +1013,7 @@ int InitGfx (int evoodoo_using_window)
     voodoo.sup_32bit_tex = FALSE;
 
   voodoo.gamma_correction = 0;
-  if (char * extstr = (char*)strstr(extensions, "GETGAMMA"))
+  if (strstr(extensions, "GETGAMMA"))
     grGet(GR_GAMMA_TABLE_ENTRIES, sizeof(voodoo.gamma_table_size), &voodoo.gamma_table_size);
 
   if (fb_hwfbe_enabled)
