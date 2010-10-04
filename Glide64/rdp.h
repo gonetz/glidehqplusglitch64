@@ -278,8 +278,6 @@ typedef struct {
   int alt_tex_size;
   int use_sts1_only;
   int flame_corona; //hack for zeldas flame's corona
-  int depth_bias;
-  int soft_depth_compare; // use GR_CMP_LEQUAL instead of GR_CMP_LESS
   int increase_texrect_edge; // add 1 to lower right corner coordinates of texrect
   int decrease_fillrect_edge; // sub 1 from lower right corner coordinates of fillrect
   int texture_correction; // enable perspective texture correction emulation. is on by default
@@ -289,9 +287,7 @@ typedef struct {
   int force_quad3d; //force 0xb5 command to be quad, not line 3d
   int clip_zmin; //enable near z clipping
   int clip_zmax; //enable far plane clipping;
-  int texrect_compare_func; //function used for texrect depth compare
   int adjust_aspect; //adjust screen aspect for wide screen mode
-  int force_depth_compare; //NFL Quarterback Club 99 and All-Star Baseball 2000
   int force_calc_sphere; //use spheric mapping only, Ridge Racer 64
   int pal230;    //set special scale for PAL games
   int correct_viewport; //correct viewport values
@@ -597,6 +593,7 @@ struct RDP_Base{
   wxUint32 CENTER;
   wxUint32 prim_lodmin, prim_lodfrac;
   wxUint16 prim_depth;
+  wxUint16 prim_dz;
   wxUint8 K4;
   wxUint8 K5;
   enum {
