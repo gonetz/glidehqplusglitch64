@@ -2101,15 +2101,15 @@ static void rdp_fillrect()
     rdp.scissor.lr_y);
 
   // KILL the floating point error with 0.01f
-  wxUint32 s_ul_x = (wxUint32)min(max(ul_x * rdp.scale_x + rdp.offset_x + 0.01f, rdp.scissor.ul_x), rdp.scissor.lr_x);
-  wxUint32 s_lr_x = (wxUint32)min(max(lr_x * rdp.scale_x + rdp.offset_x + 0.01f, rdp.scissor.ul_x), rdp.scissor.lr_x);
-  wxUint32 s_ul_y = (wxUint32)min(max(ul_y * rdp.scale_y + rdp.offset_y + 0.01f, rdp.scissor.ul_y), rdp.scissor.lr_y);
-  wxUint32 s_lr_y = (wxUint32)min(max(lr_y * rdp.scale_y + rdp.offset_y + 0.01f, rdp.scissor.ul_y), rdp.scissor.lr_y);
+  wxInt32 s_ul_x = (wxUint32)min(max(ul_x * rdp.scale_x + rdp.offset_x + 0.01f, rdp.scissor.ul_x), rdp.scissor.lr_x);
+  wxInt32 s_lr_x = (wxUint32)min(max(lr_x * rdp.scale_x + rdp.offset_x + 0.01f, rdp.scissor.ul_x), rdp.scissor.lr_x);
+  wxInt32 s_ul_y = (wxUint32)min(max(ul_y * rdp.scale_y + rdp.offset_y + 0.01f, rdp.scissor.ul_y), rdp.scissor.lr_y);
+  wxInt32 s_lr_y = (wxUint32)min(max(lr_y * rdp.scale_y + rdp.offset_y + 0.01f, rdp.scissor.ul_y), rdp.scissor.lr_y);
 
-  if (s_lr_x < 0.0f) s_lr_x = 0;
-  if (s_lr_y < 0.0f) s_lr_y = 0;
-  if (s_ul_x > (float)settings.res_x) s_ul_x = settings.res_x;
-  if (s_ul_y > (float)settings.res_y) s_ul_y = settings.res_y;
+  if (s_lr_x < 0) s_lr_x = 0;
+  if (s_lr_y < 0) s_lr_y = 0;
+  if ((wxUint32)s_ul_x > settings.res_x) s_ul_x = settings.res_x;
+  if ((wxUint32)s_ul_y > settings.res_y) s_ul_y = settings.res_y;
 
   FRDP (" - %d, %d, %d, %d\n", s_ul_x, s_ul_y, s_lr_x, s_lr_y);
 
