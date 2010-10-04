@@ -325,7 +325,7 @@ bool DrawFrameBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     scale = 1.0f;
     t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_256;
   }
-  if (width <= 512)
+  else if (width <= 512)
   {
     texwidth = 512;
     scale = 0.5f;
@@ -602,7 +602,7 @@ void DrawDepthBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     scale = 1.0f;
     t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_256;
   }
-  if (width <= 512)
+  else if (width <= 512)
   {
     texwidth = 512;
     scale = 0.5f;
