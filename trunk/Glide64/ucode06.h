@@ -276,38 +276,38 @@ void DrawImage (DRAWIMAGE *d)
   int x_size, y_size, x_shift, y_shift, line;
   // choose optimum size for the format/size
   switch (d->imageSiz)
-{
-    case 0:
-      x_size = 128;
-      y_size = 64;
-      x_shift = 7;
-      y_shift = 6;
-      line = 8;
-      break;
-    case 1:
-      x_size = 64;
-      y_size = 64;
-      x_shift = 6;
-      y_shift = 6;
-      line = 8;
-      break;
-    case 2:
-      x_size = 64;
-      y_size = 32;
-      x_shift = 6;
-      y_shift = 5;
-      line = 16;
-      break;
-    case 3:
-      x_size = 32;
-      y_size = 16;
-      x_shift = 4;
-      y_shift = 3;
-      line = 16;
-      break;
-    default:
-      FRDP("DrawImage. unknown image size: %d\n", d->imageSiz);
-      return;
+  {
+  case 0:
+    x_size = 128;
+    y_size = 64;
+    x_shift = 7;
+    y_shift = 6;
+    line = 8;
+    break;
+  case 1:
+    x_size = 64;
+    y_size = 64;
+    x_shift = 6;
+    y_shift = 6;
+    line = 8;
+    break;
+  case 2:
+    x_size = 64;
+    y_size = 32;
+    x_shift = 6;
+    y_shift = 5;
+    line = 16;
+    break;
+  case 3:
+    x_size = 32;
+    y_size = 16;
+    x_shift = 4;
+    y_shift = 3;
+    line = 16;
+    break;
+  default:
+    FRDP("DrawImage. unknown image size: %d\n", d->imageSiz);
+    return;
   }
 
   if (rdp.ci_width == 512 && !no_dlist) //RE2
@@ -324,6 +324,7 @@ void DrawImage (DRAWIMAGE *d)
     }
   }
 
+  if (d->imageH%2 == 1) d->imageH -= 1;
   if ((settings.hacks&hack_PPL))
   {
     if (d->imageY > d->imageH) d->imageY = (d->imageY%d->imageH);
@@ -501,7 +502,7 @@ void DrawImage (DRAWIMAGE *d)
 
       if ((flr_x <= rdp.scissor.lr_x) || (ful_x < rdp.scissor.lr_x))
       {
-          VERTEX v[4] = {
+        VERTEX v[4] = {
           { ful_x, ful_y, Z, 1.0f, ful_u, ful_v },
           { flr_x, ful_y, Z, 1.0f, flr_u, ful_v },
           { ful_x, flr_y, Z, 1.0f, ful_u, flr_v },
@@ -565,7 +566,6 @@ void DrawImage (DRAWIMAGE *d)
   rdp.allow_combine = 1;
   rdp.bg_image_height = 0xFFFF;
 }
-
 
 void DrawHiresImage(DRAWIMAGE *d, int screensize = FALSE)
 {
