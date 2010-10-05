@@ -13015,7 +13015,7 @@ static COMBINER alpha_cmb_list[] = {
   {0x0c770c77, ac_t0_mul_t1},
   // flame, paper mario. Added by Gonetz
   // (1-t0)*t1+1, (cmb-t1)*t1+t1
-  {0x0c8e0490, ac_t0},
+  {0x0c8e0490, ac_t0_mul_t1},
   // Ring boundary, dual heroes
   // (0-1)*prim+1
   {0x0cf70cf7, ac_one_sub_prim},

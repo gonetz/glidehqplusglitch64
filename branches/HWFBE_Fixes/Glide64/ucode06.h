@@ -449,7 +449,7 @@ void DrawImage (DRAWIMAGE *d)
 
   while (1)
   {
-    cur_wrap_u = min_wrap_u + 1 + 1024; // x wrapping is not required
+    cur_wrap_u = min_wrap_u + 1;
     cur_u = min_256_u + 1;
 
     // calculate intersection with this point
@@ -807,17 +807,6 @@ static void uc6_bg_1cyc ()
     {
       LRDP("uc6:bg_1cyc skipped\n");
     }
-  }
-  else if (d.imageX + d.frameW*d.scaleX > d.imageW)
-  {
-    DRAWIMAGE d1 = d;
-    d1.frameW = (d.imageW - d.imageX - 1) / d.scaleX;
-    DrawImage (&d1);
-    DRAWIMAGE d2 = d;
-    d2.frameX = d.frameX + d1.frameW;
-    d2.frameW = d.frameW - d1.frameW;
-    d2.imageX = 0;
-    DrawImage (&d2);
   }
   else
   {
