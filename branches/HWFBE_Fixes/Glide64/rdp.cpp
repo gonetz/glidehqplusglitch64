@@ -123,9 +123,9 @@ const char *str_offon[] = { "OFF", "ON" };
 const char *str_cull[] = { "DISABLE", "FRONT", "BACK", "BOTH" };
 
 // I=intensity probably
-const char *str_format[]   = { "RGBA", "YUV", "CI", "IA", "I", "?", "?", "?" };
-const char *str_size[]     = { "4bit", "8bit", "16bit", "32bit" };
-const char *str_cm[]       = { "WRAP/NO CLAMP", "MIRROR/NO CLAMP", "WRAP/CLAMP", "MIRROR/CLAMP" };
+const char *str_format[] = { "RGBA", "YUV", "CI", "IA", "I", "?", "?", "?" };
+const char *str_size[]   = { "4bit", "8bit", "16bit", "32bit" };
+const char *str_cm[]     = { "WRAP/NO CLAMP", "MIRROR/NO CLAMP", "WRAP/CLAMP", "MIRROR/CLAMP" };
 const char *str_lod[]    = { "1", "2", "4", "8", "16", "32", "64", "128", "256", "512", "1024", "2048" };
 const char *str_aspect[] = { "1x8", "1x4", "1x2", "1x1", "2x1", "4x1", "8x1" };
 
@@ -133,7 +133,9 @@ const char *str_filter[] = { "Point Sampled", "Average (box)", "Bilinear" };
 
 const char *str_tlut[]   = { "TT_NONE", "TT_UNKNOWN", "TT_RGBA_16", "TT_IA_16" };
 
-const char *CIStatus[] = { "ci_main", "ci_zimg", "ci_unknown",  "ci_useless",
+const char *str_dither[] = { "Pattern", "~Pattern", "Noise", "None" };
+
+const char *CIStatus[]   = { "ci_main", "ci_zimg", "ci_unknown",  "ci_useless",
                             "ci_old_copy", "ci_copy", "ci_copy_self",
                             "ci_zcopy", "ci_aux", "ci_aux_copy" };
 
@@ -240,6 +242,7 @@ void RDP::Reset()
 
   cycle_mode = 2;
   allow_combine = 1;
+  rdp.update = UPDATE_SCISSOR | UPDATE_COMBINE | UPDATE_ZBUF_ENABLED | UPDATE_CULL_MODE;
   fog_mode = RDP::fog_enabled;
   maincimg[0].addr = maincimg[1].addr = last_drawn_ci_addr = 0x7FFFFFFF;
 
@@ -1159,29 +1162,14 @@ static void rdp_texrect()
 
   wxUint32 tile = (wxUint16)((rdp.cmd1 & 0x07000000) >> 24);
 
-  // update MUST be at the beginning, b/c of update_scissor
-  if (rdp.cycle_mode == 2)
-  {
-    rdp.tex = 1;
-    rdp.allow_combine = 0;
-
-    cmb.tmu1_func = cmb.tmu0_func = GR_COMBINE_FUNCTION_LOCAL;
-    cmb.tmu1_fac = cmb.tmu0_fac = GR_COMBINE_FACTOR_NONE;
-    cmb.tmu1_a_func = cmb.tmu0_a_func = GR_COMBINE_FUNCTION_LOCAL;
-    cmb.tmu1_a_fac = cmb.tmu0_a_fac = GR_COMBINE_FACTOR_NONE;
-    cmb.tmu1_invert = cmb.tmu0_invert = FXFALSE;
-    cmb.tmu1_a_invert = cmb.tmu0_a_invert = FXFALSE;
-  }
-
   rdp.texrecting = 1;
 
   wxUint32 prev_tile = rdp.cur_tile;
   rdp.cur_tile = tile;
-  rdp.update |= UPDATE_COMBINE;
-  update ();
+
+  const float Z = set_sprite_combine_mode ();
 
   rdp.texrecting = 0;
-  rdp.allow_combine = 1;
 
   if (!rdp.cur_cache[0])
   {
@@ -1359,36 +1347,6 @@ static void rdp_texrect()
 
   FRDP ("  draw at: (%f, %f) -> (%f, %f)\n", s_ul_x, s_ul_y, s_lr_x, s_lr_y);
 
-  // DO NOT SET CLAMP MODE HERE
-
-  float Z = 1.0f;
-  if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030))  // othermode check makes sure it
-    // USES the z-buffer.  Otherwise it returns bad (unset) values for lot and telescope
-    //in zelda:mm.
-  {
-    FRDP ("prim_depth = %d\n", rdp.prim_depth);
-    Z = rdp.prim_depth;
-    if (settings.increase_primdepth)
-      Z += 8.0f;
-    Z = ScaleZ(Z);
-
-    if (rdp.othermode_l & 0x10)
-      grDepthBufferFunction (settings.texrect_compare_func);
-    else
-      grDepthBufferFunction (GR_CMP_ALWAYS);
-
-    if (rdp.othermode_l & 0x20)
-      grDepthMask (FXTRUE);
-    else
-      grDepthMask (FXFALSE);
-
-    rdp.update |= UPDATE_ZBUF_ENABLED;
-  }
-  else
-  {
-    LRDP("no prim_depth used, using 1.0\n");
-  }
-
   VERTEX vstd[4] = {
     { s_ul_x, s_ul_y, Z, 1.0f, texUV[0].ul_u, texUV[0].ul_v, texUV[1].ul_u, texUV[1].ul_v, {0, 0, 0, 0}, 255 },
     { s_lr_x, s_ul_y, Z, 1.0f, texUV[0].lr_u, texUV[0].ul_v, texUV[1].lr_u, texUV[1].ul_v, {0, 0, 0, 0}, 255 },
@@ -1542,38 +1500,6 @@ static void rdp_texrect()
         }
         grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
       }
-      else
-      {
-        grFogMode (GR_FOG_DISABLE);
-      }
-      grCullMode (GR_CULL_DISABLE);
-
-      if (rdp.cycle_mode == 2)
-      {
-        grColorCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
-          GR_COMBINE_FACTOR_ONE,
-          GR_COMBINE_LOCAL_NONE,
-          GR_COMBINE_OTHER_TEXTURE,
-          FXFALSE);
-        grAlphaCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
-          GR_COMBINE_FACTOR_ONE,
-          GR_COMBINE_LOCAL_NONE,
-          GR_COMBINE_OTHER_TEXTURE,
-          FXFALSE);
-        grAlphaBlendFunction (GR_BLEND_ONE,
-          GR_BLEND_ZERO,
-          GR_BLEND_ZERO,
-          GR_BLEND_ZERO);
-        if (rdp.othermode_l & 1)
-        {
-          grAlphaTestFunction (GR_CMP_GEQUAL);
-          grAlphaTestReferenceValue (0x80);
-        }
-        else
-          grAlphaTestFunction (GR_CMP_ALWAYS);
-
-        rdp.update |= UPDATE_ALPHA_COMPARE | UPDATE_COMBINE;
-      }
 
       ConvertCoordsConvert (vptr, n_vertices);
 
@@ -1607,12 +1533,6 @@ static void rdp_texrect()
       }
       else
         rdp.tri_n += 2;
-
-      if (settings.fog && (rdp.flags & FOG_ENABLED))
-      {
-        grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
-      }
-      rdp.update |= UPDATE_CULL_MODE | UPDATE_VIEWPORT;
     }
     else
     {
@@ -1714,6 +1634,7 @@ static void rdp_setscissor()
 static void rdp_setprimdepth()
 {
   rdp.prim_depth = (wxUint16)((rdp.cmd1 >> 16) & 0x7FFF);
+  rdp.prim_dz = (wxUint16)(rdp.cmd1 & 0x7FFF);
 
   FRDP("setprimdepth: %d\n", rdp.prim_depth);
 }
@@ -2211,23 +2132,26 @@ static void rdp_fillrect()
     return;
   }
 
-  // Update scissor
-  if (fullscreen)
-    update_scissor ();
-
   if (rdp.cur_image && (rdp.cur_image->format != 0) && (rdp.cycle_mode == 3) && (rdp.cur_image->width == lr_x))
   {
     wxUint32 color = rdp.fill_color;
-    color = ((color&1)?0xFF:0) |
-      ((wxUint32)((float)((color&0xF800) >> 11) / 31.0f * 255.0f) << 24) |
-      ((wxUint32)((float)((color&0x07C0) >> 6) / 31.0f * 255.0f) << 16) |
-      ((wxUint32)((float)((color&0x003E) >> 1) / 31.0f * 255.0f) << 8);
+    if (rdp.ci_size < 3)
+    {
+	  color = ((color&1)?0xFF:0) |
+		((wxUint32)((float)((color&0xF800) >> 11) / 31.0f * 255.0f) << 24) |
+		((wxUint32)((float)((color&0x07C0) >> 6) / 31.0f * 255.0f) << 16) |
+		((wxUint32)((float)((color&0x003E) >> 1) / 31.0f * 255.0f) << 8);
+    }
     grDepthMask (FXFALSE);
     grBufferClear (color, 0, 0xFFFF);
     grDepthMask (FXTRUE);
     rdp.update |= UPDATE_ZBUF_ENABLED;
     return;
   }
+
+  // Update scissor
+  if (fullscreen)
+    update_scissor ();
 
   if (settings.decrease_fillrect_edge && rdp.cycle_mode == 0)
   {
@@ -2240,15 +2164,15 @@ static void rdp_fillrect()
     rdp.scissor.lr_y);
 
   // KILL the floating point error with 0.01f
-  wxUint32 s_ul_x = (wxUint32)min(max(ul_x * rdp.scale_x + rdp.offset_x + 0.01f, rdp.scissor.ul_x), rdp.scissor.lr_x);
-  wxUint32 s_lr_x = (wxUint32)min(max(lr_x * rdp.scale_x + rdp.offset_x + 0.01f, rdp.scissor.ul_x), rdp.scissor.lr_x);
-  wxUint32 s_ul_y = (wxUint32)min(max(ul_y * rdp.scale_y + rdp.offset_y + 0.01f, rdp.scissor.ul_y), rdp.scissor.lr_y);
-  wxUint32 s_lr_y = (wxUint32)min(max(lr_y * rdp.scale_y + rdp.offset_y + 0.01f, rdp.scissor.ul_y), rdp.scissor.lr_y);
+  wxInt32 s_ul_x = (wxUint32)min(max(ul_x * rdp.scale_x + rdp.offset_x + 0.01f, rdp.scissor.ul_x), rdp.scissor.lr_x);
+  wxInt32 s_lr_x = (wxUint32)min(max(lr_x * rdp.scale_x + rdp.offset_x + 0.01f, rdp.scissor.ul_x), rdp.scissor.lr_x);
+  wxInt32 s_ul_y = (wxUint32)min(max(ul_y * rdp.scale_y + rdp.offset_y + 0.01f, rdp.scissor.ul_y), rdp.scissor.lr_y);
+  wxInt32 s_lr_y = (wxUint32)min(max(lr_y * rdp.scale_y + rdp.offset_y + 0.01f, rdp.scissor.ul_y), rdp.scissor.lr_y);
 
-  if (s_lr_x < 0.0f) s_lr_x = 0;
-  if (s_lr_y < 0.0f) s_lr_y = 0;
-  if (s_ul_x > (float)settings.res_x) s_ul_x = settings.res_x;
-  if (s_ul_y > (float)settings.res_y) s_ul_y = settings.res_y;
+  if (s_lr_x < 0) s_lr_x = 0;
+  if (s_lr_y < 0) s_lr_y = 0;
+  if ((wxUint32)s_ul_x > settings.res_x) s_ul_x = settings.res_x;
+  if ((wxUint32)s_ul_y > settings.res_y) s_ul_y = settings.res_y;
 
   FRDP (" - %d, %d, %d, %d\n", s_ul_x, s_ul_y, s_lr_x, s_lr_y);
 
@@ -2256,29 +2180,7 @@ static void rdp_fillrect()
   {
     grFogMode (GR_FOG_DISABLE);
 
-    float Z = 1.0f;
-    if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030))
-    {
-      FRDP ("prim_depth = %d\n", rdp.prim_depth);
-      Z = ScaleZ(rdp.prim_depth);
-
-      if (rdp.othermode_l & 0x10)
-        grDepthBufferFunction (GR_CMP_LEQUAL);
-      else
-        grDepthBufferFunction (GR_CMP_ALWAYS);
-
-      if (rdp.othermode_l & 0x20)
-        grDepthMask (FXTRUE);
-      else
-        grDepthMask (FXFALSE);
-    }
-    else
-    {
-      grDepthBufferFunction (GR_CMP_ALWAYS);
-      grDepthMask (FXFALSE);
-      LRDP("no prim_depth used, using 1.0\n");
-    }
-    rdp.update |= UPDATE_ZBUF_ENABLED;
+    const float Z = (rdp.cycle_mode == 3) ? 0.0f : set_sprite_combine_mode();
 
     // Draw the rectangle
     VERTEX v[4] = {
@@ -2297,7 +2199,7 @@ static void rdp_fillrect()
           //make it black, set 0 alpha to plack pixels on frame buffer read
           color = 0;
         }
-        else if (rdp.ci_size < 3) //(color&0xFFFF) == (color>>16)
+        else if (rdp.ci_size < 3)
         {
           color = ((color&1)?0xFF:0) |
             ((wxUint32)((float)((color&0xF800) >> 11) / 31.0f * 255.0f) << 24) |
@@ -2321,13 +2223,19 @@ static void rdp_fillrect()
 
         grAlphaBlendFunction (GR_BLEND_ONE, GR_BLEND_ZERO, GR_BLEND_ONE, GR_BLEND_ZERO);
 
-        rdp.update |= UPDATE_COMBINE;
+        grAlphaTestFunction (GR_CMP_ALWAYS);
+        if (grStippleModeExt)
+        grStippleModeExt(GR_STIPPLE_DISABLE);
+
+        grCullMode(GR_CULL_DISABLE);
+        grFogMode (GR_FOG_DISABLE);
+        grDepthBufferFunction (GR_CMP_ALWAYS);
+        grDepthMask (FXFALSE);
+
+        rdp.update |= UPDATE_COMBINE | UPDATE_CULL_MODE | UPDATE_FOG_ENABLED | UPDATE_ZBUF_ENABLED;
       }
       else
       {
-        Combine ();
-        rdp.tex = 0;
-        TexCache ();  // (to update combiner)
         wxUint32 cmb_mode_c = (rdp.cycle1 << 16) | (rdp.cycle2 & 0xFFFF);
         wxUint32 cmb_mode_a = (rdp.cycle1 & 0x0FFF0000) | ((rdp.cycle2 >> 16) & 0x00000FFF);
         if (cmb_mode_c == 0x9fff9fff || cmb_mode_a == 0x09ff09ff) //shade
@@ -2344,14 +2252,9 @@ static void rdp_fillrect()
             GR_COMBINE_OTHER_NONE,
             FXFALSE);
           grConstantColorValue((cmb.ccolor&0xFFFFFF00)|(rdp.fog_color&0xFF));
+          rdp.update |= UPDATE_COMBINE;
         }
       }
-
-      grAlphaTestFunction (GR_CMP_ALWAYS);
-      if (grStippleModeExt)
-        grStippleModeExt(GR_STIPPLE_DISABLE);
-
-      grCullMode(GR_CULL_DISABLE);
 
       if (settings.wireframe)
       {
@@ -2384,13 +2287,6 @@ static void rdp_fillrect()
       }
       else
         rdp.tri_n += 2;
-
-      if (settings.fog && (rdp.flags & FOG_ENABLED))
-      {
-        grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
-      }
-
-      rdp.update |= UPDATE_CULL_MODE | UPDATE_ALPHA_COMPARE | UPDATE_ZBUF_ENABLED;
   }
   else
   {
@@ -3371,7 +3267,7 @@ void DetectFrameBufferUsage ()
     rdp.read_whole_frame = TRUE;
   if (rdp.read_whole_frame)
   {
-    if (fb_hwfbe_enabled && !(settings.frame_buffer&fb_ignore_previous))
+    if (fb_hwfbe_enabled)
     {
       if (rdp.read_previous_ci && !previous_ci_was_read && (settings.swapmode != 2) && (settings.ucode != ucode_PerfectDark))
       {
@@ -3383,7 +3279,7 @@ void DetectFrameBufferUsage ()
       }
       if (rdp.swap_ci_index < 0)
       {
-        rdp.texbufs[0].clear_allowed = rdp.texbufs[0].clear_allowed = TRUE;
+        rdp.texbufs[0].clear_allowed = rdp.texbufs[1].clear_allowed = TRUE;
         OpenTextureBuffer(rdp.frame_buffers[rdp.main_ci_index]);
       }
     }
@@ -3436,10 +3332,7 @@ void DetectFrameBufferUsage ()
   rdp.ci_count = 0;
   if (settings.hacks&hack_Banjo2)
     rdp.cur_tex_buf = 0;
-  if (settings.frame_buffer&fb_ignore_previous)
-    rdp.read_whole_frame = FALSE;
-  else
-    rdp.maincimg[0] = rdp.frame_buffers[rdp.main_ci_index];
+  rdp.maincimg[0] = rdp.frame_buffers[rdp.main_ci_index];
   //    rdp.scale_x = rdp.scale_x_bak;
   //    rdp.scale_y = rdp.scale_y_bak;
   LRDP("DetectFrameBufferUsage End\n");

@@ -132,9 +132,9 @@ static void mod_col_inter_col1_using_tex (wxUint16 *dst, int size, wxUint32 colo
 		percent_r = ((col >> 8) & 0xF) / 15.0f;
 		percent_g = ((col >> 4) & 0xF) / 15.0f;
 		percent_b = (col & 0xF) / 15.0f;
-		r = min(15, (wxUint8)((1.0f-percent_r) * cr0 + percent_r * cr1));
-		g = min(15, (wxUint8)((1.0f-percent_g) * cg0 + percent_g * cg1));
-		b = min(15, (wxUint8)((1.0f-percent_b) * cb0 + percent_b * cb1));
+		r = min(15, (wxUint8)((1.0f-percent_r) * cr0 + percent_r * cr1 + 0.0001f));
+		g = min(15, (wxUint8)((1.0f-percent_g) * cg0 + percent_g * cg1 + 0.0001f));
+		b = min(15, (wxUint8)((1.0f-percent_b) * cb0 + percent_b * cb1 + 0.0001f));
 		*(dst++) = a | (r << 8) | (g << 4) | b;
 	}
 }

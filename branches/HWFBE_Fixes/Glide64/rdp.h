@@ -222,7 +222,6 @@ typedef struct {
   #define  fb_depth_render         (1<<6)   //enable software depth render
   #define  fb_optimize_texrect     (1<<7)   //fast texrect rendering with hwfbe
   #define  fb_ignore_aux_copy      (1<<8)   //do not copy auxilary frame buffers
-  #define  fb_ignore_previous      (1<<9)   //do not check of previous frame usage
   #define  fb_useless_is_useless   (1<<10)  //
   #define  fb_get_info             (1<<11)  //get frame buffer info
   #define  fb_read_back_to_screen  (1<<12)  //render N64 frame buffer to screen
@@ -283,8 +282,6 @@ typedef struct {
   int alt_tex_size;
   int use_sts1_only;
   int flame_corona; //hack for zeldas flame's corona
-  int depth_bias;
-  int soft_depth_compare; // use GR_CMP_LEQUAL instead of GR_CMP_LESS
   int increase_texrect_edge; // add 1 to lower right corner coordinates of texrect
   int decrease_fillrect_edge; // sub 1 from lower right corner coordinates of fillrect
   int texture_correction; // enable perspective texture correction emulation. is on by default
@@ -294,13 +291,11 @@ typedef struct {
   int force_quad3d; //force 0xb5 command to be quad, not line 3d
   int clip_zmin; //enable near z clipping
   int clip_zmax; //enable far plane clipping;
-  int texrect_compare_func; //function used for texrect depth compare
   int adjust_aspect; //adjust screen aspect for wide screen mode
-  int force_depth_compare; //NFL Quarterback Club 99 and All-Star Baseball 2000
   int force_calc_sphere; //use spheric mapping only, Ridge Racer 64
-  int increase_primdepth;  //increase prim_depth value for texrects
   int pal230;    //set special scale for PAL games
   int correct_viewport; //correct viewport values
+  int n64_z_scale; //scale vertex z value before writing to depth buffer, as N64 does.
 
   //Special game hacks
   #define  hack_ASB         (1<<0)   //All-Star Baseball games
@@ -561,9 +556,6 @@ struct RDP_Base{
   float scale_x, scale_1024, scale_x_bak;
   float scale_y, scale_768, scale_y_bak;
 
-  wxUint32 res_scale_x;
-  wxUint32 res_scale_y;
-
   float view_scale[3];
   float view_trans[3];
   float clip_min_x, clip_max_x, clip_min_y, clip_max_y;
@@ -607,6 +599,7 @@ struct RDP_Base{
   wxUint32 CENTER;
   wxUint32 prim_lodmin, prim_lodfrac;
   wxUint16 prim_depth;
+  wxUint16 prim_dz;
   wxUint8 K4;
   wxUint8 K5;
   enum {
@@ -626,6 +619,7 @@ struct RDP_Base{
   // othermode_l flags
   int acmp; // 0 = none, 1 = threshold, 2 = dither
   int zsrc; // 0 = pixel, 1 = prim
+  wxUint8 alpha_dither_mode;
 
   // Matrices
   DECLAREALIGN16VAR(model[4][4]);
@@ -725,7 +719,6 @@ struct RDP_Base{
   wxUint32 ci_upper_bound, ci_lower_bound;
   int  motionblur, fb_drawn, fb_drawn_front, read_previous_ci, read_whole_frame;
   CI_STATUS ci_status;
-  TEXTURE_BUFFER texbufs[2];
   TBUFF_COLOR_IMAGE * cur_image;  //image currently being drawn
   TBUFF_COLOR_IMAGE * tbuff_tex;  //image, which corresponds to currently selected texture
   TBUFF_COLOR_IMAGE * aTBuffTex[2]; 
@@ -765,6 +758,7 @@ struct RDP : public RDP_Base
   int v0, vn;
 
   COLOR_IMAGE *frame_buffers; //[NUMTEXBUF+2]
+  TEXTURE_BUFFER texbufs[2];
 
   wxString RomName;
 
@@ -861,7 +855,6 @@ __inline void ConvertCoordsKeep (VERTEX *v, int n)
 // Convert from u0/v0/u1/v1 to the real coordinates based on the tmu they are on
 __inline void ConvertCoordsConvert (VERTEX *v, int n)
 {
-//  float z;
   for (int i=0; i<n; i++)
   {
     v[i].uc(rdp.t0) = v[i].u0;
@@ -886,20 +879,6 @@ __inline void AddOffset (VERTEX *v, int n)
     v[i].x += rdp.offset_x;
     v[i].y += rdp.offset_y;
   }
-}
-
-__inline float ScaleZ(float z)
-{
-//  z *= 2.0f;
-//  if (z > 65535.0f) return 65535.0f;
-//  return (z / 65535.0f) * z;
-//  if (z  < 4096.0f) return z * 0.25f;
-//  z = (z / 16384.0f) * z;
-
-  if (z  < 0.0f) return 0.0f;
-  z *= 1.9f;
-  if (z > 65534.0f) return 65534.0f;
-  return z;
 }
 
 __inline void CalculateFog (VERTEX *v)

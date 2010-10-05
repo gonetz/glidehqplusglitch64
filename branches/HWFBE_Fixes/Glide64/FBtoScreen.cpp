@@ -218,6 +218,9 @@ static void DrawFrameBufferToScreen256(FB_TO_SCREEN_INFO & fb_info)
   wxUint32 h_tail = height%256;
   wxUint16 c;
   wxUint32 c32;
+  wxUint32 idx;
+  wxUint32 bound = BMASK+1-fb_info.addr;
+  bound = fb_info.size == 2 ? bound >> 1 : bound >> 2;
   wxUint8 r, g, b, a;
   wxUint32 cur_width, cur_height, cur_tail;
   wxUint32 tex_adr = voodoo.tex_min_addr[tmu]+voodoo.tmem_ptr[tmu];
@@ -239,7 +242,10 @@ static void DrawFrameBufferToScreen256(FB_TO_SCREEN_INFO & fb_info)
         {
           for (wxUint32 x=0; x < cur_width; x++)
           {
-            c = src[(x+256*w+(y+256*h)*fb_info.width)^1];
+            idx = (x+256*w+(y+256*h)*fb_info.width)^1;
+            if (idx >= bound)
+              break;
+            c = src[idx];
             *(dst++) = (c >> 1) | ((c&1)<<15);
           }
           dst += cur_tail;
@@ -251,7 +257,10 @@ static void DrawFrameBufferToScreen256(FB_TO_SCREEN_INFO & fb_info)
         {
           for (wxUint32 x=0; x < cur_width; x++)
           {
-            c32 = src32[(x+256*w+(y+256*h)*fb_info.width)];
+            idx = (x+256*w+(y+256*h)*fb_info.width);
+            if (idx >= bound)
+              break;
+            c32 = src32[idx];
             r = (wxUint8)((c32 >> 24)&0xFF);
             r = (wxUint8)((float)r / 255.0f * 31.0f);
             g = (wxUint8)((c32 >> 16)&0xFF);
@@ -316,7 +325,7 @@ bool DrawFrameBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     scale = 1.0f;
     t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_256;
   }
-  if (width <= 512)
+  else if (width <= 512)
   {
     texwidth = 512;
     scale = 0.5f;
@@ -347,12 +356,17 @@ bool DrawFrameBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     wxUint16 * src = (wxUint16*)image;
     src += fb_info.ul_x + fb_info.ul_y * fb_info.width;
     wxUint16 c;
+    wxUint32 idx;
+    const wxUint32 bound = (BMASK+1-fb_info.addr) >> 1;
     bool empty = true;
     for (wxUint32 y=0; y < height; y++)
     {
       for (wxUint32 x=0; x < width; x++)
       {
-        c = src[(x+y*fb_info.width)^1];
+        idx = (x+y*fb_info.width)^1;
+        if (idx >= bound)
+          break;
+        c = src[idx];
         if (c) empty = false;
         *(dst++) = (c >> 1) | ((c&1)<<15);
       }
@@ -370,11 +384,16 @@ bool DrawFrameBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     wxUint32 * src = (wxUint32*)image;
     src += fb_info.ul_x + fb_info.ul_y * fb_info.width;
     wxUint32 col;
+    wxUint32 idx;
+    const wxUint32 bound = (BMASK+1-fb_info.addr) >> 2;
     for (wxUint32 y=0; y < height; y++)
     {
       for (wxUint32 x=0; x < width; x++)
       {
-        col = src[x+y*fb_info.width];
+        idx = x+y*fb_info.width;
+        if (idx >= bound)
+          break;
+        col = src[idx];
         *(dst++) = (col >> 8) | 0xFF000000;
       }
       dst += texwidth-width;
@@ -583,7 +602,7 @@ void DrawDepthBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     scale = 1.0f;
     t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_256;
   }
-  if (width <= 512)
+  else if (width <= 512)
   {
     texwidth = 512;
     scale = 0.5f;

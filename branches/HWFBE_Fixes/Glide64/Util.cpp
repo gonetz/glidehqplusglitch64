@@ -280,32 +280,42 @@ void apply_shade_mods (VERTEX *v)
 }
 
 static int dzdx = 0;
+static int deltaZ = 0;
 VERTEX **org_vtx;
 
 void draw_tri (VERTEX **vtx, wxUint16 linew)
 {
-  if (fb_depth_render_enabled && linew == 0)
+  deltaZ = dzdx = 0;
+  if (linew == 0 && (fb_depth_render_enabled || (rdp.rm & 0xC00) == 0xC00))
   {
-    float X0 =  vtx[0]->sx / rdp.scale_x;
-    float Y0 =  vtx[0]->sy / rdp.scale_y;
-    float X1 =  vtx[1]->sx / rdp.scale_x;
-    float Y1 =  vtx[1]->sy / rdp.scale_y;
-    float X2 =  vtx[2]->sx / rdp.scale_x;
-    float Y2 =  vtx[2]->sy / rdp.scale_y;
-    float diff12 = Y1 - Y2;
-    float diff02 = Y0 - Y2;
+    double X0 = vtx[0]->sx / rdp.scale_x;
+    double Y0 = vtx[0]->sy / rdp.scale_y;
+    double X1 = vtx[1]->sx / rdp.scale_x;
+    double Y1 = vtx[1]->sy / rdp.scale_y;
+    double X2 = vtx[2]->sx / rdp.scale_x;
+    double Y2 = vtx[2]->sy / rdp.scale_y;
+    double diffy_02 = Y0 - Y2;
+    double diffy_12 = Y1 - Y2;
+    double diffx_02 = X0 - X2;
+    double diffx_12 = X1 - X2;
 
-    double denom = ((X0 - X2) * diff12 - (X1 - X2) * diff02);
+    double denom = (diffx_02 * diffy_12 - diffx_12 * diffy_02);
     if(denom*denom > 0.0)
     {
-      dzdx = (int)(((vtx[0]->sz - vtx[2]->sz) * diff12 -
-        (vtx[1]->sz - vtx[2]->sz) * diff02) / denom * 65536.0);
+      double diffz_02 = vtx[0]->sz - vtx[2]->sz;
+      double diffz_12 = vtx[1]->sz - vtx[2]->sz;
+      double fdzdx = (diffz_02 * diffy_12 - diffz_12 * diffy_02) / denom;
+      if ((rdp.rm & 0xC00) == 0xC00) {
+        // Calculate deltaZ per polygon for Decal z-mode
+        double fdzdy = (diffz_02 * diffx_12 - diffz_12 * diffx_02) / denom;
+        double fdz = fabs(fdzdx) + fabs(fdzdy);
+        if ((settings.hacks & hack_Zelda) && (rdp.rm & 0x800))
+          fdz *= 4.0;  // Decal mode in Zelda sometimes needs mutiplied deltaZ to work correct, e.g. roads
+        deltaZ = max(8, (int)fdz);
+      }
+      dzdx = (int)(fdzdx * 65536.0);
     }
-    else
-      dzdx = 0;
   }
-  else
-    dzdx = 0;
 
   org_vtx = vtx;
 
@@ -1021,6 +1031,21 @@ static void CalculateLOD(VERTEX *v, int n)
   FRDP("CalculateLOD factor: %f, tile: %d, lod_fraction: %f\n", (float)lodFactor, lod_tile, lod_fraction);
 }
 
+float ScaleZ(float z)
+{
+  if (settings.n64_z_scale)
+  {
+    int iz = (int)(z*8.0f+0.5f);
+    if (iz < 0) iz = 0;
+    else if (iz >= 0x40000) iz = 0x40000 - 1;
+    return (float)zLUT[iz];
+  }
+  if (z  < 0.0f) return 0.0f;
+  z *= 1.9f;
+  if (z > 65534.0f) return 65534.0f;
+  return z;
+}
+
 static void DepthBuffer(VERTEX * vtx, int n)
 {
   if (fb_depth_render_enabled && !(settings.hacks&hack_RE2) && dzdx && (rdp.flags & ZBUF_UPDATE))
@@ -1045,17 +1070,6 @@ static void DepthBuffer(VERTEX * vtx, int n)
       }
     }
     Rasterize(v, n, dzdx);
-  }
-  if ((settings.hacks&hack_RE2) || ((settings.hacks&hack_BAR) && fb_hwfbe_enabled && !evoodoo))
-  {
-    for(int i=0; i<n; i++)
-    {
-      int fz = (int)(vtx[i].z*8.0f+0.5f);
-      if (fz < 0) fz = 0;
-      else if (fz >= 0x40000) fz = 0x40000 - 1;
-      vtx[i].z = (float)zLUT[fz];
-    }
-    return;
   }
   for(int i=0; i<n; i++)
     vtx[i].z = ScaleZ(vtx[i].z);
@@ -1685,6 +1699,8 @@ static void render_tri (wxUint16 linew, int old_interpolate)
       else
       {
         DepthBuffer(rdp.vtxbuf, n);
+        if ((rdp.rm & 0xC10) == 0xC10)
+          grDepthBiasLevel (-deltaZ);
         grDrawVertexArray (GR_TRIANGLE_FAN, n, rdp.vtx_buffer?(&vtx_list2):(&vtx_list1));
       }
     }
@@ -1813,19 +1829,12 @@ void update ()
   if (rdp.render_mode_changed & 0x00000C30)
   {
     FRDP (" |- render_mode_changed zbuf - decal: %s, update: %s, compare: %s\n",
-      str_yn[(rdp.othermode_l&0x00000C00) == 0x00000C00],
+      str_yn[(rdp.othermode_l & 0x00000400)?1:0],
       str_yn[(rdp.othermode_l&0x00000020)?1:0],
       str_yn[(rdp.othermode_l&0x00000010)?1:0]);
 
     rdp.render_mode_changed &= ~0x00000C30;
     rdp.update |= UPDATE_ZBUF_ENABLED;
-
-    // Decal?
-    //    if ((rdp.othermode_l & 0x00000C00) == 0x00000C00)
-    if (rdp.othermode_l & 0x00000800)
-      rdp.flags |= ZBUF_DECAL;
-    else
-      rdp.flags &= ~ZBUF_DECAL;
 
     // Update?
     if ((rdp.othermode_l & 0x00000020))
@@ -1915,57 +1924,49 @@ void update ()
       // already logged above
       rdp.update ^= UPDATE_ZBUF_ENABLED;
 
-      if (rdp.flags & ZBUF_DECAL)
-      {
-        if ((rdp.othermode_l & 0x00000C00) == 0x00000C00)
-        {
-          grDepthBiasLevel (settings.depth_bias);//(-32);
-          FRDP("depth bias: %d\n", settings.depth_bias);
-        }
-        else
-        {
-          grDepthBiasLevel (-4);//-16);
-          LRDP("depth bias: -4");
-        }
-      }
-      else
-      {
-        grDepthBiasLevel (0);
-      }
-
-      if ((rdp.flags & ZBUF_ENABLED) || (settings.force_depth_compare && rdp.zsrc == 1))
+      if (((rdp.flags & ZBUF_ENABLED) || rdp.zsrc == 1) && rdp.cycle_mode < 2)
       {
         if (rdp.flags & ZBUF_COMPARE)
         {
-          if (settings.soft_depth_compare)
-          {
-            grDepthBufferFunction (GR_CMP_LEQUAL);
-          }
-          else
-          {
-            grDepthBufferFunction (GR_CMP_LESS);
+          switch ((rdp.rm & 0xC00)>>10) {
+            case 0:
+              grDepthBiasLevel(0);
+              grDepthBufferFunction ((rdp.othermode_l & 0x08) ? GR_CMP_LEQUAL : GR_CMP_LESS);
+            break;
+			case 1:
+              grDepthBiasLevel(-4);
+              grDepthBufferFunction ((rdp.othermode_l & 0x08) ? GR_CMP_LEQUAL : GR_CMP_LESS);
+            break;
+            case 2:
+              grDepthBiasLevel(settings.ucode == 7 ? -4 : 0);
+              grDepthBufferFunction (GR_CMP_LESS);
+              break;
+            case 3:
+              // will be set dynamically per polygon
+              //grDepthBiasLevel(-deltaZ);
+              grDepthBufferFunction (GR_CMP_LEQUAL);
+              break;
           }
         }
         else
         {
+          grDepthBiasLevel(0);
           grDepthBufferFunction (GR_CMP_ALWAYS);
         }
 
         if (rdp.flags & ZBUF_UPDATE)
-        {
           grDepthMask (FXTRUE);
-        }
         else
-        {
           grDepthMask (FXFALSE);
-        }
       }
       else
       {
+        grDepthBiasLevel(0);
         grDepthBufferFunction (GR_CMP_ALWAYS);
         grDepthMask (FXFALSE);
       }
     }
+
     // Alpha compare
     if (rdp.update & UPDATE_ALPHA_COMPARE)
     {
@@ -1977,10 +1978,7 @@ void update ()
       if (rdp.acmp == 1 && !(rdp.othermode_l & 0x00002000) && (!(rdp.othermode_l & 0x00004000) || (rdp.blend_color&0xFF)))
       {
         wxUint8 reference = (wxUint8)(rdp.blend_color&0xFF);
-        if (reference)
-          grAlphaTestFunction (GR_CMP_GEQUAL);
-        else
-          grAlphaTestFunction (GR_CMP_GREATER);
+        grAlphaTestFunction (reference ? GR_CMP_GEQUAL : GR_CMP_GREATER);
         grAlphaTestReferenceValue (reference);
         FRDP (" |- alpha compare: blend: %02lx\n", reference);
       }
@@ -2015,7 +2013,7 @@ void update ()
           LRDP (" |- alpha compare: none\n");
         }
       }
-      if (rdp.acmp == 3)
+      if (rdp.acmp == 3 && rdp.alpha_dither_mode != 3 && rdp.cycle_mode < 2)
       {
         if (grStippleModeExt)
         {

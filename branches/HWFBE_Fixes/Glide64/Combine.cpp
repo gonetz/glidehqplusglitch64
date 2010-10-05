@@ -715,13 +715,13 @@ COMBINE cmb;
 #define MULSHADE(color) XSHADE(color, CMB_MULT)
 #define MULSHADE_PRIM() MULSHADE(rdp.prim_color)
 #define MULSHADE_ENV() MULSHADE(rdp.env_color)
+#define MULSHADE_1MPRIM() XSHADE1M(rdp.prim_color, CMB_MULT)
 #define MULSHADE_1MENV() XSHADE1M(rdp.env_color, CMB_MULT)
 #define MULSHADE_PRIMSUBENV() XSHADEC1MC2(rdp.prim_color, rdp.env_color, CMB_MULT)
 #define MULSHADE_ENVSUBPRIM() XSHADEC1MC2(rdp.env_color, rdp.prim_color, CMB_MULT)
 #define MULSHADE_BYTE(byte) XSHADE_BYTE(byte, CMB_MULT)
 #define MULSHADE_PRIMA() MULSHADE_BYTE((rdp.prim_color & 0xFF))
 #define MULSHADE_ENVA() MULSHADE_BYTE((rdp.env_color & 0xFF))
-#define MULSHADE_1MPRIM() MULSHADE_BYTE(((~rdp.prim_color) & 0xFF))
 #define MULSHADE_1MENVA() MULSHADE_BYTE(((~rdp.env_color) & 0xFF))
 #define MULSHADE_PRIMLOD() MULSHADE_BYTE((rdp.prim_lodfrac & 0xFF))
 #define MULSHADE_K5() MULSHADE_BYTE(rdp.K5)
@@ -6652,6 +6652,31 @@ static void cc_t0_inter_prim_using_primlod ()
   MOD_0_FAC (lod_frac & 0xFF);
 }
 
+static void cc_t0_inter_shade_using_t0a ()
+{
+  if (cmb.combine_ext)
+  {
+    CCMBEXT(GR_CMBX_ITRGB, GR_FUNC_MODE_X,
+      GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_TEXTURE_ALPHA, 0,
+      GR_CMBX_B, 0);
+    USE_T0();
+    A_USE_T0();
+  }
+  else
+  {
+    //(shade-t0)*t0a+t0 = t0*(1-t0a)+shade*t0a
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_ITERATED,
+      GR_COMBINE_OTHER_TEXTURE);
+    rdp.best_tex = 1;
+    cmb.tex = 1;
+    cmb.tmu0_func = GR_COMBINE_FUNCTION_BLEND_LOCAL;
+    cmb.tmu0_fac = GR_COMBINE_FACTOR_LOCAL_ALPHA;
+  }
+}
+
 static void cc_t0_inter_shade_using_primlod ()
 {
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
@@ -10073,7 +10098,7 @@ static COMBINER color_cmb_list[] = {
   {0x2813e4f0, cc__t0_inter_prim_using_t0a__mul_shade},
   // intro, Duck Dodgers. Added by Gonetz
   // (shade-t0)*t0_alpha+t0   **INC**
-  {0x28142814, cc_t0},
+  {0x28142814, cc_t0_inter_shade_using_t0a},
   // F1 World Grand Prix. Added by Gonetz
   // (prim-0)*t0_a+t0, (cmb-0)*shade+0   ** INC **
   {0x28f3e4f0, cc__t0a_mul_prim_add_t0__mul_shade},
@@ -10793,8 +10818,9 @@ static COMBINER color_cmb_list[] = {
   // (env-prim)*t1+prim
   {0x62356235, cc_env_sub_prim_mul_t1_add_prim},
   // Pokemon Stadium 2, [gokuss4]. Added by Gonetz
-  // (env-prim)*t1+prim, (cmb-0)*t1+0  ** INC **
-  {0x6235e2f0, cc_env_sub_prim_mul_t1_add_prim},
+  // (env-prim)*t1+prim, (cmb-0)*t1+0
+  // Hack alert!
+  {0x6235e2f0, cc_t1},
   // bike trace, xg2 intro. Added by Gonetz
   // (1-prim)*t1+prim
   {0x62366236, cc_one_sub_prim_mul_t1_add_prim},
@@ -13854,7 +13880,7 @@ void CombineBlender ()
     case 0x0150: //spiderman
     case 0x0d18: //clr_in * a_fog + clr_mem * (1-a)
       A_BLEND (GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA);
-      if (rdp.cycle2 != 0x01ff1fff)
+      if (rdp.cycle_mode == 1 && rdp.cycle2 != 0x01ff1fff)
       {
         wxUint32 prim = rdp.prim_color;
         rdp.prim_color = rdp.fog_color;
