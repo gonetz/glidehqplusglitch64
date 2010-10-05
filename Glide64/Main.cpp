@@ -166,7 +166,7 @@ SETTINGS settings = { FALSE, 640, 480, GR_RESOLUTION_640x480, 0 };
 
 HOTKEY_INFO hotkey_info;
 
-VOODOO voodoo = {0, 0, 0, 0, 
+VOODOO voodoo = {0, 0, 0, 0,
                  0, 0, 0, 0,
                  0, 0, 0, 0
                 };
@@ -444,10 +444,7 @@ void ReadSpecialSettings (const char * name)
   else if (strstr(name, (const char *)"All") && strstr(name, (const char *)"Star") && strstr(name, (const char *)"Baseball"))
     settings.hacks |= hack_ASB;
   else if (strstr(name, (const char *)"Beetle") || strstr(name, (const char *)"BEETLE") || strstr(name, (const char *)"HSV"))
-  {
     settings.hacks |= hack_BAR;
-    ZLUT_init();
-  }
   else if (strstr(name, (const char *)"I S S 64") || strstr(name, (const char *)"J WORLD SOCCER3") || strstr(name, (const char *)"PERFECT STRIKER"))
     settings.hacks |= hack_ISS64;
   else if (strstr(name, (const char *)"MARIOKART64"))
@@ -457,10 +454,7 @@ void ReadSpecialSettings (const char * name)
   else if (strstr(name, (const char *)"CHOPPER_ATTACK") || strstr(name, (const char *)"WILD CHOPPERS"))
     settings.hacks |= hack_Chopper;
   else if (strstr(name, (const char *)"Resident Evil II") || strstr(name, (const char *)"BioHazard II"))
-  {
     settings.hacks |= hack_RE2;
-    ZLUT_init();
-  }
   else if (strstr(name, (const char *)"YOSHI STORY"))
     settings.hacks |= hack_Yoshi;
   else if (strstr(name, (const char *)"F-Zero X") || strstr(name, (const char *)"F-ZERO X"))
@@ -506,18 +500,10 @@ void ReadSpecialSettings (const char * name)
   ini->Read(_T("alt_tex_size"), &(settings.alt_tex_size));
   ini->Read(_T("use_sts1_only"), &(settings.use_sts1_only));
   if (ini->Read(_T("PPL"), -1) == 1) settings.hacks |= hack_PPL;
-  ini->Read(_T("soft_depth_compare"), &(settings.soft_depth_compare));
-  ini->Read(_T("force_depth_compare"), &(settings.force_depth_compare));
   ini->Read(_T("force_calc_sphere"), &(settings.force_calc_sphere));
   ini->Read(_T("correct_viewport"), &(settings.correct_viewport));
-  int depth_bias = ini->Read(_T("depth_bias"), -1);
-  if (depth_bias != -1)
-    settings.depth_bias = -depth_bias;
   ini->Read(_T("increase_texrect_edge"), &(settings.increase_texrect_edge));
   ini->Read(_T("decrease_fillrect_edge"), &(settings.decrease_fillrect_edge));
-  ini->Read(_T("increase_primdepth"), &(settings.increase_primdepth));
-  if (ini->Read(_T("texrect_compare_less"), -1) == 1) settings.texrect_compare_func = GR_CMP_LESS;
-  else settings.texrect_compare_func = GR_CMP_LEQUAL;
   if (ini->Read(_T("texture_correction"), -1) == 0) settings.texture_correction = 0;
   else settings.texture_correction = 1;
   if (ini->Read(_T("pal230"), -1) == 1) settings.pal230 = 1;
@@ -531,11 +517,13 @@ void ReadSpecialSettings (const char * name)
   ini->Read(_T("clip_zmax"), &(settings.clip_zmax));
   ini->Read(_T("fast_crc"), &(settings.fast_crc));
   ini->Read(_T("adjust_aspect"), &(settings.adjust_aspect), 1);
+  ini->Read(_T("n64_z_scale"), &(settings.n64_z_scale));
+  if (settings.n64_z_scale)
+    ZLUT_init();
 
   //frame buffer
   int optimize_texrect = ini->Read(_T("optimize_texrect"), -1);
   int ignore_aux_copy = ini->Read(_T("ignore_aux_copy"), -1);
-  int ignore_previous = ini->Read(_T("ignore_previous"), -1);
   int hires_buf_clear = ini->Read(_T("hires_buf_clear"), -1);
   int read_alpha = ini->Read(_T("fb_read_alpha"), -1);
   int useless_is_useless = ini->Read(_T("useless_is_useless"), -1);
@@ -547,8 +535,6 @@ void ReadSpecialSettings (const char * name)
   else if (ignore_aux_copy == 0) settings.frame_buffer &= ~fb_ignore_aux_copy;
   if (hires_buf_clear > 0) settings.frame_buffer |= fb_hwfbe_buf_clear;
   else if (hires_buf_clear == 0) settings.frame_buffer &= ~fb_hwfbe_buf_clear;
-  if (ignore_previous > 0) settings.frame_buffer |= fb_ignore_previous;
-  else if (ignore_previous == 0) settings.frame_buffer &= ~fb_ignore_previous;
   if (read_alpha > 0) settings.frame_buffer |= fb_read_alpha;
   else if (read_alpha == 0) settings.frame_buffer &= ~fb_read_alpha;
   if (useless_is_useless > 0) settings.frame_buffer |= fb_useless_is_useless;
@@ -1022,7 +1008,7 @@ int InitGfx (int evoodoo_using_window)
     voodoo.sup_32bit_tex = FALSE;
 
   voodoo.gamma_correction = 0;
-  if (char * extstr = (char*)strstr(extensions, "GETGAMMA"))
+  if (strstr(extensions, "GETGAMMA"))
     grGet(GR_GAMMA_TABLE_ENTRIES, sizeof(voodoo.gamma_table_size), &voodoo.gamma_table_size);
 
   if (fb_hwfbe_enabled)
@@ -1203,12 +1189,12 @@ void ReleaseGfx ()
   LOG("ReleaseGfx ()\n");
 
   // Restore gamma settings
-  if (voodoo.gamma_correction) 
+  if (voodoo.gamma_correction)
   {
     if (voodoo.gamma_table_r)
       grLoadGammaTable(voodoo.gamma_table_size, voodoo.gamma_table_r, voodoo.gamma_table_g, voodoo.gamma_table_b);
     else
-      guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop 
+      guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop
     voodoo.gamma_correction = 0;
   }
 
@@ -1781,7 +1767,7 @@ void drawViRegBG()
   FB_TO_SCREEN_INFO fb_info;
   fb_info.width  = VIwidth;
   fb_info.height = (wxUint32)rdp.vi_height;
-  if (fb_info.height == 0) 
+  if (fb_info.height == 0)
   {
     LRDP("Image height = 0 - skipping\n");
     return;
@@ -1798,7 +1784,7 @@ void drawViRegBG()
     fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<2);
     fb_info.size   = 3;
   }
-  else if (rdp.ci_size > 1) 
+  else if (rdp.ci_size > 1)
   {
     fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<(rdp.ci_size-1));
     fb_info.size   = rdp.ci_size;
@@ -1807,12 +1793,6 @@ void drawViRegBG()
   {
     fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<1);
     fb_info.size   = 2;
-  }
-  wxUint32 image_end_addr = fb_info.addr + ((fb_info.width*fb_info.height)<<fb_info.size>>1);
-  if (image_end_addr > BMASK+1)
-  {
-    FRDP("Image is out of RDRAM bounds: %d\n", image_end_addr);
-    return;
   }
   rdp.last_bg = fb_info.addr;
 
@@ -1958,7 +1938,7 @@ static void DrawWholeFrameBufferToScreen()
 static void GetGammaTable()
 {
   char strGetGammaTableExt[] = "grGetGammaTableExt";
-  void (FX_CALL *grGetGammaTableExt)(FxU32, FxU32*, FxU32*, FxU32*) = 
+  void (FX_CALL *grGetGammaTableExt)(FxU32, FxU32*, FxU32*, FxU32*) =
     (void (FX_CALL *)(FxU32, FxU32*, FxU32*, FxU32*))grGetProcAddress(strGetGammaTableExt);
   if (grGetGammaTableExt)
   {
@@ -2242,22 +2222,22 @@ void newSwapBuffers()
       fps_count ++;
       if (*gfx.VI_STATUS_REG&0x08) //gamma correction is used
       {
-        if (!voodoo.gamma_correction) 
+        if (!voodoo.gamma_correction)
         {
           if (voodoo.gamma_table_size && !voodoo.gamma_table_r)
             GetGammaTable(); //save initial gamma tables
           guGammaCorrectionRGB(2.0f, 2.0f, 2.0f); //with gamma=2.0 gamma table is the same, as in N64
           voodoo.gamma_correction = 1;
         }
-      } 
+      }
       else
       {
-        if (voodoo.gamma_correction) 
+        if (voodoo.gamma_correction)
         {
           if (voodoo.gamma_table_r)
             grLoadGammaTable(voodoo.gamma_table_size, voodoo.gamma_table_r, voodoo.gamma_table_g, voodoo.gamma_table_b);
           else
-            guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop 
+            guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop
           voodoo.gamma_correction = 0;
         }
       }

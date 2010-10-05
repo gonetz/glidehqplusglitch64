@@ -39,6 +39,79 @@
 
 // STANDARD DRAWIMAGE - draws a 2d image based on the following structure
 
+static float set_sprite_combine_mode ()
+{
+  if (rdp.cycle_mode == 2)
+  {
+    rdp.tex = 1;
+    rdp.allow_combine = 0;
+    // Now actually combine !
+    cmb.tmu1_func = cmb.tmu0_func = GR_COMBINE_FUNCTION_LOCAL;
+    cmb.tmu1_fac = cmb.tmu0_fac = GR_COMBINE_FACTOR_NONE;
+    cmb.tmu1_a_func = cmb.tmu0_a_func = GR_COMBINE_FUNCTION_LOCAL;
+    cmb.tmu1_a_fac = cmb.tmu0_a_fac = GR_COMBINE_FACTOR_NONE;
+    cmb.tmu1_invert = cmb.tmu0_invert = FXFALSE;
+    cmb.tmu1_a_invert = cmb.tmu0_a_invert = FXFALSE;
+  }
+
+  rdp.update |= UPDATE_COMBINE;
+  update ();
+
+  rdp.allow_combine = 1;
+
+  // set z buffer mode
+  float Z = 0.0f;
+  if ((rdp.othermode_l & 0x00000030) && rdp.cycle_mode < 2)
+  {
+    wxUint16 prim_dz = 0;
+    if (rdp.zsrc == 1)
+    {
+      Z = rdp.prim_depth;
+      prim_dz = rdp.prim_dz;
+    }
+    FRDP ("prim_depth = %d, prim_dz = %d\n", rdp.prim_depth, rdp.prim_dz);
+    Z = ScaleZ(Z);
+
+    if (rdp.othermode_l & 0x00000400)
+      grDepthBiasLevel(rdp.prim_dz);
+  }
+  else
+  {
+    LRDP("z compare not used, using 0\n");
+  }
+
+  grCullMode (GR_CULL_DISABLE);
+  grFogMode (GR_FOG_DISABLE);
+  rdp.update |= UPDATE_CULL_MODE | UPDATE_FOG_ENABLED;
+
+  if (rdp.cycle_mode == 2)
+  {
+    grColorCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_NONE,
+      GR_COMBINE_OTHER_TEXTURE,
+      FXFALSE);
+    grAlphaCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_NONE,
+      GR_COMBINE_OTHER_TEXTURE,
+      FXFALSE);
+    grAlphaBlendFunction (GR_BLEND_ONE,
+      GR_BLEND_ZERO,
+      GR_BLEND_ZERO,
+      GR_BLEND_ZERO);
+    if (rdp.othermode_l & 1)
+    {
+      grAlphaTestFunction (GR_CMP_GEQUAL);
+      grAlphaTestReferenceValue (0x80);
+    }
+    else
+      grAlphaTestFunction (GR_CMP_ALWAYS);
+    rdp.update |= UPDATE_ALPHA_COMPARE | UPDATE_COMBINE;
+  }
+  return Z;
+}
+
 void uc6_sprite2d ();
 
 typedef struct DRAWIMAGE_t {
@@ -88,20 +161,20 @@ void DrawHiresDepthImage (DRAWIMAGE *d)
     rdp.texbufs[1].begin,
     GR_MIPMAPLEVELMASK_BOTH,
     &t_info);
-  grTexCombine( GR_TMU1, 
-    GR_COMBINE_FUNCTION_LOCAL, 
-    GR_COMBINE_FACTOR_NONE, 
-    GR_COMBINE_FUNCTION_LOCAL, 
-    GR_COMBINE_FACTOR_NONE, 
-    FXFALSE, 
-    FXFALSE ); 
-  grTexCombine( GR_TMU0, 
-    GR_COMBINE_FUNCTION_SCALE_OTHER, 
-    GR_COMBINE_FACTOR_ONE, 
-    GR_COMBINE_FUNCTION_SCALE_OTHER, 
-    GR_COMBINE_FACTOR_ONE, 
-    FXFALSE, 
-    FXFALSE ); 
+  grTexCombine( GR_TMU1,
+    GR_COMBINE_FUNCTION_LOCAL,
+    GR_COMBINE_FACTOR_NONE,
+    GR_COMBINE_FUNCTION_LOCAL,
+    GR_COMBINE_FACTOR_NONE,
+    FXFALSE,
+    FXFALSE );
+  grTexCombine( GR_TMU0,
+    GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_ONE,
+    GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_ONE,
+    FXFALSE,
+    FXFALSE );
   grColorCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
     GR_COMBINE_FACTOR_ONE,
     GR_COMBINE_LOCAL_NONE,
@@ -112,7 +185,7 @@ void DrawHiresDepthImage (DRAWIMAGE *d)
     GR_COMBINE_LOCAL_NONE,
     GR_COMBINE_OTHER_TEXTURE,
     FXFALSE);
-  grAlphaBlendFunction (GR_BLEND_ONE,   
+  grAlphaBlendFunction (GR_BLEND_ONE,
     GR_BLEND_ZERO,
     GR_BLEND_ONE,
     GR_BLEND_ZERO);
@@ -131,7 +204,7 @@ void DrawHiresDepthImage (DRAWIMAGE *d)
     { 0, 0, 1.0f, 1.0f, 0, 0, 0, 0 },
     { lr_x, 0, 1.0f, 1.0f, lr_u, 0, lr_u, 0 },
     { 0, lr_y, 1.0f, 1.0f, 0, lr_v, 0, lr_v },
-    { lr_x, lr_y, 1.0f, 1.0f, lr_u, lr_v, lr_u, lr_v } 
+    { lr_x, lr_y, 1.0f, 1.0f, lr_u, lr_v, lr_u, lr_v }
   };
   AddOffset(v, 4);
   for (int i=0; i<4; i++)
@@ -140,7 +213,7 @@ void DrawHiresDepthImage (DRAWIMAGE *d)
     v[i].vc(0) = v[i].vc(1) = v[i].v0;
   }
   grTextureBufferExt( rdp.texbufs[0].tmu, rdp.texbufs[0].begin, LOD, LOD,
-    GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH ); 
+    GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH );
   grRenderBuffer( GR_BUFFER_TEXTUREBUFFER_EXT );
   grAuxBufferExt( GR_BUFFER_AUXBUFFER );
   grSstOrigin(GR_ORIGIN_UPPER_LEFT);
@@ -149,7 +222,7 @@ void DrawHiresDepthImage (DRAWIMAGE *d)
   grDrawTriangle (&v[2], &v[3], &v[1]);
   grRenderBuffer( GR_BUFFER_BACKBUFFER );
   grTextureAuxBufferExt( rdp.texbufs[0].tmu, rdp.texbufs[0].begin, LOD, LOD,
-    GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH ); 
+    GR_ASPECT_LOG2_1x1, GR_TEXFMT_RGB_565, GR_MIPMAPLEVELMASK_BOTH );
   grAuxBufferExt( GR_BUFFER_TEXTUREAUXBUFFER_EXT );
   grDepthMask (FXTRUE);
 }
@@ -200,59 +273,58 @@ void DrawImage (DRAWIMAGE *d)
 {
   if (d->imageW == 0 || d->imageH == 0 || d->frameH == 0)   return;
 
-  int x_size;
-  int y_size;
-  int x_shift;
-  int y_shift;
-  int line;
-
+  int x_size, y_size, x_shift, y_shift, line;
   // choose optimum size for the format/size
-  if (d->imageSiz == 0)
+  switch (d->imageSiz)
   {
+  case 0:
     x_size = 128;
     y_size = 64;
     x_shift = 7;
     y_shift = 6;
     line = 8;
-  }
-  if (d->imageSiz == 1)
-  {
+    break;
+  case 1:
     x_size = 64;
     y_size = 64;
     x_shift = 6;
     y_shift = 6;
     line = 8;
-  }
-  if (d->imageSiz == 2)
-  {
+    break;
+  case 2:
     x_size = 64;
     y_size = 32;
     x_shift = 6;
     y_shift = 5;
     line = 16;
-  }
-  if (d->imageSiz == 3)
-  {
+    break;
+  case 3:
     x_size = 32;
     y_size = 16;
     x_shift = 4;
     y_shift = 3;
     line = 16;
+    break;
+  default:
+    FRDP("DrawImage. unknown image size: %d\n", d->imageSiz);
+    return;
   }
+
   if (rdp.ci_width == 512 && !no_dlist) //RE2
   {
     wxUint16 width = (wxUint16)(*gfx.VI_WIDTH_REG & 0xFFF);
     d->frameH = d->imageH = (d->frameW*d->frameH)/width;
-    d->frameW = d->imageW = width; 
+    d->frameW = d->imageW = width;
     if (rdp.zimg == rdp.cimg)
     {
       DrawDepthImage(d);
-      rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE | 
+      rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE |
         UPDATE_ALPHA_COMPARE | UPDATE_VIEWPORT;
       return;
     }
   }
 
+  if (d->imageH%2 == 1) d->imageH -= 1;
   if ((settings.hacks&hack_PPL))
   {
     if (d->imageY > d->imageH) d->imageY = (d->imageY%d->imageH);
@@ -330,73 +402,23 @@ void DrawImage (DRAWIMAGE *d)
   rdp.tiles[0].lr_s = x_size-1;
   rdp.tiles[0].lr_t = y_size-1;
 
+  const float Z = set_sprite_combine_mode ();
   if (rdp.cycle_mode == 2)
-  {
     rdp.allow_combine = 0;
-    rdp.update &= ~UPDATE_TEXTURE;
-  }
-  update ();                            // note: allow loading of texture
-
-  float Z = 1.0f;
 
   if (fullscreen)
   {
-
-    //grFogMode (GR_FOG_DISABLE);
-
-    grFogMode (GR_FOG_DISABLE);
-    if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030))  // othermode check makes sure it
-      // USES the z-buffer.  Otherwise it returns bad (unset) values for lot and telescope
-      //in zelda:mm.
-    {
-      LRDP("Background uses depth compare\n");
-      Z = ScaleZ(rdp.prim_depth);
-      grDepthBufferFunction (GR_CMP_LEQUAL);
-      grDepthMask (FXTRUE);
-    }
-    else
-    {
-      LRDP("Background not uses depth compare\n");
-      grDepthBufferFunction (GR_CMP_ALWAYS);
-      grDepthMask (FXFALSE);
-    }
-
     if (rdp.ci_width == 512 && !no_dlist)
       grClipWindow (0, 0, settings.scr_res_x, settings.scr_res_y);
     else if (d->scaleX == 1.0f && d->scaleY == 1.0f)
       grClipWindow (rdp.scissor.ul_x, rdp.scissor.ul_y, rdp.scissor.lr_x, rdp.scissor.lr_y);
     else
       grClipWindow (rdp.scissor.ul_x, rdp.scissor.ul_y, min(rdp.scissor.lr_x, (wxUint32)((d->frameX+d->imageW/d->scaleX+0.5f)*rdp.scale_x)), min(rdp.scissor.lr_y, (wxUint32)((d->frameY+d->imageH/d->scaleY+0.5f)*rdp.scale_y)));
-
-    grCullMode (GR_CULL_DISABLE);
-    if (rdp.cycle_mode == 2)
-    {
-      rdp.allow_combine = 0;
-      cmb.tmu0_func = GR_COMBINE_FUNCTION_LOCAL;
-      cmb.tmu0_a_func = GR_COMBINE_FUNCTION_LOCAL;
-
-      grColorCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
-        GR_COMBINE_FACTOR_ONE,
-        GR_COMBINE_LOCAL_NONE,
-        GR_COMBINE_OTHER_TEXTURE,
-        FXFALSE);
-      grAlphaCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
-        GR_COMBINE_FACTOR_ONE,
-        GR_COMBINE_LOCAL_NONE,
-        GR_COMBINE_OTHER_TEXTURE,
-        FXFALSE);
-      grConstantColorValue (0xFFFFFFFF);
-      grAlphaBlendFunction (GR_BLEND_ONE,       // use alpha compare, but not T0 alpha
-        GR_BLEND_ZERO,
-        GR_BLEND_ZERO,
-        GR_BLEND_ZERO);
-      rdp.update |= UPDATE_COMBINE;
-    }
-
+    rdp.update |=  UPDATE_SCISSOR;
   }
+
   // Texture ()
   rdp.cur_tile = 0;
-  rdp.tex = 1;
 
   float nul_x, nul_y, nlr_x, nlr_y;
   int nul_u, nul_v, nlr_u, nlr_v;
@@ -468,7 +490,7 @@ void DrawImage (DRAWIMAGE *d)
 
       ful_u *= rdp.cur_cache[0]->c_scl_x;
       ful_v *= rdp.cur_cache[0]->c_scl_y;
-      flr_u *= rdp.cur_cache[0]->c_scl_x;      
+      flr_u *= rdp.cur_cache[0]->c_scl_x;
       flr_v *= rdp.cur_cache[0]->c_scl_y;
 
       ful_x = nul_x * rdp.scale_x + rdp.offset_x;
@@ -480,7 +502,7 @@ void DrawImage (DRAWIMAGE *d)
 
       if ((flr_x <= rdp.scissor.lr_x) || (ful_x < rdp.scissor.lr_x))
       {
-          VERTEX v[4] = {
+        VERTEX v[4] = {
           { ful_x, ful_y, Z, 1.0f, ful_u, ful_v },
           { flr_x, ful_y, Z, 1.0f, flr_u, ful_v },
           { ful_x, flr_y, Z, 1.0f, ful_u, flr_v },
@@ -543,21 +565,12 @@ void DrawImage (DRAWIMAGE *d)
 
   rdp.allow_combine = 1;
   rdp.bg_image_height = 0xFFFF;
-
-  rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE | UPDATE_TEXTURE | UPDATE_ALPHA_COMPARE
-    | UPDATE_SCISSOR;
-
-  if (fullscreen && settings.fog && (rdp.flags & FOG_ENABLED))
-  {
-    grFogMode (GR_FOG_WITH_TABLE_ON_FOGCOORD_EXT);
-  }
 }
-
 
 void DrawHiresImage(DRAWIMAGE *d, int screensize = FALSE)
 {
   FRDP("DrawHiresImage. addr: %08lx\n", d->imagePtr);
-  if (!fullscreen) 
+  if (!fullscreen)
     return;
   TBUFF_COLOR_IMAGE *tbuff_tex;
   if (rdp.motionblur)
@@ -575,7 +588,7 @@ void DrawHiresImage(DRAWIMAGE *d, int screensize = FALSE)
   update ();                            // note: allow loading of texture
 
   float Z = 1.0f;
-  if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030)) 
+  if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030))
   {
     LRDP("Background uses depth compare\n");
     Z = ScaleZ(rdp.prim_depth);
@@ -612,37 +625,37 @@ void DrawHiresImage(DRAWIMAGE *d, int screensize = FALSE)
 
   if (tbuff_tex->tmu == GR_TMU0)
   {
-    grTexCombine( GR_TMU1, 
-      GR_COMBINE_FUNCTION_NONE, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_NONE, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE ); 
-    grTexCombine( GR_TMU0, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE ); 
+    grTexCombine( GR_TMU1,
+      GR_COMBINE_FUNCTION_NONE,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_NONE,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXFALSE );
+    grTexCombine( GR_TMU0,
+      GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXFALSE );
   }
   else
   {
-    grTexCombine( GR_TMU1, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE ); 
-    grTexCombine( GR_TMU0, 
-      GR_COMBINE_FUNCTION_SCALE_OTHER, 
-      GR_COMBINE_FACTOR_ONE, 
-      GR_COMBINE_FUNCTION_SCALE_OTHER, 
-      GR_COMBINE_FACTOR_ONE, 
-      FXFALSE, 
-      FXFALSE ); 
+    grTexCombine( GR_TMU1,
+      GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,
+      GR_COMBINE_FUNCTION_LOCAL,
+      GR_COMBINE_FACTOR_NONE,
+      FXFALSE,
+      FXFALSE );
+    grTexCombine( GR_TMU0,
+      GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_FUNCTION_SCALE_OTHER,
+      GR_COMBINE_FACTOR_ONE,
+      FXFALSE,
+      FXFALSE );
   }
   grTexSource( tbuff_tex->tmu, tbuff_tex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(tbuff_tex->info) );
 
@@ -790,7 +803,7 @@ static void uc6_bg_1cyc ()
   {
     if ( (d.imagePtr != rdp.cimg) && (d.imagePtr != rdp.ocimg) && d.imagePtr) //can't draw from framebuffer
       DrawImage (&d);
-    else        
+    else
     {
       LRDP("uc6:bg_1cyc skipped\n");
     }
@@ -862,7 +875,7 @@ static void uc6_bg_copy ()
   {
     if ( (d.imagePtr != rdp.cimg) && (d.imagePtr != rdp.ocimg) && d.imagePtr)  //can't draw from framebuffer
       DrawImage (&d);
-    else        
+    else
     {
       LRDP("uc6:bg_copy skipped\n");
     }
@@ -1020,70 +1033,6 @@ static void draw_split_triangle(VERTEX **vtx)
   }
 }
 
-static float set_sprite_combine_mode ()
-{
-  if (rdp.cycle_mode == 2)
-  {
-    rdp.tex = 1;
-    rdp.allow_combine = 0;
-    //*
-    cmb.tmu1_func = cmb.tmu0_func = GR_COMBINE_FUNCTION_LOCAL;
-    cmb.tmu1_fac = cmb.tmu0_fac = GR_COMBINE_FACTOR_NONE;
-    cmb.tmu1_a_func = cmb.tmu0_a_func = GR_COMBINE_FUNCTION_LOCAL;
-    cmb.tmu1_a_fac = cmb.tmu0_a_fac = GR_COMBINE_FACTOR_NONE;
-    cmb.tmu1_invert = cmb.tmu0_invert = FXFALSE;
-    cmb.tmu1_a_invert = cmb.tmu0_a_invert = FXFALSE;
-    rdp.update |= UPDATE_COMBINE;
-    //*/
-  }
-  rdp.update |= UPDATE_TEXTURE;
-  update ();
-  rdp.allow_combine = 1;
-
-  float Z = 1.0f;
-  if (fullscreen)
-  {
-    grFogMode (GR_FOG_DISABLE);
-    if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030))  
-    {
-      LRDP("Sprite uses depth compare\n");
-      Z = rdp.prim_depth;
-      grDepthBufferFunction (GR_CMP_LEQUAL);
-      grDepthMask (FXTRUE);
-    }
-    else
-    {
-      LRDP("Sprite not uses depth compare\n");
-      grDepthBufferFunction (GR_CMP_ALWAYS);
-      grDepthMask (FXFALSE);
-    }
-
-    //grClipWindow (0, 0, settings.res_x, settings.res_y); //Wrong! GT64 map rendered out of borders with it.
-    grCullMode (GR_CULL_DISABLE);
-    rdp.update |= UPDATE_SCISSOR | UPDATE_CULL_MODE;
-
-    if (rdp.cycle_mode == 2)
-    {
-      grColorCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
-        GR_COMBINE_FACTOR_ONE,
-        GR_COMBINE_LOCAL_NONE,
-        GR_COMBINE_OTHER_TEXTURE,
-        FXFALSE);
-      grAlphaCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
-        GR_COMBINE_FACTOR_ONE,
-        GR_COMBINE_LOCAL_NONE,
-        GR_COMBINE_OTHER_TEXTURE,
-        FXFALSE);
-      grAlphaBlendFunction (GR_BLEND_ONE,
-        GR_BLEND_ZERO,
-        GR_BLEND_ZERO,
-        GR_BLEND_ZERO);
-      rdp.update |= UPDATE_ALPHA_COMPARE | UPDATE_COMBINE | UPDATE_ALPHA_COMPARE;
-    }
-  }
-  return Z;
-}
-
 static void uc6_draw_polygons (VERTEX v[4])
 {
   AllowShadeMods (v, 4);
@@ -1152,9 +1101,9 @@ static void uc6_obj_rectangle ()
   wxUint8  imagePal             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+2)^3]; // 11
   wxUint8  imageFlags   = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+3)^3]; // |
 
-  if (imageW < 0) 
+  if (imageW < 0)
     imageW = (short)rdp.scissor_o.lr_x - (short)objX - imageW;
-  if (imageH < 0) 
+  if (imageH < 0)
     imageH = (short)rdp.scissor_o.lr_y - (short)objY - imageH;
 
   FRDP ("uc6:obj_rectangle #%d, #%d\n"
@@ -1233,7 +1182,7 @@ static void uc6_obj_rectangle ()
     { ul_x, ul_y, Z, 1, ul_u, ul_v },
     { lr_x, ul_y, Z, 1, lr_u, ul_v },
     { ul_x, lr_y, Z, 1, ul_u, lr_v },
-    { lr_x, lr_y, Z, 1, lr_u, lr_v } 
+    { lr_x, lr_y, Z, 1, lr_u, lr_v }
   };
 
   for (int i=0; i<4; i++)
@@ -1331,7 +1280,7 @@ static void uc6_obj_sprite ()
     { ul_x, ul_y, Z, 1, ul_u, ul_v },
     { lr_x, ul_y, Z, 1, lr_u, ul_v },
     { ul_x, lr_y, Z, 1, ul_u, lr_v },
-    { lr_x, lr_y, Z, 1, lr_u, lr_v } 
+    { lr_x, lr_y, Z, 1, lr_u, lr_v }
   };
 
   for (int i=0; i<4; i++)
@@ -1465,9 +1414,9 @@ static void uc6_obj_rectangle_r ()
   wxUint8  imagePal             = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+2)^3]; // 11
   wxUint8  imageFlags   = ((wxUint8 *)gfx.RDRAM)[(((addr+10)<<1)+3)^3]; // |
 
-  if (imageW < 0) 
+  if (imageW < 0)
     imageW = (short)rdp.scissor_o.lr_x - (short)objX - imageW;
-  if (imageH < 0) 
+  if (imageH < 0)
     imageH = (short)rdp.scissor_o.lr_y - (short)objY - imageH;
 
   FRDP ("uc6:obj_rectangle_r #%d, #%d\n"
@@ -1546,7 +1495,7 @@ static void uc6_obj_rectangle_r ()
     { ul_x, ul_y, Z, 1, ul_u, ul_v },
     { lr_x, ul_y, Z, 1, lr_u, ul_v },
     { ul_x, lr_y, Z, 1, ul_u, lr_v },
-    { lr_x, lr_y, Z, 1, lr_u, lr_v } 
+    { lr_x, lr_y, Z, 1, lr_u, lr_v }
   };
 
   for (int i=0; i<4; i++)
@@ -1687,12 +1636,12 @@ void uc6_sprite2d ()
   d.imageY      = (((wxUint16 *)gfx.RDRAM)[(addr+9)^1]);        // 9
   wxUint32 tlut         = ((wxUint32*)gfx.RDRAM)[(addr + 2) >> 1];      // 2, 3
   //low-level implementation of sprite2d apparently calls setothermode command to set tlut mode
-  //However, description of sprite2d microcode just says that 
+  //However, description of sprite2d microcode just says that
   //TlutPointer should be Null when CI images will not be used.
   //HLE implementation sets rdp.tlut_mode=2 if TlutPointer is not null, and rdp.tlut_mode=0 otherwise
   //Alas, it is not sufficient, since WCW Nitro uses non-Null TlutPointer for rgba textures.
   //So, additional check added.
-  if (tlut) 
+  if (tlut)
   {
     load_palette (segoffset(tlut), 0, 256);
     if (d.imageFmt > 0)
@@ -1713,7 +1662,7 @@ void uc6_sprite2d ()
   {
     if ( (cmd0>>24) == 0xBE )
     {
-      wxUint32 cmd1 = ((wxUint32*)gfx.RDRAM)[(a>>2)+1]; 
+      wxUint32 cmd1 = ((wxUint32*)gfx.RDRAM)[(a>>2)+1];
       rdp.pc[rdp.pc_i] = (a+8) & BMASK;
 
       d.scaleX  = ((cmd1>>16)&0xFFFF)/1024.0f;
@@ -1721,7 +1670,7 @@ void uc6_sprite2d ()
       //the code below causes wrong background height in super robot spirit, so it is disabled.
       //need to find, for which game this hack was made
       //if( (cmd1&0xFFFF) < 0x100 )
-      //  d.scaleY = d.scaleX; 
+      //  d.scaleY = d.scaleX;
       d.flipX = (wxUint8)((cmd0>>8)&0xFF);
       d.flipY = (wxUint8)(cmd0&0xFF);
 
@@ -1731,10 +1680,10 @@ void uc6_sprite2d ()
     }
     if ( (cmd0>>24) == 0xBD )
     {
-      wxUint32 cmd1 = ((wxUint32*)gfx.RDRAM)[(a>>2)+1]; 
+      wxUint32 cmd1 = ((wxUint32*)gfx.RDRAM)[(a>>2)+1];
 
       d.frameX  = ((short)((cmd1>>16)&0xFFFF)) / 4.0f;
-      d.frameY  = ((short)(cmd1&0xFFFF)) / 4.0f;        
+      d.frameY  = ((short)(cmd1&0xFFFF)) / 4.0f;
       d.frameW    = (wxUint16) (d.imageW / d.scaleX);
       d.frameH    = (wxUint16) (d.imageH / d.scaleY);
       if (settings.hacks&hack_WCWnitro)
@@ -1781,7 +1730,7 @@ void uc6_sprite2d ()
           line++;
         line >>= 1;
       }
-      else 
+      else
       {
         line <<= (d.imageSiz-1);
       }
@@ -1799,8 +1748,8 @@ void uc6_sprite2d ()
 
       // SetTile ()
       TILE *tile = &rdp.tiles[0];
-      tile->format = d.imageFmt;        
-      tile->size = d.imageSiz;          
+      tile->format = d.imageFmt;
+      tile->size = d.imageSiz;
       tile->line = line;//(d.imageW>>3);
       tile->t_mem = 0;
       tile->palette = 0;
