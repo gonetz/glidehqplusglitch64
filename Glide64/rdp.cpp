@@ -1099,28 +1099,25 @@ static void rdp_texrect()
   if (rdp.tbuff_tex && (settings.frame_buffer & fb_optimize_texrect))
   {
     LRDP("Attempt to optimize texrect\n");
-    if (rdp.tbuff_tex)
+    if (!rdp.tbuff_tex->drawn)
     {
-      if (!rdp.tbuff_tex->drawn)
-      {
-        DRAWIMAGE d;
-        d.imageX  = 0;
-        d.imageW  = (wxUint16)rdp.tbuff_tex->width;
-        d.frameX  = (wxUint16)ul_x;
-        d.frameW  = (wxUint16)(rdp.tbuff_tex->width);
+      DRAWIMAGE d;
+      d.imageX  = 0;
+      d.imageW  = (wxUint16)rdp.tbuff_tex->width;
+      d.frameX  = (wxUint16)ul_x;
+      d.frameW  = (wxUint16)(rdp.tbuff_tex->width);
 
-        d.imageY  = 0;
-        d.imageH  = (wxUint16)rdp.tbuff_tex->height;
-        d.frameY  = (wxUint16)ul_y;
-        d.frameH  = (wxUint16)(rdp.tbuff_tex->height);
-        FRDP("texrect. ul_x: %d, ul_y: %d, lr_x: %d, lr_y: %d, width: %d, height: %d\n", ul_x, ul_y, lr_x, lr_y, rdp.tbuff_tex->width, rdp.tbuff_tex->height);
-        d.scaleX  = 1.0f;
-        d.scaleY  = 1.0f;
-        DrawHiresImage(&d, rdp.tbuff_tex->width == rdp.ci_width);
-        rdp.tbuff_tex->drawn = TRUE;
-      }
-      return;
+      d.imageY  = 0;
+      d.imageH  = (wxUint16)rdp.tbuff_tex->height;
+      d.frameY  = (wxUint16)ul_y;
+      d.frameH  = (wxUint16)(rdp.tbuff_tex->height);
+      FRDP("texrect. ul_x: %d, ul_y: %d, lr_x: %d, lr_y: %d, width: %d, height: %d\n", ul_x, ul_y, lr_x, lr_y, rdp.tbuff_tex->width, rdp.tbuff_tex->height);
+      d.scaleX  = 1.0f;
+      d.scaleY  = 1.0f;
+      DrawHiresImage(&d, rdp.tbuff_tex->width == rdp.ci_width);
+      rdp.tbuff_tex->drawn = TRUE;
     }
+    return;
   }
   //*/
   // framebuffer workaround for Zelda: MM LOT
