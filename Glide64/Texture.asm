@@ -2625,7 +2625,12 @@ rgba16:
         jz .end_y_loop
         push ecx
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax, esi
+        and eax, 0xFFF
+        add esi, eax
         add edi,[ebp + %$ext]
 
         mov ecx,[ebp + %$wid_64]
@@ -2650,7 +2655,12 @@ rgba16:
         dec ecx
         jnz .x_loop_2
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax, esi
+        and eax, 0xFFF
+        add esi, eax
         add edi,[ebp + %$ext]
 
         pop ecx
