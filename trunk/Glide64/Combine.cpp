@@ -2639,6 +2639,16 @@ static void cc_t0_mul_shade_add_prim ()
   USE_T0 ();
 }
 
+static void cc_t0_mul_shade_add_prima ()
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+    GR_COMBINE_FACTOR_TEXTURE_RGB,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  CC_PRIMA ();
+  USE_T0 ();
+}
+
 static void cc_t1_mul_shade_add_prim ()
 {
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
@@ -12085,7 +12095,7 @@ static COMBINER color_cmb_list[] = {
   {0xeaf4eaf4, cc_shade_mul_prima},
   // blast corps [Ogy]
   // (noise-0)*prim_a+0, (t1-0)*shade+cmb   ** INC **
-  {0xeaf704f2, cc_t1_mul_shade},
+  {0xeaf704f2, cc_t0_mul_shade_add_prima},
   // F1 World Grand Prix. Added by Gonetz
   // (noise-0)*prim_a+0, (t1-0)*env_a+cmb   ** INC **
   {0xeaf70cf2, cc_t1_mul_enva},
