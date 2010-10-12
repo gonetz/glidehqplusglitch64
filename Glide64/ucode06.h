@@ -324,13 +324,14 @@ void DrawImage (DRAWIMAGE *d)
     }
   }
 
-  if (d->imageH%2 == 1) d->imageH -= 1;
   if ((settings.hacks&hack_PPL))
   {
     if (d->imageY > d->imageH) d->imageY = (d->imageY%d->imageH);
   }
   else
   {
+    if (d->imageH%2 == 1)
+      d->imageH -= 1;
     if ( (d->frameX > 0) && (d->frameW == rdp.ci_width) )
       d->frameW -= (wxUint16)(2.0f*d->frameX);
     if ( (d->frameY > 0) && (d->frameH == rdp.ci_height) )
