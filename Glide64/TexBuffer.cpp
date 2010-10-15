@@ -435,10 +435,10 @@ int CloseTextureBuffer(int draw)
   GrTextureFormat_t buf_format = rdp.tbuff_tex->info.format;
   rdp.tbuff_tex->info.format = TexBufSetupCombiner();
   float zero = 0.0f;
-  float ul_x = (float)rdp.offset_x;
-  float ul_y = (float)rdp.offset_y;
-  float lr_x = (float)(rdp.tbuff_tex->scr_width + rdp.offset_x);
-  float lr_y = (float)(rdp.tbuff_tex->scr_height + rdp.offset_y);
+  float ul_x = rdp.offset_x;
+  float ul_y = rdp.offset_y;
+  float lr_x = rdp.tbuff_tex->scr_width + rdp.offset_x;
+  float lr_y = rdp.tbuff_tex->scr_height + rdp.offset_y;
   float lr_u = rdp.tbuff_tex->lr_u;
   float lr_v = rdp.tbuff_tex->lr_v;
   FRDP("lr_x: %f, lr_y: %f, lr_u: %f, lr_v: %f\n", lr_x, lr_y, lr_u, lr_v);
@@ -493,8 +493,8 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
   TexBufSetupCombiner(TRUE);
   float ul_x = 0.0f;
   float ul_y = 0.0f;
-  float lr_x = (float)rdp.tbuff_tex->scr_width;
-  float lr_y = (float)rdp.tbuff_tex->scr_height;
+  float lr_x = rdp.tbuff_tex->scr_width;
+  float lr_y = rdp.tbuff_tex->scr_height;
   float zero = 0.0f;
   float lr_u = rdp.tbuff_tex->lr_u;
   float lr_v = rdp.tbuff_tex->lr_v;
@@ -611,8 +611,8 @@ int SwapTextureBuffer()
 
   float ul_x = 0.0f;
   float ul_y = 0.0f;
-  float lr_x = (float)rdp.tbuff_tex->scr_width;
-  float lr_y = (float)rdp.tbuff_tex->scr_height;
+  float lr_x = rdp.tbuff_tex->scr_width;
+  float lr_y = rdp.tbuff_tex->scr_height;
   float zero = 0.0f;
   float lr_u = rdp.tbuff_tex->lr_u;
   float lr_v = rdp.tbuff_tex->lr_v;
