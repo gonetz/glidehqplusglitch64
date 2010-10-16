@@ -93,8 +93,8 @@ static rdp_instr gfx_instruction[10][256] =
         undef,                      undef,                      undef,                      undef,        
         undef,                      undef,                      undef,                      undef,        
         undef,                      undef,                      undef,                      undef,        
-        undef,                      uc0_tri4,                       rdphalf_cont,       rdphalf_2,
-        rdphalf_1,          uc0_quad3d,             uc0_cleargeometrymode,  uc0_setgeometrymode,
+        undef,                      uc0_tri4,           rdphalf_cont,           rdphalf_2,
+        rdphalf_1,              uc0_line3d,             uc0_cleargeometrymode,  uc0_setgeometrymode,
         uc0_enddl,              uc0_setothermode_l,     uc0_setothermode_h,     uc0_texture,
         uc0_moveword,           uc0_popmatrix,          uc0_culldl,             uc0_tri1,
           // c0-ff: RDP commands
@@ -462,8 +462,8 @@ static rdp_instr gfx_instruction[10][256] =
         undef,                      undef,                      undef,                      undef,        
         undef,                      undef,                      undef,                      undef,        
         undef,                      undef,                      undef,                      undef,        
-        undef,                      uc0_tri4,                       rdphalf_cont,       rdphalf_2,
-        rdphalf_1,          uc0_quad3d,             uc5_cleargeometrymode,  uc5_setgeometrymode,
+        undef,                      uc0_tri4,                   rdphalf_cont,               rdphalf_2,
+        rdphalf_1,              uc0_line3d,             uc5_cleargeometrymode,  uc5_setgeometrymode,
         uc0_enddl,              uc0_setothermode_l,     uc0_setothermode_h,     uc0_texture,
         uc5_moveword,           uc0_popmatrix,          uc0_culldl,             uc5_dma_offsets,
           // c0-ff: RDP commands

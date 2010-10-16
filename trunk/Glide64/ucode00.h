@@ -1042,15 +1042,26 @@ static void uc0_cleargeometrymode()
   }
 }
 
-static void uc0_quad3d()
+static void uc0_line3d()
 {
-  // Actually line3d, not supported I think
+  wxUint32 v0 = ((rdp.cmd1 >> 16) & 0xff) / 10;
+  wxUint32 v1 = ((rdp.cmd1 >>  8) & 0xff) / 10;
+  wxUint16 width = (wxUint16)(rdp.cmd1 & 0xFF) + 3;
 
-  int v0 = ((rdp.cmd1 >> 16) & 0xff) / 10;
-  int v1 = ((rdp.cmd1 >>  8) & 0xff) / 10;
-  int f = (rdp.cmd1 >> 24) & 0xff;
+  VERTEX *v[3] = {
+    &rdp.vtx[v1],
+    &rdp.vtx[v0],
+    &rdp.vtx[v0]
+  };
+  wxUint32 cull_mode = (rdp.flags & CULLMASK) >> CULLSHIFT;
+  rdp.flags |= CULLMASK;
+  rdp.update |= UPDATE_CULL_MODE;
+  rsp_tri1(v, width);
+  rdp.flags ^= CULLMASK;
+  rdp.flags |= cull_mode << CULLSHIFT;
+  rdp.update |= UPDATE_CULL_MODE;
 
-  FRDP("uc0:line3d v0:%d, v1:%d, f:%02lx - IGNORED\n", v0, v1, f);
+  FRDP("uc0:line3d v0:%d, v1:%d, width:%d\n", v0, v1, width);
 }
 
 static void uc0_tri4 ()
