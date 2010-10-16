@@ -1644,55 +1644,54 @@ static void render_tri (wxUint16 linew, int old_interpolate)
 
       if (linew > 0)
       {
-        if (linew == 1)
+        VERTEX *V0 = &rdp.vtxbuf[0];
+        VERTEX *V1 = &rdp.vtxbuf[1];
+        if (fabs(V0->x - V1->x) < 0.01 && fabs(V0->y - V1->y) < 0.01)
+          V1 = &rdp.vtxbuf[2];
+        V0->z = ScaleZ(V0->z);
+        V1->z = ScaleZ(V1->z);
+        VERTEX v[4];
+        v[0] = *V0;
+        v[1] = *V0;
+        v[2] = *V1;
+        v[3] = *V1;
+        float width = linew * 0.25f;
+        if (fabs(V0->y - V1->y) < 0.0001)
         {
-          for (i=0; i<n; i++)
-          {
-            rdp.vtxbuf[i].z = ScaleZ(rdp.vtxbuf[i].z);
-            j = i+1;
-            if (j == n) j = 0;
-            grDrawLine (&rdp.vtxbuf[i], &rdp.vtxbuf[j]);
-          }
+          v[0].x = v[1].x = V0->x;
+          v[2].x = v[3].x = V1->x;
+
+          width *= rdp.scale_y;
+          v[0].y = v[2].y = V0->y - width;
+          v[1].y = v[3].y = V0->y + width;
         }
-        else if (n == 3)
+        else if (fabs(V0->x - V1->x) < 0.0001)
         {
-          VERTEX *V0 = &rdp.vtxbuf[0];
-          VERTEX *V1 = &rdp.vtxbuf[1];
-          if (fabs(V0->x - V1->x) < 0.01 && fabs(V0->y - V1->y) < 0.01)
-            V1 = &rdp.vtxbuf[2];
-          if ((V0->x > V1->x) || (V0->y > V1->y))
-          {
-            VERTEX *tmp = V0;
-            V0 = V1;
-            V1 = tmp;
-          }
-          rdp.vtxbuf[0].z = ScaleZ(V0->z);
-          rdp.vtxbuf[1].z = ScaleZ(V1->z);
-          VERTEX v[4];
-          v[0] = *V0;
-          v[1] = *V0;
-          v[2] = *V1;
-          v[3] = *V1;
-          float width = (linew-1)*0.25f;
-          if(fabs(V0->y - V1->y) < 0.01)
-          {
-            v[0].x = v[1].x = V0->x;
-            v[2].x = v[3].x = V1->x;
+          v[0].y = v[1].y = V0->y;
+          v[2].y = v[3].y = V1->y;
 
-            v[0].y = v[2].y = max(rdp.clip_min_y, V0->y-width*rdp.scale_y+1.0f);
-            v[1].y = v[3].y = min(rdp.clip_max_y, V0->y+width*rdp.scale_y);
-          }
-          else
-          {
-            v[0].y = v[1].y = V0->y;
-            v[2].y = v[3].y = V1->y;
-
-            v[0].x = v[2].x = max(rdp.clip_min_x, V0->x-width*rdp.scale_x+1.0f);
-            v[1].x = v[3].x = min(rdp.clip_max_x, V0->x+width*rdp.scale_x);
-          }
-          grDrawTriangle(&v[0], &v[1], &v[2]);
-          grDrawTriangle(&v[1], &v[2], &v[3]);
+          width *= rdp.scale_x;
+          v[0].x = v[2].x = V0->x - width;
+          v[1].x = v[3].x = V0->x + width;
         }
+        else
+        {
+          float dx = V1->x - V0->x;
+          float dy = V1->y - V0->y;
+          float len = sqrtf(dx*dx + dy*dy);
+          float wx = dy * width * rdp.scale_x / len;
+          float wy = dx * width * rdp.scale_y / len;
+          v[0].x = V0->x + wx;
+          v[0].y = V0->y - wy;
+          v[1].x = V0->x - wx;
+          v[1].y = V0->y + wy;
+          v[2].x = V1->x + wx;
+          v[2].y = V1->y - wy;
+          v[3].x = V1->x - wx;
+          v[3].y = V1->y + wy;
+        }
+        grDrawTriangle(&v[0], &v[1], &v[2]);
+        grDrawTriangle(&v[1], &v[2], &v[3]);
       }
       else
       {
