@@ -1113,7 +1113,7 @@ static void rdp_texrect()
       FRDP("texrect. ul_x: %d, ul_y: %d, lr_x: %d, lr_y: %d, width: %d, height: %d\n", ul_x, ul_y, lr_x, lr_y, rdp.tbuff_tex->width, rdp.tbuff_tex->height);
       d.scaleX  = 1.0f;
       d.scaleY  = 1.0f;
-      DrawHiresImage(&d, rdp.tbuff_tex->width == rdp.ci_width);
+      DrawHiresImage(d, rdp.tbuff_tex->width == rdp.ci_width);
       rdp.tbuff_tex->drawn = TRUE;
     }
     return;
