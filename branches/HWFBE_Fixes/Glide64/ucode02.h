@@ -361,7 +361,7 @@ static void uc2_line3d ()
         &rdp.vtx[(rdp.cmd0 >> 9) & 0x7F],
         &rdp.vtx[(rdp.cmd0 >> 9) & 0x7F]
     };
-    wxUint16 width = (wxUint16)(rdp.cmd0&0xFF) + 1;
+    wxUint16 width = (wxUint16)(rdp.cmd0&0xFF) + 3;
     wxUint32 cull_mode = (rdp.flags & CULLMASK) >> CULLSHIFT;
     rdp.flags |= CULLMASK;
     rdp.update |= UPDATE_CULL_MODE;

@@ -2625,7 +2625,12 @@ rgba16:
         jz .end_y_loop
         push ecx
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax, esi
+        and eax, 0xFFF
+        add esi, eax
         add edi,[ebp + %$ext]
 
         mov ecx,[ebp + %$wid_64]
@@ -2650,7 +2655,12 @@ rgba16:
         dec ecx
         jnz .x_loop_2
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax, esi
+        and eax, 0xFFF
+        add esi, eax
         add edi,[ebp + %$ext]
 
         pop ecx
@@ -2736,322 +2746,6 @@ ia16:
         pop esi
         pop ebx
 endproc ;asmLoad16bIA
-
-;****************************************************************
-;32b textures load
-;****************************************************************
-
-ALIGN 4
-
-;****************************************************************
-; Size: 2, Format: 0
-;
-; 2008.03.29 cleaned up - H.Morii
-; 2009 ported to NASM - Sergey (Gonetz) Lipski
-
-proc asmLoad32bRGBAas16bRGBA
-CPU 586
-        %$src     arg
-        %$dst     arg
-        %$wid_64  arg
-        %$height  arg
-        %$line    arg
-        %$ext     arg
-rgba32as16:
-        push ebx
-        push esi
-        push edi
-
-        mov esi,[ebp + %$src]
-        mov edi,[ebp + %$dst]
-        mov ecx,[ebp + %$height]
-.y_loop:
-        push ecx
-        mov ecx,[ebp + %$wid_64]
-.x_loop:
-        mov eax,[esi]           ; read first pixel
-        add esi,4
-        mov edx,eax
-
-        shr edx,16      ; 0xFF000000 -> 0x0000FF00 (a)
-        and edx,0x0000F000
-        mov ebx,eax
-        shr ebx,20      ; 0x00FF0000 -> 0x0000000F (b)
-        and ebx,0x0000000F
-        or ebx,edx
-        mov edx,eax
-        shr edx,8       ; 0x0000FF00 -> 0x000000FF (g)
-        and edx,0x000000F0
-        or ebx,edx
-        shl eax,4       ; 0x000000FF -> 0x00000FF0 (r)
-        and eax,0x00000F00
-        or ebx,eax
-
-        mov eax,[esi]           ; read second pixel
-        add esi,4
-        mov edx,eax
-
-        and edx,0xF0000000 ; 0xF0000000 (a)
-        or ebx,edx
-        mov edx,eax
-        shr edx,4       ; 0x00FF0000 -> 0x000FF000 (b)
-        and edx,0x000F0000
-        or ebx,edx
-        mov edx,eax
-        shl edx,8       ; 0x0000FF00 -> 0x00FF0000 (g)
-        and edx,0x00F00000
-        or ebx,edx
-        shl eax,20      ; 0x000000FF -> 0x0FF00000 (r)
-        and eax,0x0F000000
-        or ebx,eax
-
-        mov [edi],ebx
-        add edi,4
-
-        ; * copy
-        mov eax,[esi]           ; read first pixel
-        add esi,4
-        mov edx,eax
-
-        shr edx,16      ; 0xFF000000 -> 0x0000FF00 (a)
-        and edx,0x0000F000
-        mov ebx,eax
-        shr ebx,20      ; 0x00FF0000 -> 0x000000FF (b)
-        and ebx,0x0000000F
-        or ebx,edx
-        mov edx,eax
-        shr edx,8       ; 0x0000FF00 -> 0x000000FF (g)
-        and edx,0x000000F0
-        or ebx,edx
-        shl eax,4       ; 0x000000FF -> 0x00000FF0 (r)
-        and eax,0x00000F00
-        or ebx,eax
-
-        mov eax,[esi]           ; read second pixel
-        add esi,4
-        mov edx,eax
-
-        and edx,0xF0000000 ; 0xF0000000 (a)
-        or ebx,edx
-        mov edx,eax
-        shr edx,4       ; 0x00FF0000 -> 0x000FF000 (b)
-        and edx,0x000F0000
-        or ebx,edx
-        mov edx,eax
-        shl edx,8       ; 0x0000FF00 -> 0x00FF0000 (g)
-        and edx,0x00F00000
-        or ebx,edx
-        shl eax,20      ; 0x000000FF -> 0x0FF00000 (r)
-        and eax,0x0F000000
-        or ebx,eax
-
-        mov [edi],ebx
-        add edi,4
-        ; *
-
-        dec ecx
-        jnz .x_loop
-
-        pop ecx
-        dec ecx
-        jz near .end_y_loop
-        push ecx
-
-        add esi,[ebp + %$line]
-        add edi,[ebp + %$ext]
-
-        mov ecx,[ebp + %$wid_64]
-.x_loop_2:
-        mov eax,[esi+8]         ; read first pixel
-        mov edx,eax
-
-        shr edx,16      ; 0xFF000000 -> 0x0000FF00 (a)
-        and edx,0x0000F000
-        mov ebx,eax
-        shr ebx,20      ; 0x00FF0000 -> 0x000000FF (b)
-        and ebx,0x0000000F
-        or ebx,edx
-        mov edx,eax
-        shr edx,8       ; 0x0000FF00 -> 0x000000FF (g)
-        and edx,0x000000F0
-        or ebx,edx
-        shl eax,4       ; 0x000000FF -> 0x00000FF0 (r)
-        and eax,0x00000F00
-        or ebx,eax
-
-        mov eax,[esi+12]                ; read second pixel
-        mov edx,eax
-
-        and edx,0xF0000000 ; 0xF0000000 (a)
-        or ebx,edx
-        mov edx,eax
-        shr edx,4       ; 0x00FF0000 -> 0x000FF000 (b)
-        and edx,0x000F0000
-        or ebx,edx
-        mov edx,eax
-        shl edx,8       ; 0x0000FF00 -> 0x00FF0000 (g)
-        and edx,0x00F00000
-        or ebx,edx
-        shl eax,20      ; 0x000000FF -> 0x0FF00000 (r)
-        and eax,0x0F000000
-        or ebx,eax
-
-        mov [edi],ebx
-        add edi,4
-
-        ; * copy
-        mov eax,[esi+0]         ; read first pixel
-        mov edx,eax
-
-        shr edx,16      ; 0xFF000000 -> 0x0000FF00 (a)
-        and edx,0x0000F000
-        mov ebx,eax
-        shr ebx,20      ; 0x00FF0000 -> 0x000000FF (b)
-        and ebx,0x0000000F
-        or ebx,edx
-        mov edx,eax
-        shr edx,8       ; 0x0000FF00 -> 0x000000FF (g)
-        and edx,0x000000F0
-        or ebx,edx
-        shl eax,4       ; 0x000000FF -> 0x00000FF0 (r)
-        and eax,0x00000F00
-        or ebx,eax
-
-        mov eax,[esi+4]         ; read second pixel
-        add esi,16
-        mov edx,eax
-
-        and edx,0xF0000000 ; 0xF0000000 (a)
-        or ebx,edx
-        mov edx,eax
-        shr edx,4       ; 0x00FF0000 -> 0x000FF000 (b)
-        and edx,0x000F0000
-        or ebx,edx
-        mov edx,eax
-        shl edx,8       ; 0x0000FF00 -> 0x00FF0000 (g)
-        and edx,0x00F00000
-        or ebx,edx
-        shl eax,20      ; 0x000000FF -> 0x0FF00000 (r)
-        and eax,0x0F000000
-        or ebx,eax
-
-        mov [edi],ebx
-        add edi,4
-        ; *
-
-        dec ecx
-        jnz .x_loop_2
-
-        add esi,[ebp + %$line]
-        add edi,[ebp + %$ext]
-
-        pop ecx
-        dec ecx
-        jnz .y_loop
-
-.end_y_loop:
-        pop edi
-        pop esi
-        pop ebx
-endproc ;asmLoad32bRGBAas16bRGBA
-
-
-proc asmLoad32bRGBA
-CPU 586
-        %$src     arg
-        %$dst     arg
-        %$wid_64  arg
-        %$height  arg
-        %$line    arg
-        %$ext     arg
-rgba32:
-        push ebx
-        push esi
-        push edi
-
-        mov esi,[ebp + %$src]
-        mov edi,[ebp + %$dst]
-        mov ecx,[ebp + %$height]
-.y_loop:
-        push ecx
-        mov ecx,[ebp + %$wid_64]
-.x_loop:
-        mov eax,[esi]           ; read first pixel
-        mov ebx,[esi+4]         ; read second pixel
-        bswap eax
-        bswap ebx
-        ror eax, 8
-        ror ebx, 8
-        mov [edi],eax
-        mov [edi+4],ebx
-        add esi,8
-        add edi,8
-
-        ; * copy
-        mov eax,[esi]           ; read first pixel
-        mov ebx,[esi+4]         ; read second pixel
-        bswap eax
-        bswap ebx
-        ror eax, 8
-        ror ebx, 8
-        mov [edi],eax
-        mov [edi+4],ebx
-        add esi,8
-        add edi,8
-        ; *
-
-        dec ecx
-        jnz .x_loop
-
-        pop ecx
-        dec ecx
-        jz .end_y_loop
-        push ecx
-
-        add esi,[ebp + %$line]
-        add edi,[ebp + %$ext]
-
-        mov ecx,[ebp + %$wid_64]
-.x_loop_2:
-        mov eax,[esi+8]         ; read first pixel
-        mov ebx,[esi+12]        ; read second pixel
-        bswap eax
-        bswap ebx
-        ror eax, 8
-        ror ebx, 8
-        mov [edi],eax
-        mov [edi+4],ebx
-        add edi,8
-
-        ; * copy
-        mov eax,[esi+0]         ; read first pixel
-        mov ebx,[esi+4]         ; read second pixel
-        bswap eax
-        bswap ebx
-        ror eax, 8
-        ror ebx, 8
-        mov [edi],eax
-        mov [edi+4],ebx
-        add esi,16
-        add edi,8
-        ; *
-
-        dec ecx
-        jnz .x_loop_2
-
-        add esi,[ebp + %$line]
-        add edi,[ebp + %$ext]
-
-        pop ecx
-        dec ecx
-        jnz .y_loop
-
-.end_y_loop:
-        pop edi
-        pop esi
-        pop ebx
-endproc ;asmLoad32bRGBA
-
 
 ;****************************************************************
 ;
@@ -3919,40 +3613,6 @@ swapblock32_loop:
         dec ecx
         jnz swapblock32_loop
 swapblock32_end:
-        pop ebx
-        pop eax
-        ret
-
-ALIGN 4
-
-global SwapBlock64
-SwapBlock64:
-CPU 586
-        push eax
-        push ebx
-        push edx
-        shr ecx,1
-        or ecx,ecx
-        jz swapblock64_end
-swapblock64_loop:
-        ;mov eax,[edi]
-        ;mov ebx,[edi+4]
-        ;mov edx,[edi+8]
-        ;mov [edi+8],eax
-        ;mov eax,[edi+12]
-        ;mov [edi+12],ebx
-        ;mov [edi+0],edx
-        ;mov [edi+4],eax
-        ; faster using fpu
-        fild qword [edi]
-        fild qword [edi+8]
-        fistp qword [edi]
-        fistp qword [edi+8]
-        add edi,16
-        dec ecx
-        jnz swapblock64_loop
-swapblock64_end:
-        pop edx
         pop ebx
         pop eax
         ret
