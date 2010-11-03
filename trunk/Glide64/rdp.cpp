@@ -1793,6 +1793,7 @@ static void rdp_settilesize()
 }
 
 extern "C" void asmLoadBlock(int src, int dst, int off, int dxt, int cnt, int swp);
+void LoadBlock32b(wxUint32 tile, wxUint32 ul_s, wxUint32 ul_t, wxUint32 lr_s, wxUint32 dxt);
 static void rdp_loadblock()
 {
   if (rdp.skip_drawing)
@@ -1863,14 +1864,15 @@ static void rdp_loadblock()
   if (rdp.tiles[tile].size == 3)
     cnt <<= 1;
 
-  // Since it's not loading 32-bit textures as the N64 would, 32-bit textures need to
-  //  be swapped by 64-bits, not 32.
-  wxUIntPtr SwapMethod = (rdp.tiles[tile].size==3)?wxPtrToUInt(reinterpret_cast<void*>(SwapBlock64)):wxPtrToUInt(reinterpret_cast<void*>(SwapBlock32));
+  wxUIntPtr SwapMethod = wxPtrToUInt(reinterpret_cast<void*>(SwapBlock32));
+
+  if (rdp.timg.size == 3)
+    LoadBlock32b(tile, ul_s, ul_t, lr_s, dxt);
+  else
+    asmLoadBlock(wxPtrToUInt(gfx.RDRAM), dst, off, _dxt, cnt, SwapMethod);
 
   rdp.timg.addr += cnt << 3;
   rdp.tiles[tile].lr_t = ul_t + ((dxt*cnt)>>11);
-
-  asmLoadBlock(wxPtrToUInt(gfx.RDRAM), dst, off, _dxt, cnt, SwapMethod);
 
   rdp.update |= UPDATE_TEXTURE;
 
@@ -1880,6 +1882,7 @@ static void rdp_loadblock()
 }
 
 extern "C" void asmLoadTile(int src, int dst, int width, int height, int line, int off, int end, int swap);
+void LoadTile32b (wxUint32 tile, wxUint32 ul_s, wxUint32 ul_t, wxUint32 width, wxUint32 height);
 static void rdp_loadtile()
 {
   if (rdp.skip_drawing)
@@ -1944,34 +1947,33 @@ static void rdp_loadtile()
   info.tex_size = rdp.timg.size;
 #endif
 
-  wxUint32 wid_64 = rdp.tiles[tile].line;
+  if (rdp.timg.size == 3)
+  {
+    LoadTile32b(tile, ul_s, ul_t, width, height);
+  }
+  else
+  {
+    wxUint32 wid_64 = rdp.tiles[tile].line;
+    int line_n = rdp.timg.width << rdp.tiles[tile].size >> 1;
 
-  // CHEAT: it's very unlikely that it loads more than 1 32-bit texture in one command,
-  //   so i don't bother to write in two different places at once.  Just load once with
-  //   twice as much data.
-  if (rdp.tiles[tile].size == 3)
-    wid_64 <<= 1;
+    wxUint32 offs = ul_t * line_n;
+    offs += ul_s << rdp.tiles[tile].size >> 1;
+    offs += rdp.timg.addr;
+    if (offs >= BMASK)
+      return;
 
-  int line_n = rdp.timg.width << rdp.tiles[tile].size >> 1;
+    // check if points to bad location
+    if (offs + line_n*height > BMASK)
+      height = (BMASK - offs) / line_n;
+    if (height == 0)
+      return;
 
-  wxUint32 offs = ul_t * line_n;
-  offs += ul_s << rdp.tiles[tile].size >> 1;
-  offs += rdp.timg.addr;
-  if (offs >= BMASK)
-    return;
+    wxUIntPtr SwapMethod = wxPtrToUInt(reinterpret_cast<void*>(SwapBlock32));
 
-  // check if points to bad location
-  if (offs + line_n*height > BMASK)
-    height = (BMASK - offs) / line_n;
-  if (height == 0)
-    return;
-
-  wxUIntPtr SwapMethod = (rdp.tiles[tile].size==3)?wxPtrToUInt(reinterpret_cast<void*>(SwapBlock64)):wxPtrToUInt(reinterpret_cast<void*>(SwapBlock32));
-
-  wxUIntPtr dst = wxPtrToUInt(rdp.tmem) + (rdp.tiles[tile].t_mem<<3);
-  wxUIntPtr end = wxPtrToUInt(rdp.tmem) + 4096 - (wid_64<<3);
-  asmLoadTile(wxPtrToUInt(gfx.RDRAM), dst, wid_64, height, line_n, offs, end, SwapMethod);
-
+    wxUIntPtr dst = wxPtrToUInt(rdp.tmem) + (rdp.tiles[tile].t_mem<<3);
+    wxUIntPtr end = wxPtrToUInt(rdp.tmem) + 4096 - (wid_64<<3);
+    asmLoadTile(wxPtrToUInt(gfx.RDRAM), dst, wid_64, height, line_n, offs, end, SwapMethod);
+  }
   FRDP("loadtile: tile: %d, ul_s: %d, ul_t: %d, lr_s: %d, lr_t: %d\n", tile,
     ul_s, ul_t, lr_s, lr_t);
 }

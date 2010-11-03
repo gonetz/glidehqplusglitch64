@@ -335,18 +335,44 @@ void GetTexInfo (int id, int tile)
     if (wid_64 < 1) wid_64 = 1;
     wxUIntPtr addr = wxPtrToUInt(rdp.tmem) + (rdp.tiles[tile].t_mem<<3);
     if (crc_height > 0) // Check the CRC
-      crc = asmTextureCRC(addr, wid_64, crc_height, line);
+    {
+      if (rdp.tiles[tile].size < 3)
+        crc = asmTextureCRC(addr, wid_64, crc_height, line);
+      else //32b texture
+      {
+        int line_2 = line >> 1;
+        int wid_64_2 = max(1, wid_64 >> 1);
+        crc = asmTextureCRC(addr, wid_64_2, crc_height, line_2);
+        crc += asmTextureCRC(addr+0x800, wid_64_2, crc_height, line_2);
+      }
+    }
   }
   else
   {
     crc = 0xFFFFFFFF;
     wxUIntPtr addr = wxPtrToUInt(rdp.tmem) + (rdp.tiles[tile].t_mem<<3);
     wxUint32 line2 = max(line,1);
-    line2 <<= 3;
-    for (int y = 0; y < crc_height; y++)
+    if (rdp.tiles[tile].size < 3)
     {
-      crc = CRC32( crc, reinterpret_cast<void*>(addr), bpl );
-      addr += line2;
+      line2 <<= 3;
+      for (int y = 0; y < crc_height; y++)
+      {
+        crc = CRC32( crc, reinterpret_cast<void*>(addr), bpl );
+        addr += line2;
+      }
+    }
+    else //32b texture
+    {
+      line2 <<= 2;
+      //32b texel is split in two 16b parts, so bpl/2 and line/2.
+      //Min value for bpl is 4, because when width==1 first 2 bytes of tmem will not be used.
+      bpl = max(bpl >> 1, 4);
+      for (int y = 0; y < crc_height; y++)
+      {
+        crc = CRC32( crc, reinterpret_cast<void*>(addr), bpl);
+        crc = CRC32( crc, reinterpret_cast<void*>(addr + 0x800), bpl);
+        addr += line2;
+      }
     }
     line = (line - wid_64) << 3;
     if (wid_64 < 1) wid_64 = 1;
@@ -1374,6 +1400,8 @@ void LoadTex (int id, int tmu)
 
         int start_src = i * 256;	// start 256 more to the right
         start_src = start_src << (rdp.tiles[td].size) >> 1;
+        if (rdp.tiles[td].size == 3)
+          start_src >>= 1;
 
         result = load_table[rdp.tiles[td].size][rdp.tiles[td].format]
         (wxPtrToUInt(texture)+start_dst, wxPtrToUInt(rdp.tmem)+(rdp.tiles[td].t_mem<<3)+start_src,
