@@ -2351,7 +2351,7 @@ static void rdp_settextureimage()
     {
       if (!rdp.cur_image)
         CopyFrameBuffer();
-      else if (rdp.ci_count >= rdp.num_of_ci || rdp.frame_buffers[rdp.ci_count].status != ci_copy)
+      else
         CloseTextureBuffer(TRUE);
       rdp.fb_drawn = TRUE;
     }
