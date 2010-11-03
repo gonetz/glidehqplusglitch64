@@ -325,17 +325,11 @@ bool DrawFrameBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     scale = 1.0f;
     t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_256;
   }
-  else if (width <= 512)
+  else
   {
     texwidth = 512;
     scale = 0.5f;
     t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_512;
-  }
-  else
-  {
-    texwidth = 1024;
-    scale = 0.25f;
-    t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_1024;
   }
 
   if (height <= (texwidth>>1))
@@ -602,17 +596,11 @@ void DrawDepthBufferToScreen(FB_TO_SCREEN_INFO & fb_info)
     scale = 1.0f;
     t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_256;
   }
-  else if (width <= 512)
+  else
   {
     texwidth = 512;
     scale = 0.5f;
     t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_512;
-  }
-  else
-  {
-    texwidth = 1024;
-    scale = 0.25f;
-    t_info.smallLodLog2 = t_info.largeLodLog2 = GR_LOD_LOG2_1024;
   }
 
   if (height <= (texwidth>>1))
