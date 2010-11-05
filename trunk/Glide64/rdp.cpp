@@ -2071,7 +2071,7 @@ static void rdp_fillrect()
     return;
   }
 
-  if (rdp.cur_image && (rdp.cur_image->format != 0) && (rdp.cycle_mode == 3) && (rdp.cur_image->width == lr_x))
+  if (rdp.cur_image && (rdp.cur_image->format != 0) && (rdp.cycle_mode == 3) && (rdp.cur_image->width == lr_x - ul_x) && (rdp.cur_image->height == lr_y - ul_y))
   {
     wxUint32 color = rdp.fill_color;
     if (rdp.ci_size < 3)
@@ -2085,6 +2085,7 @@ static void rdp_fillrect()
     grBufferClear (color, 0, 0xFFFF);
     grDepthMask (FXTRUE);
     rdp.update |= UPDATE_ZBUF_ENABLED;
+    LRDP("Fillrect - cleared the texture buffer\n");
     return;
   }
 
