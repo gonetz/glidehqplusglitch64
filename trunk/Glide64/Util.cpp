@@ -1922,12 +1922,12 @@ void update ()
           switch ((rdp.rm & 0xC00)>>10) {
             case 0:
               grDepthBiasLevel(0);
-              grDepthBufferFunction ((rdp.othermode_l & 0x08) ? GR_CMP_LEQUAL : GR_CMP_LESS);
-            break;
-			case 1:
+              grDepthBufferFunction (settings.zmode_compare_less ? GR_CMP_LESS : GR_CMP_LEQUAL);
+              break;
+            case 1:
               grDepthBiasLevel(-4);
-              grDepthBufferFunction ((rdp.othermode_l & 0x08) ? GR_CMP_LEQUAL : GR_CMP_LESS);
-            break;
+              grDepthBufferFunction (settings.zmode_compare_less ? GR_CMP_LESS : GR_CMP_LEQUAL);
+              break;
             case 2:
               grDepthBiasLevel(settings.ucode == 7 ? -4 : 0);
               grDepthBufferFunction (GR_CMP_LESS);
