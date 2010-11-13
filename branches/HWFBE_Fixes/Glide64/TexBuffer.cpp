@@ -46,24 +46,6 @@
 #include "TexBuffer.h"
 #include "CRC.h"
 
-static wxUint32 CalcCRC(const TBUFF_COLOR_IMAGE * pTCI)
-{
-  wxUint32 result = 0;
-  if (settings.fb_crc_mode == SETTINGS::fbcrcFast)
-    result = *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
-  else if (settings.fb_crc_mode == SETTINGS::fbcrcSafe)
-  {
-    wxUint8 * pSrc = gfx.RDRAM + pTCI->addr;
-    const wxUint32 nSize = pTCI->end_addr-pTCI->addr;
-    result = CRC32(0xFFFFFFFF, pSrc, 32);
-    result = CRC32(result, pSrc + (nSize>>1), 32);
-    result = CRC32(result, pSrc + nSize - 32, 32);
-  }
-  return result;
-
-  //return *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
-}
-
 static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
 {
   TBUFF_COLOR_IMAGE texbuf;
@@ -339,7 +321,6 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   }
 
   rdp.acc_tex_buf = rdp.cur_tex_buf;
-  texbuf->crc = (settings.frame_buffer&fb_ref) ? 0 : CalcCRC(texbuf);
   rdp.cur_image = texbuf;
   grRenderBuffer( GR_BUFFER_TEXTUREBUFFER_EXT );
   grTextureBufferExt( rdp.cur_image->tmu, rdp.cur_image->tex_addr, rdp.cur_image->info.smallLodLog2, rdp.cur_image->info.largeLodLog2,
@@ -687,6 +668,22 @@ int SwapTextureBuffer()
   }
   LRDP("SwapTextureBuffer draw, OK\n");
   return TRUE;
+}
+
+static wxUint32 CalcCRC(const TBUFF_COLOR_IMAGE * pTCI)
+{
+  wxUint32 result = 0;
+  if (settings.fb_crc_mode == SETTINGS::fbcrcFast)
+    result = *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
+  else if (settings.fb_crc_mode == SETTINGS::fbcrcSafe)
+  {
+    wxUint8 * pSrc = gfx.RDRAM + pTCI->addr;
+    const wxUint32 nSize = pTCI->end_addr-pTCI->addr;
+    result = CRC32(0xFFFFFFFF, pSrc, 32);
+    result = CRC32(result, pSrc + (nSize>>1), 32);
+    result = CRC32(result, pSrc + nSize - 32, 32);
+  }
+  return result;
 }
 
 int FindTextureBuffer(wxUint32 addr, wxUint16 width)
