@@ -670,10 +670,12 @@ int SwapTextureBuffer()
   return TRUE;
 }
 
-static wxUint32 CalcCRC(const TBUFF_COLOR_IMAGE * pTCI)
+static wxUint32 CalcCRC(TBUFF_COLOR_IMAGE * pTCI)
 {
   wxUint32 result = 0;
-  if (settings.fb_crc_mode == SETTINGS::fbcrcFast)
+  if ((settings.frame_buffer&fb_ref) > 0)
+    pTCI->crc = 0; //Since fb content changes each frame, crc check is meaningless.
+  else if (settings.fb_crc_mode == SETTINGS::fbcrcFast)
     result = *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
   else if (settings.fb_crc_mode == SETTINGS::fbcrcSafe)
   {
