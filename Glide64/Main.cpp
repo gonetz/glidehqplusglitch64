@@ -517,6 +517,7 @@ void ReadSpecialSettings (const char * name)
   ini->Read(_T("clip_zmax"), &(settings.clip_zmax));
   ini->Read(_T("fast_crc"), &(settings.fast_crc));
   ini->Read(_T("adjust_aspect"), &(settings.adjust_aspect), 1);
+  ini->Read(_T("zmode_compare_less"), &(settings.zmode_compare_less));
   ini->Read(_T("n64_z_scale"), &(settings.n64_z_scale));
   if (settings.n64_z_scale)
     ZLUT_init();
