@@ -294,17 +294,33 @@ void DrawImage (DRAWIMAGE & d)
   switch (d.imageSiz)
   {
   case 0:
+    if (rdp.tlut_mode < 2)
+    {
+      y_size = 64;
+      y_shift = 6;
+    }
+    else
+    {
+      y_size = 32;
+      y_shift = 5;
+    }
     x_size = 128;
-    y_size = 64;
     x_shift = 7;
-    y_shift = 6;
     line = 8;
     break;
   case 1:
+    if (rdp.tlut_mode < 2)
+    {
+      y_size = 64;
+      y_shift = 6;
+    }
+    else
+    {
+      y_size = 32;
+      y_shift = 5;
+    }
     x_size = 64;
-    y_size = 64;
     x_shift = 6;
-    y_shift = 6;
     line = 8;
     break;
   case 2:
