@@ -43,8 +43,6 @@
 #include "Util.h"
 #include "Debugger.h"
 #include "Combine.h"
-#include "Util.h"
-#include "TexCache.h"
 #include "TexCache.h"
 #include "TexBuffer.h"
 #include "FBtoScreen.h"
