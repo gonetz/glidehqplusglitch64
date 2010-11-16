@@ -479,6 +479,8 @@ void ReadSpecialSettings (const char * name)
     settings.hacks |= hack_Pilotwings;
   else if (strstr(name, (const char *)"Supercross"))
     settings.hacks |= hack_Supercross;
+  else if (strstr(name, (const char *)"STARCRAFT 64"))
+    settings.hacks |= hack_Starcraft;
   else if (strstr(name, (const char *)"BANJO KAZOOIE 2") || strstr(name, (const char *)"BANJO TOOIE"))
     settings.hacks |= hack_Banjo2;
   else if (strstr(name, (const char *)"FIFA: RTWC 98") || strstr(name, (const char *)"RoadToWorldCup98"))
