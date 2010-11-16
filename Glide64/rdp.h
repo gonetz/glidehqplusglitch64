@@ -317,12 +317,13 @@ typedef struct {
   #define  hack_PMario      (1<<19)  //Paper Mario
   #define  hack_PPL         (1<<20)  //pokemon puzzle league requires many special fixes
   #define  hack_RE2         (1<<21)  //Resident Evil 2
-  #define  hack_Supercross  (1<<22)  //Supercross 2000
-  #define  hack_TGR         (1<<23)  //Top Gear Rally
-  #define  hack_TGR2        (1<<24)  //Top Gear Rally 2
-  #define  hack_Tonic       (1<<25)  //tonic trouble
-  #define  hack_Yoshi       (1<<26)  //Yoshi Story
-  #define  hack_Zelda       (1<<27)  //zeldas hacks
+  #define  hack_Starcraft   (1<<22)  //StarCraft64
+  #define  hack_Supercross  (1<<23)  //Supercross 2000
+  #define  hack_TGR         (1<<24)  //Top Gear Rally
+  #define  hack_TGR2        (1<<25)  //Top Gear Rally 2
+  #define  hack_Tonic       (1<<26)  //tonic trouble
+  #define  hack_Yoshi       (1<<27)  //Yoshi Story
+  #define  hack_Zelda       (1<<28)  //zeldas hacks
   wxUint32 hacks;
 
   //wrapper settings
