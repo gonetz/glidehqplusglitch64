@@ -242,7 +242,12 @@ ci4:
         jz near .end_y_loop
         push ecx
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax,esi
+        and eax,0x7FF
+        add esi,eax
         add edi,[ebp + %$ext]
 
         mov ecx,[ebp + %$wid_64]
@@ -326,7 +331,12 @@ ci4:
         ; * copy
         mov eax,[esi]           ; read all 8 pixels
         bswap eax
-        add esi,8
+        mov edx,esi
+        add edx,8
+        mov esi,[ebp + %$src]
+        sub edx,esi
+        and edx,0x7FF
+        add esi,edx
         mov edx,eax
 
         ; 1st dword output {
@@ -405,7 +415,12 @@ ci4:
         dec ecx
         jnz .x_loop_2
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax,esi
+        and eax,0x7FF
+        add esi,eax
         add edi,[ebp + %$ext]
 
         pop ecx
@@ -604,7 +619,12 @@ ia4pal:
         jz near .end_y_loop
         push ecx
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax,esi
+        and eax,0x7FF
+        add esi,eax
         add edi,[ebp + %$ext]
 
         mov ecx,[ebp + %$wid_64]
@@ -688,7 +708,12 @@ ia4pal:
         ; * copy
         mov eax,[esi]           ; read all 8 pixels
         bswap eax
-        add esi,8
+        mov edx,esi
+        add edx,8
+        mov esi,[ebp + %$src]
+        sub edx,esi
+        and edx,0x7FF
+        add esi,edx
         mov edx,eax
 
         ; 1st dword output {
@@ -767,7 +792,12 @@ ia4pal:
         dec ecx
         jnz .x_loop_2
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax,esi
+        and eax,0x7FF
+        add esi,eax
         add edi,[ebp + %$ext]
 
         pop ecx
@@ -2055,7 +2085,12 @@ ci8:
         jz near .end_y_loop
         push ecx
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax,esi
+        and eax,0x7FF
+        add esi,eax
         add edi,[ebp + %$ext]
 
         mov ecx,[ebp + %$wid_64]
@@ -2103,7 +2138,12 @@ ci8:
         ; * copy
         mov eax,[esi]           ; read all 4 pixels
         bswap eax
-        add esi,8
+        mov edx,esi
+        add edx,8
+        mov esi,[ebp + %$src]
+        sub edx,esi
+        and edx,0x7FF
+        add esi,edx
         mov edx,eax
 
         ; 1st dword output {
@@ -2146,7 +2186,12 @@ ci8:
         dec ecx
         jnz .x_loop_2
 
-        add esi,[ebp + %$line]
+        mov eax,esi
+        add eax,[ebp + %$line]
+        mov esi,[ebp + %$src]
+        sub eax,esi
+        and eax,0x7FF
+        add esi,eax
         add edi,[ebp + %$ext]
 
         pop ecx

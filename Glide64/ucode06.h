@@ -294,17 +294,33 @@ void DrawImage (DRAWIMAGE & d)
   switch (d.imageSiz)
   {
   case 0:
+    if (rdp.tlut_mode < 2)
+    {
+      y_size = 64;
+      y_shift = 6;
+    }
+    else
+    {
+      y_size = 32;
+      y_shift = 5;
+    }
     x_size = 128;
-    y_size = 64;
     x_shift = 7;
-    y_shift = 6;
     line = 8;
     break;
   case 1:
+    if (rdp.tlut_mode < 2)
+    {
+      y_size = 64;
+      y_shift = 6;
+    }
+    else
+    {
+      y_size = 32;
+      y_shift = 5;
+    }
     x_size = 64;
-    y_size = 64;
     x_shift = 6;
-    y_shift = 6;
     line = 8;
     break;
   case 2:
@@ -340,14 +356,18 @@ void DrawImage (DRAWIMAGE & d)
     }
   }
 
-  if ((settings.hacks&hack_PPL))
+  if ((settings.hacks&hack_PPL) > 0)
   {
-    if (d.imageY > d.imageH) d.imageY = (d.imageY%d.imageH);
+    if (d.imageY > d.imageH)
+      d.imageY = (d.imageY%d.imageH);
   }
-  else
+  else if ((settings.hacks&hack_Starcraft) > 0)
   {
     if (d.imageH%2 == 1)
       d.imageH -= 1;
+  }
+  else
+  {
     if ( (d.frameX > 0) && (d.frameW == rdp.ci_width) )
       d.frameW -= (wxUint16)(2.0f*d.frameX);
     if ( (d.frameY > 0) && (d.frameH == rdp.ci_height) )
@@ -1605,13 +1625,10 @@ void uc6_sprite2d ()
       return;
     }
 
-    wxUint32 texsize = d.imageW * d.imageH;
-    if (d.imageSiz == 0)
-      texsize >>= 1;
-    else
-      texsize <<= (d.imageSiz-1);
+    const wxUint32 texsize = (d.imageW * d.imageH) << d.imageSiz >> 1;
+    const wxUint32 maxTexSize = rdp.tlut_mode < 2 ? 4096 : 2048;
 
-    if (texsize > 4096)
+    if (texsize > maxTexSize)
     {
       if (d.scaleX != 1)
         d.scaleX *= (float)stride/(float)d.imageW;
