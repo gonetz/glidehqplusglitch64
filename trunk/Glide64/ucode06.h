@@ -609,7 +609,13 @@ void DrawHiresImage(DRAWIMAGE & d, int screensize = FALSE)
   FRDP("DrawHiresImage. addr: %08lx\n", d.imagePtr);
   if (!fullscreen)
     return;
-  TBUFF_COLOR_IMAGE *tbuff_tex = (rdp.motionblur)?&(rdp.texbufs[rdp.cur_tex_buf^1].images[0]):rdp.tbuff_tex;
+  TBUFF_COLOR_IMAGE *tbuff_tex;
+  if (rdp.motionblur)
+    tbuff_tex = &(rdp.texbufs[rdp.cur_tex_buf^1].images[0]);
+  else if (rdp.tbuff_tex)
+    tbuff_tex = rdp.tbuff_tex;
+  else
+    return;
 
   if (rdp.cycle_mode == 2)
   {
@@ -709,10 +715,10 @@ void DrawHiresImage(DRAWIMAGE & d, int screensize = FALSE)
     ul_y = 0.0f;
     ul_u = 0.15f;
     ul_v = 0.15f;
-    lr_x = rdp.tbuff_tex->scr_width;
-    lr_y = rdp.tbuff_tex->scr_height;
-    lr_u = rdp.tbuff_tex->lr_u;
-    lr_v = rdp.tbuff_tex->lr_v;
+    lr_x = tbuff_tex->scr_width;
+    lr_y = tbuff_tex->scr_height;
+    lr_u = tbuff_tex->lr_u;
+    lr_v = tbuff_tex->lr_v;
   }
   else
   {
@@ -730,10 +736,10 @@ void DrawHiresImage(DRAWIMAGE & d, int screensize = FALSE)
     lr_x *= rdp.scale_x;
     ul_y *= rdp.scale_y;
     lr_y *= rdp.scale_y;
-    ul_u *= rdp.tbuff_tex->u_scale;
-    lr_u *= rdp.tbuff_tex->u_scale;
-    ul_v *= rdp.tbuff_tex->v_scale;
-    lr_v *= rdp.tbuff_tex->v_scale;
+    ul_u *= tbuff_tex->u_scale;
+    lr_u *= tbuff_tex->u_scale;
+    ul_v *= tbuff_tex->v_scale;
+    lr_v *= tbuff_tex->v_scale;
     ul_u = max(0.15f, ul_u);
     ul_v = max(0.15f, ul_v);
     if (lr_x > rdp.scissor.lr_x) lr_x = (float)rdp.scissor.lr_x;

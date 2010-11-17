@@ -233,6 +233,10 @@ typedef struct {
   #define fb_depth_render_enabled ((settings.frame_buffer&fb_depth_render)>0)
 
   wxUint32 frame_buffer;
+  enum FBCRCMODE {
+    fbcrcNone = 0,
+    fbcrcFast = 1,
+    fbcrcSafe = 2} fb_crc_mode;
 
 #ifdef TEXTURE_FILTER
   //Texture filtering options
@@ -492,10 +496,10 @@ typedef enum {
 typedef struct
 {
 	wxUint32 addr;   //color image address
-	wxUint32 format;
-	wxUint32 size;
-	wxUint32 width;
-	wxUint32 height;
+	wxUint8 format;
+	wxUint8 size;
+	wxUint16 width;
+	wxUint16 height;
 	CI_STATUS status;
 	int   changed;
 } COLOR_IMAGE;
@@ -508,10 +512,11 @@ typedef struct
 	wxUint32 tex_addr; //address in video memory
 	wxUint32 width;    //width of color image
 	wxUint32 height;   //height of color image
-	wxUint16 format;   //format of color image
+	wxUint8  format;   //format of color image
+	wxUint8  size;   //format of color image
 	wxUint8  clear;  //flag. texture buffer must be cleared
 	wxUint8  drawn;  //flag. if equal to 1, this image was already drawn in current frame
-  wxUint32 center; //bytes from the center of the color image
+	wxUint32 crc; //checksum of the color image
 	float scr_width; //width of rendered image
 	float scr_height; //height of rendered image
 	wxUint32 tex_width;  //width of texture buffer
@@ -527,6 +532,7 @@ typedef struct
 	float v_scale; //used to map vertex u,v coordinates into hires texture
 	CACHE_LUT * cache; //pointer to texture cache item
 	GrTexInfo info;
+  wxUint16 t_mem;
 } TBUFF_COLOR_IMAGE;
 
 typedef struct
@@ -717,6 +723,7 @@ struct RDP_Base{
   CI_STATUS ci_status;
   TBUFF_COLOR_IMAGE * cur_image;  //image currently being drawn
   TBUFF_COLOR_IMAGE * tbuff_tex;  //image, which corresponds to currently selected texture
+  TBUFF_COLOR_IMAGE * aTBuffTex[2]; 
   wxUint8  cur_tex_buf;
   wxUint8  acc_tex_buf;
   int skip_drawing; //rendering is not required. used for frame buffer emulation
@@ -850,16 +857,6 @@ __inline void ConvertCoordsKeep (VERTEX *v, int n)
 // Convert from u0/v0/u1/v1 to the real coordinates based on the tmu they are on
 __inline void ConvertCoordsConvert (VERTEX *v, int n)
 {
-
-  if (rdp.tbuff_tex && rdp.tex != 3)
-  {
-    for (int i=0; i<n; i++)
-    {
-      v[i].u1 = v[i].u0;
-      v[i].v1 = v[i].v0;
-    }
-  }
-
   for (int i=0; i<n; i++)
   {
     v[i].uc(rdp.t0) = v[i].u0;
