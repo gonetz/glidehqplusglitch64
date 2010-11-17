@@ -44,6 +44,7 @@
 
 #include "Gfx #1.3.h"
 #include "TexBuffer.h"
+#include "CRC.h"
 
 static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
 {
@@ -52,7 +53,8 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.end_addr = cimage.addr + ((cimage.width*cimage.height)<<cimage.size>>1);
   texbuf.width = cimage.width;
   texbuf.height = cimage.height;
-  texbuf.format = (wxUint16)cimage.format;
+  texbuf.format = cimage.format;
+  texbuf.size = cimage.size;
   texbuf.scr_width = min(cimage.width * rdp.scale_x, settings.scr_res_x);
   float height = min(rdp.vi_height,cimage.height);
   if (cimage.status == ci_copy_self || (cimage.status == ci_copy && cimage.width == rdp.frame_buffers[rdp.main_ci_index].width))
@@ -147,7 +149,8 @@ static TBUFF_COLOR_IMAGE * AllocateTextureBuffer(COLOR_IMAGE & cimage)
   texbuf.u_scale = texbuf.lr_u / (float)(texbuf.width);
   texbuf.v_scale = texbuf.lr_v / (float)(texbuf.height);
   texbuf.cache = 0;
-  texbuf.center = 0;
+  texbuf.crc = 0;
+  texbuf.t_mem = 0;
 
   FRDP("\nAllocateTextureBuffer. width: %d, height: %d, scr_width: %f, scr_height: %f, vi_width: %f, vi_height:%f, scale_x: %f, scale_y: %f, lr_u: %f, lr_v: %f, u_scale: %f, v_scale: %f\n", texbuf.width, texbuf.height, texbuf.scr_width, texbuf.scr_height, rdp.vi_width, rdp.vi_height, rdp.scale_x, rdp.scale_y, texbuf.lr_u, texbuf.lr_v, texbuf.u_scale, texbuf.v_scale);
 
@@ -214,7 +217,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
   wxUint32 addr = cimage.addr;
   if ((settings.hacks&hack_Banjo2) && cimage.status == ci_copy_self)
     addr = rdp.frame_buffers[rdp.copy_ci_index].addr;
-  wxUint32 end_addr = addr + cimage.width*cimage.height*cimage.size;
+  wxUint32 end_addr = addr + ((cimage.width*cimage.height)<<cimage.size>>1);
   if (rdp.motionblur)
   {
 //    if (cimage.format != 0)
@@ -226,7 +229,7 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
     if (settings.hacks&hack_PMario) //motion blur effects in Paper Mario
     {
       rdp.cur_tex_buf = rdp.acc_tex_buf;
-      FRDP("read_whole_frame. last allocated bank: %d\n", rdp.acc_tex_buf);
+      FRDP("\nread_whole_frame. last allocated bank: %d\n", rdp.acc_tex_buf);
     }
     else
     {
@@ -270,7 +273,9 @@ int OpenTextureBuffer(COLOR_IMAGE & cimage)
             texbuf->info.format = GR_TEXFMT_ALPHA_INTENSITY_88;
           else
             texbuf->info.format = GR_TEXFMT_RGB_565;
-          texbuf->center = 0;
+          texbuf->crc = 0;
+          texbuf->t_mem = 0;
+          texbuf->tile = 0;
           found = TRUE;
           rdp.cur_tex_buf = i;
           rdp.texbufs[i].clear_allowed = FALSE;
@@ -471,9 +476,10 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
 {
   if (!fullscreen)
     return FALSE;
-  LRDP("CopyTextureBuffer. ");
+  FRDP("CopyTextureBuffer from %08x to %08x\n", fb_from.addr, fb_to.addr);
   if (rdp.cur_image)
   {
+    rdp.cur_image->crc = 0;
     if (rdp.cur_image->addr == fb_to.addr)
       return CloseTextureBuffer(TRUE);
     rdp.tbuff_tex = rdp.cur_image;
@@ -488,6 +494,7 @@ int CopyTextureBuffer(COLOR_IMAGE & fb_from, COLOR_IMAGE & fb_to)
     LRDP("Can't open new buffer.\n");
     return CloseTextureBuffer(TRUE);
   }
+  rdp.tbuff_tex->crc = 0;
   GrTextureFormat_t buf_format = rdp.tbuff_tex->info.format;
   rdp.tbuff_tex->info.format = GR_TEXFMT_RGB_565;
   TexBufSetupCombiner(TRUE);
@@ -663,9 +670,22 @@ int SwapTextureBuffer()
   return TRUE;
 }
 
-inline wxUint32 CalcCenter(TBUFF_COLOR_IMAGE * pTCI)
+static wxUint32 CalcCRC(TBUFF_COLOR_IMAGE * pTCI)
 {
-  return *((wxUint32*)(gfx.RDRAM + pTCI->addr + pTCI->height*pTCI->width + pTCI->width));
+  wxUint32 result = 0;
+  if ((settings.frame_buffer&fb_ref) > 0)
+    pTCI->crc = 0; //Since fb content changes each frame, crc check is meaningless.
+  else if (settings.fb_crc_mode == SETTINGS::fbcrcFast)
+    result = *((wxUint32*)(gfx.RDRAM + pTCI->addr + (pTCI->end_addr-pTCI->addr)/2));
+  else if (settings.fb_crc_mode == SETTINGS::fbcrcSafe)
+  {
+    wxUint8 * pSrc = gfx.RDRAM + pTCI->addr;
+    const wxUint32 nSize = pTCI->end_addr-pTCI->addr;
+    result = CRC32(0xFFFFFFFF, pSrc, 32);
+    result = CRC32(result, pSrc + (nSize>>1), 32);
+    result = CRC32(result, pSrc + nSize - 32, 32);
+  }
+  return result;
 }
 
 int FindTextureBuffer(wxUint32 addr, wxUint16 width)
@@ -684,13 +704,13 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
       if(addr >= rdp.tbuff_tex->addr && addr < rdp.tbuff_tex->end_addr)// && rdp.timg.format == 0)
       {
         bool bCorrect;
-        if (rdp.tbuff_tex->center == 0)
+        if (rdp.tbuff_tex->crc == 0)
         {
-          rdp.tbuff_tex->center = CalcCenter(rdp.tbuff_tex);
+          rdp.tbuff_tex->crc = CalcCRC(rdp.tbuff_tex);
           bCorrect = width == 1 || rdp.tbuff_tex->width == width || (rdp.tbuff_tex->width > 320 && rdp.tbuff_tex->width == width*2);
         }
         else
-          bCorrect = rdp.tbuff_tex->center == CalcCenter(rdp.tbuff_tex);
+          bCorrect = rdp.tbuff_tex->crc == CalcCRC(rdp.tbuff_tex);
         if (bCorrect)
         {
           shift = addr - rdp.tbuff_tex->addr;
@@ -724,13 +744,8 @@ int FindTextureBuffer(wxUint32 addr, wxUint16 width)
       rdp.tbuff_tex->v_shift = 0;
       rdp.tbuff_tex->u_shift = 0;
     }
-    /*
-    if (rdp.timg.format == 0) //RGB
-    rdp.tbuff_tex->info.format = GR_TEXFMT_RGB_565;
-    else  //IA
-    rdp.tbuff_tex->info.format = GR_TEXFMT_ALPHA_INTENSITY_88;
-    */
-    FRDP("FindTextureBuffer, found, u_shift: %d,  v_shift: %d, format: %d\n", rdp.tbuff_tex->u_shift, rdp.tbuff_tex->v_shift, rdp.tbuff_tex->info.format);
+    FRDP("FindTextureBuffer, found, u_shift: %d,  v_shift: %d, format: %s\n", rdp.tbuff_tex->u_shift, rdp.tbuff_tex->v_shift, str_format[rdp.tbuff_tex->format]);
+    //FRDP("Buffer, addr=%08lx, end_addr=%08lx, width: %d, height: %d\n", rdp.tbuff_tex->addr, rdp.tbuff_tex->end_addr, rdp.tbuff_tex->width, rdp.tbuff_tex->height);
     return TRUE;
   }
   rdp.tbuff_tex = 0;

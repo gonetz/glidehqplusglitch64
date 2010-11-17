@@ -159,7 +159,12 @@ void GetTexInfo (int id, int tile)
   for (t=0; t<MAX_TMU; t++)
     tex_found[id][t] = -1;
 
-  if (rdp.tbuff_tex && rdp.tbuff_tex->tile%2 == id && rdp.tbuff_tex->cache)
+  TBUFF_COLOR_IMAGE * pFBTex = 0;
+  if (rdp.aTBuffTex[0] && rdp.aTBuffTex[0]->tile == id)
+    pFBTex = rdp.aTBuffTex[0];
+  else if (rdp.aTBuffTex[1] && rdp.aTBuffTex[1]->tile == id)
+    pFBTex = rdp.aTBuffTex[1];
+  if (pFBTex && pFBTex->cache)
     return;
 
   TEXINFO *info = &texinfo[id];
@@ -487,65 +492,10 @@ int ChooseBestTmu (int tmu1, int tmu2)
 
 //****************************************************************
 // SelectTBuffTex - select texture from texture buffer 
-static void SelectTBuffTex()
+static void SelectTBuffTex(TBUFF_COLOR_IMAGE * pTBuffTex)
 {
-  FRDP ("SelectTBuffTex: tex: %d, tmu: %d, tile: %d\n", rdp.tex, rdp.tbuff_tex->tmu, rdp.tbuff_tex->tile);
-  if (voodoo.tex_UMA && rdp.tbuff_tex->info.format == GR_TEXFMT_RGB_565)
-  {
-    grTexSource( rdp.tbuff_tex->tile%2, rdp.tbuff_tex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(rdp.tbuff_tex->info) );
-    return;
-  }
-
-  if (rdp.tex == 3)
-  {
-    if (rdp.tbuff_tex->tmu == rdp.tbuff_tex->tile) 
-    {
-      grTexSource( rdp.tbuff_tex->tmu, rdp.tbuff_tex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(rdp.tbuff_tex->info) );
-      return;
-    }
-    else if (rdp.cur_image && rdp.cur_image->tmu == 1)
-    {
-      grTexSource( rdp.cur_image->tmu, rdp.cur_image->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(rdp.cur_image->info) );
-      return;
-    }
-  }  
-  grTexSource( rdp.tbuff_tex->tmu, rdp.tbuff_tex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(rdp.tbuff_tex->info) );
-  GrCombineFunction_t color_source = 
-    (rdp.tbuff_tex->info.format == GR_TEXFMT_RGB_565) ? GR_COMBINE_FUNCTION_LOCAL : GR_COMBINE_FUNCTION_LOCAL_ALPHA;
-  if (rdp.tbuff_tex->tmu == GR_TMU0)
-  {
-    grTexCombine( GR_TMU1, 
-      GR_COMBINE_FUNCTION_NONE, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_NONE, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE ); 
-    grTexCombine( GR_TMU0, 
-      color_source, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE); 
-  }
-  else
-  {
-    grTexCombine( GR_TMU1, 
-      color_source, 
-      GR_COMBINE_FACTOR_NONE, 
-      GR_COMBINE_FUNCTION_LOCAL, 
-      GR_COMBINE_FACTOR_NONE, 
-      FXFALSE, 
-      FXFALSE); 
-    grTexCombine( GR_TMU0, 
-      GR_COMBINE_FUNCTION_SCALE_OTHER, 
-      GR_COMBINE_FACTOR_ONE, 
-      GR_COMBINE_FUNCTION_SCALE_OTHER, 
-      GR_COMBINE_FACTOR_ONE, 
-      FXFALSE, 
-      FXFALSE ); 
-  }
+  FRDP ("SelectTBuffTex: tex: %d, tmu: %d, tile: %d\n", rdp.tex, pTBuffTex->tmu, pTBuffTex->tile);
+  grTexSource(pTBuffTex->tile, pTBuffTex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(pTBuffTex->info) );
 }
 
 //****************************************************************
@@ -577,16 +527,16 @@ void TexCache ()
   }
 #endif
 
-  if (rdp.tbuff_tex && !voodoo.tex_UMA && rdp.tex == 3)
-  {
-    if (rdp.tbuff_tex->tmu != rdp.tbuff_tex->tile && !rdp.cur_image && SwapTextureBuffer())
-      rdp.tbuff_tex->tile = rdp.tbuff_tex->tmu;
-  }
-
   if (rdp.tex & 1)
     GetTexInfo (0, rdp.cur_tile);
   if (rdp.tex & 2)
     GetTexInfo (1, rdp.cur_tile+1);
+
+  TBUFF_COLOR_IMAGE * aTBuff[2] = {0, 0};
+  if (rdp.aTBuffTex[0])
+    aTBuff[rdp.aTBuffTex[0]->tile] = rdp.aTBuffTex[0];
+  if (rdp.aTBuffTex[1])
+    aTBuff[rdp.aTBuffTex[1]->tile] = rdp.aTBuffTex[1];
 
 #define TMUMODE_NORMAL		0
 #define TMUMODE_PASSTHRU	1
@@ -848,12 +798,12 @@ void TexCache ()
 
   if ((rdp.tex & 1) && tmu_0 < voodoo.num_tmu)
   {
-    if (rdp.tbuff_tex && rdp.tbuff_tex->tile%2 == tmu_0 && rdp.tbuff_tex->cache)
+    if (aTBuff[0] && aTBuff[0]->cache)
     {
       LRDP(" | |- Hires tex T0 found in cache.\n");
       if (fullscreen)
       {
-        rdp.cur_cache[0] = rdp.tbuff_tex->cache;
+        rdp.cur_cache[0] = aTBuff[0]->cache;
         rdp.cur_cache[0]->last_used = frame_count;
         rdp.cur_cache[0]->uses = rdp.debug_n;
       }
@@ -879,12 +829,12 @@ void TexCache ()
   }
   if ((rdp.tex & 2) && tmu_1 < voodoo.num_tmu)
   {
-    if (rdp.tbuff_tex && rdp.tbuff_tex->tile%2 == tmu_1 && rdp.tbuff_tex->cache)
+    if (aTBuff[1] && aTBuff[1]->cache)
     {
       LRDP(" | |- Hires tex T1 found in cache.\n");
       if (fullscreen)
       {
-        rdp.cur_cache[1] = rdp.tbuff_tex->cache;
+        rdp.cur_cache[1] = aTBuff[1]->cache;
         rdp.cur_cache[1]->last_used = frame_count;
         rdp.cur_cache[1]->uses = rdp.debug_n;
       }
@@ -981,9 +931,9 @@ void TexCache ()
           mode_s,
           mode_t);
       }
+      if (aTBuff[i] && (rdp.tex&(i+1)))
+        SelectTBuffTex(aTBuff[i]);
     }
-    if (rdp.tbuff_tex)
-      SelectTBuffTex();
   }
 
   LRDP(" | +- TexCache End\n");
@@ -1289,11 +1239,13 @@ void LoadTex (int id, int tmu)
   cache->mod_color1 = modcolor1;
   cache->mod_factor = modfactor;
 
-  if (rdp.tbuff_tex && rdp.tbuff_tex->tile == id) //texture buffer will be used instead of frame buffer texture
-  {
-    rdp.tbuff_tex->cache = cache;
-    LRDP("tbuff_tex selected\n");
-    return;
+  for (int t = 0; t < 2; t++) {
+    if (rdp.aTBuffTex[t] && rdp.aTBuffTex[t]->tile == id) //texture buffer will be used instead of frame buffer texture
+    {
+      rdp.aTBuffTex[t]->cache = cache;
+      FRDP("tbuff_tex selected: %d, tile=%d\n", t, id);
+      return;
+    }
   }
 
   wxUint32 result = 0;	// keep =0 so it doesn't mess up on the first split
