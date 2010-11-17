@@ -289,7 +289,8 @@ grClipWindow( FxU32 minx, FxU32 miny, FxU32 maxx, FxU32 maxy )
 
   if (!use_fbo) {
     int th = height;
-    if (!use_fbo && th > screen_height) th = screen_height;
+    if (th > screen_height)
+      th = screen_height;
     maxy = th - maxy;
     miny = th - miny;
     FxU32 tmp = maxy; maxy = miny; miny = tmp;
@@ -2723,7 +2724,7 @@ grLoadGammaTable( FxU32 nentries, FxU32 *red, FxU32 *green, FxU32 *blue)
   if (!fullscreen)
     return;
   FxU16 aGammaRamp[3][256];
-  for (int i = 0; i < 256; i++) 
+  for (int i = 0; i < 256; i++)
   {
     aGammaRamp[0][i] = (FxU16)((red[i] << 8) & 0xFFFF);
     aGammaRamp[1][i] = (FxU16)((green[i] << 8) & 0xFFFF);
@@ -2742,14 +2743,14 @@ grGetGammaTableExt(FxU32 nentries, FxU32 *red, FxU32 *green, FxU32 *blue)
   HDC hdc = GetDC(NULL);
   if (hdc == NULL)
     return;
-  if (GetDeviceGammaRamp(hdc, aGammaRamp) == TRUE) 
+  if (GetDeviceGammaRamp(hdc, aGammaRamp) == TRUE)
   {
     ReleaseDC(NULL, hdc);
 #else
   if (SDL_GetGammaRamp(aGammaRamp[0], aGammaRamp[1], aGammaRamp[2]) != -1)
   {
 #endif
-    for (int i = 0; i < 256; i++) 
+    for (int i = 0; i < 256; i++)
     {
       red[i] = aGammaRamp[0][i] >> 8;
       green[i] = aGammaRamp[1][i] >> 8;
@@ -2765,7 +2766,7 @@ guGammaCorrectionRGB( FxFloat gammaR, FxFloat gammaG, FxFloat gammaB )
   if (!fullscreen)
     return;
   FxU16 aGammaRamp[3][256];
-  for (int i = 0; i < 256; i++) 
+  for (int i = 0; i < 256; i++)
   {
     aGammaRamp[0][i] = (((FxU16)((pow(i/255.0F, 1.0F/gammaR)) * 255.0F + 0.5F)) << 8) & 0xFFFF;
     aGammaRamp[1][i] = (((FxU16)((pow(i/255.0F, 1.0F/gammaG)) * 255.0F + 0.5F)) << 8) & 0xFFFF;

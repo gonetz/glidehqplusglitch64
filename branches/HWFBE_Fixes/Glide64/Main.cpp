@@ -479,6 +479,8 @@ void ReadSpecialSettings (const char * name)
     settings.hacks |= hack_Pilotwings;
   else if (strstr(name, (const char *)"Supercross"))
     settings.hacks |= hack_Supercross;
+  else if (strstr(name, (const char *)"STARCRAFT 64"))
+    settings.hacks |= hack_Starcraft;
   else if (strstr(name, (const char *)"BANJO KAZOOIE 2") || strstr(name, (const char *)"BANJO TOOIE"))
     settings.hacks |= hack_Banjo2;
   else if (strstr(name, (const char *)"FIFA: RTWC 98") || strstr(name, (const char *)"RoadToWorldCup98"))
@@ -517,6 +519,7 @@ void ReadSpecialSettings (const char * name)
   ini->Read(_T("clip_zmax"), &(settings.clip_zmax));
   ini->Read(_T("fast_crc"), &(settings.fast_crc));
   ini->Read(_T("adjust_aspect"), &(settings.adjust_aspect), 1);
+  ini->Read(_T("zmode_compare_less"), &(settings.zmode_compare_less));
   ini->Read(_T("n64_z_scale"), &(settings.n64_z_scale));
   if (settings.n64_z_scale)
     ZLUT_init();
