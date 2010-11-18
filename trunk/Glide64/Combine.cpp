@@ -7364,7 +7364,7 @@ static void cc__prim_inter_one_using_env__mul_shade ()
   CC_1SUBPRIM ();
   CC_C1MULC2 (cmb.ccolor, rdp.env_color);
   cmb.ccolor=(wxUint8)( min(255, (int)((cmb.ccolor & 0xFF000000) >> 24) + (int)((rdp.prim_color & 0xFF000000) >> 24)) ) << 24 |
-  (wxUint8)( min(255, (int)((cmb.ccolor & 0x00FF0000) >> 16) + (int)((rdp.prim_color & 0x00FF0000) >> 16)) ) << 16 | 
+  (wxUint8)( min(255, (int)((cmb.ccolor & 0x00FF0000) >> 16) + (int)((rdp.prim_color & 0x00FF0000) >> 16)) ) << 16 |
   (wxUint8)( min(255, (int)((cmb.ccolor & 0x0000FF00) >>  8) + (int)((rdp.prim_color & 0x0000FF00) >>  8)) ) <<  8 ;
 }
 
@@ -8888,7 +8888,7 @@ static void ac_one_sub_t0_mul_shade ()  //Aded by Gonetz
       GR_COMBINE_LOCAL_ITERATED,
       GR_COMBINE_OTHER_NONE);
     A_USE_T0 ();
-  } 
+  }
   else
     ac_zero();
 }
@@ -13293,7 +13293,7 @@ static COMBINER alpha_cmb_list[] = {
   // paper mario. Added by Gonetz
   // (t0-0)*prim+0, (cmb-0)*shade+0
   {0x0ef90f38, ac_t0_mul_prim_mul_shade},
-  // Pik        achu's mouth, smash bros
+  // Pikachu's mouth, smash bros
   // (t0-0)*prim+0, (cmb-0)*env+0
   {0x0ef90f78, ac_t0_mul_prim_mul_env},
   // bomb mask, zelda 2. Added by Gonetz

@@ -405,9 +405,9 @@ void draw_tri (VERTEX **vtx, wxUint16 linew)
             v->v0 -= rdp.tiles[rdp.cur_tile].f_ul_t; //required for megaman (boss special attack)
           v->u0 *= rdp.aTBuffTex[0]->u_scale;
           v->v0 *= rdp.aTBuffTex[0]->v_scale;
-//#ifdef EXTREME_LOGGING
+#ifdef EXTREME_LOGGING
           FRDP("tbuff_tex t0: (%f, %f)->(%f, %f)\n", v->ou, v->ov, v->u0, v->v0);
-//#endif
+#endif
         }
         else
         {
@@ -448,9 +448,9 @@ void draw_tri (VERTEX **vtx, wxUint16 linew)
             v->u1 -= rdp.tiles[rdp.cur_tile].f_ul_s;
           v->u1 *= rdp.aTBuffTex[1]->u_scale;
           v->v1 *= rdp.aTBuffTex[1]->v_scale;
-//#ifdef EXTREME_LOGGING
+#ifdef EXTREME_LOGGING
           FRDP("tbuff_tex t1: (%f, %f)->(%f, %f)\n", v->ou, v->ov, v->u1, v->v1);
-//#endif
+#endif
         }
         else
         {
