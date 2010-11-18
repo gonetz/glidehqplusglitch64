@@ -406,11 +406,11 @@ static void uc8_movemem ()
 			rdp.light[n].w = (float)(((short*)gfx.RDRAM)[(a+19)^1]);
 			rdp.light[n].nonzero = gfx.RDRAM[(addr+12)^3];
 			rdp.light[n].ca = (float)rdp.light[n].nonzero / 16.0f;
-			//			rdp.light[n].la = rdp.light[n].ca * 1.0f;
-			//#ifdef EXTREME_LOGGING
+			//rdp.light[n].la = rdp.light[n].ca * 1.0f;
+#ifdef EXTREME_LOGGING
 			FRDP ("light: n: %d, pos: x: %f, y: %f, z: %f, w: %f, ca: %f\n",
 				n, rdp.light[n].x, rdp.light[n].y, rdp.light[n].z, rdp.light[n].w, rdp.light[n].ca);
-			//#endif
+#endif
 			FRDP ("light: n: %d, r: %f, g: %f, b: %f. dir: x: %.3f, y: %.3f, z: %.3f\n",
 				n, rdp.light[n].r, rdp.light[n].g, rdp.light[n].b,
 				rdp.light[n].dir_x, rdp.light[n].dir_y, rdp.light[n].dir_z);
