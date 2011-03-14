@@ -1863,10 +1863,10 @@ void CALL UpdateScreen (void)
   if (fullscreen && (*gfx.VI_ORIGIN_REG  > width))
     update_screen_count++;
 
+#ifdef FPS
   // vertical interrupt has occured, increment counter
   vi_count ++;
 
-#ifdef FPS
   // Check frames per second
   fps_next = wxDateTime::UNow();
   wxTimeSpan difference = fps_next - fps_last;
