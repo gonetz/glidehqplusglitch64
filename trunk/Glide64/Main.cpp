@@ -551,8 +551,7 @@ void ReadSpecialSettings (const char * name)
     ini->Read(_T("buff_clear"), &(settings.buff_clear));
     ini->Read(_T("swapmode"), &(settings.swapmode));
     ini->Read(_T("aspect"), &(settings.aspectmode));
-    if (settings.lodmode == 0)
-      ini->Read(_T("lodmode"), &(settings.lodmode));
+    ini->Read(_T("lodmode"), &(settings.lodmode));
     int resolution;
     if (ini->Read(_T("resolution"), &resolution))
     {
