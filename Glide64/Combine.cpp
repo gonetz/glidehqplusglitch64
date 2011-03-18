@@ -731,6 +731,7 @@ COMBINE cmb;
 #define SETSHADE_ENV() SETSHADE(rdp.env_color)
 #define SETSHADE_BYTE(byte) XSHADE_BYTE(byte, CMB_SET)
 #define SETSHADE_PRIMA() SETSHADE_BYTE((rdp.prim_color & 0xFF))
+#define SETSHADE_ENVA() SETSHADE_BYTE((rdp.env_color & 0xFF))
 #define SETSHADE_1MPRIMA() SETSHADE_BYTE(((~rdp.prim_color) & 0xFF))
 #define SETSHADE_PRIMLOD() SETSHADE_BYTE((rdp.prim_lodfrac & 0xFF))
 #define SETSHADE_1MPRIMLOD() SETSHADE_BYTE(((~rdp.prim_lodfrac) & 0xFF))
@@ -1667,7 +1668,7 @@ static void cc__t0_inter_prim_using_prima__inter_env_using_enva ()
       GR_COMBINE_OTHER_CONSTANT);
     CC_1SUBENVA ();
     SETSHADE_ENV ();
-    MULSHADE_ENVA ();
+    SETSHADE_ENVA ();
     MOD_0 (TMOD_TEX_INTER_COLOR_USING_FACTOR);
     MOD_0_COL (rdp.prim_color & 0xFFFFFF00);
     MOD_0_FAC (rdp.prim_color & 0xFF);
@@ -1747,7 +1748,7 @@ static void cc__prim_inter_t0_using_t0a__inter_env_using_enva ()
       GR_COMBINE_OTHER_CONSTANT);
     CC_1SUBENVA ();
     SETSHADE_ENV ();
-    MULSHADE_ENVA ();
+    SETSHADE_ENVA ();
     MOD_0 (TMOD_COL_INTER_TEX_USING_TEXA);
     MOD_0_COL (rdp.prim_color & 0xFFFFFF00);
     USE_T0 ();
@@ -2018,7 +2019,7 @@ static void cc_env_sub__t0_sub_t1_mul_primlod__mul_prim () //Aded by Gonetz
       GR_CMBX_ZERO, 1,
       GR_CMBX_ZERO, 0);
     SETSHADE_PRIM ();
-    MULSHADE_PRIMLOD ();
+    SETSHADE_PRIMLOD ();
     CC_ENV ();
   }
   else
@@ -5204,7 +5205,7 @@ static void cc_prim_sub_env_mul__t0_mul_enva__add_env ()
     GR_COMBINE_OTHER_ITERATED);
   CC_ENV ();
   SETSHADE_PRIMSUBENV ();
-  MULSHADE_ENVA ();
+  SETSHADE_ENVA ();
   USE_T0 ();
 }
 
@@ -5722,7 +5723,7 @@ static void cc_prim_sub_env_mul_enva_add_t0 ()
     GR_COMBINE_LOCAL_ITERATED,
     GR_COMBINE_OTHER_TEXTURE);
   SETSHADE_PRIMSUBENV ();
-  MULSHADE_ENVA ();
+  SETSHADE_ENVA ();
   USE_T0 ();
 }
 
@@ -5733,7 +5734,7 @@ static void cc_prim_sub_env_mul_enva_add_env ()
     GR_COMBINE_LOCAL_CONSTANT,
     GR_COMBINE_OTHER_ITERATED);
   SETSHADE_PRIMSUBENV ();
-  MULSHADE_ENVA ();
+  SETSHADE_ENVA ();
   CC_ENV ();
 }
 
@@ -8740,7 +8741,7 @@ static void ac_t0_mul_prim_mul_prim ()
     GR_COMBINE_LOCAL_ITERATED,
     GR_COMBINE_OTHER_TEXTURE);
   SETSHADE_A_PRIM ();
-  MULSHADE_A_PRIM ();
+  SETSHADE_A_PRIM ();
   A_USE_T0 ();
 }
 
