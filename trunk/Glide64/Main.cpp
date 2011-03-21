@@ -1066,6 +1066,7 @@ int InitGfx (int evoodoo_using_window)
 #endif
 
   fullscreen = TRUE;
+  to_fullscreen = FALSE;
 
   if (evoodoo_using_window)
     ev_fullscreen = FALSE;
@@ -1393,6 +1394,8 @@ EXPORT void CALL ChangeWindow (void)
     if (!ev_fullscreen)
     {
       to_fullscreen = TRUE;
+      if (!fullscreen)
+        ev_fullscreen = TRUE;
 #ifdef __WINDOWS__
       if (gfx.hStatusBar)
         ShowWindow( gfx.hStatusBar, SW_HIDE );
@@ -1608,7 +1611,25 @@ int CALL InitiateGFX (GFX_INFO Gfx_Info)
   CountCombine();
   if (fb_depth_render_enabled)
     ZLUT_init();
-  voodoo.has_2mb_tex_boundary = 1;
+
+  char strConfigWrapperExt[] = "grConfigWrapperExt";
+  GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress(strConfigWrapperExt);
+  if (grConfigWrapperExt)
+    grConfigWrapperExt(settings.wrpResolution, settings.wrpVRAM * 1024 * 1024, settings.wrpFBO, settings.wrpAnisotropic);
+
+  grGlideInit ();
+  grSstSelect (0);
+  const char *extensions = grGetString (GR_EXTENSION);
+  grGlideShutdown ();
+  if (strstr (extensions, "EVOODOO"))
+  {
+    evoodoo = 1;
+    voodoo.has_2mb_tex_boundary = 0;
+  }
+  else {
+    evoodoo = 0;
+    voodoo.has_2mb_tex_boundary = 1;
+  }
 
   return TRUE;
 }
@@ -1735,6 +1756,14 @@ void CALL RomOpen (void)
 
     if (evoodoo)
       InitGfx (!ev_fullscreen);
+#ifdef __WINDOWS__
+    if (ev_fullscreen)
+    {
+      if (gfx.hStatusBar)
+        ShowWindow( gfx.hStatusBar, SW_HIDE );
+      ShowCursor( FALSE );
+    }
+#endif
   }
 
   if (strstr (extensions, "ROMNAME"))
