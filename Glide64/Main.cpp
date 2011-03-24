@@ -328,6 +328,14 @@ void ChangeSize ()
   //	settings.res_y = settings.scr_res_y;
 }
 
+void ConfigWrapper()
+{
+  char strConfigWrapperExt[] = "grConfigWrapperExt";
+  GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress(strConfigWrapperExt);
+  if (grConfigWrapperExt)
+    grConfigWrapperExt(settings.wrpResolution, settings.wrpVRAM * 1024 * 1024, settings.wrpFBO, settings.wrpAnisotropic);
+}
+
 static wxConfigBase * OpenIni()
 {
   wxConfigBase * ini = wxConfigBase::Get(false);
@@ -423,6 +431,7 @@ void ReadSettings ()
   settings.ghq_hirs_let_texartists_fly = ini->Read(_T("ghq_hirs_let_texartists_fly"), 0l);
   settings.ghq_hirs_dump = ini->Read(_T("ghq_hirs_dump"), 0l);
 #endif
+  ConfigWrapper();
 }
 
 void ReadSpecialSettings (const char * name)
@@ -876,13 +885,6 @@ int InitGfx (int evoodoo_using_window)
 
   debugging = FALSE;
   rdp_reset ();
-
-  char strConfigWrapperExt[] = "grConfigWrapperExt";
-  GRCONFIGWRAPPEREXT grConfigWrapperExt = (GRCONFIGWRAPPEREXT)grGetProcAddress(strConfigWrapperExt);
-  if (grConfigWrapperExt)
-  {
-    grConfigWrapperExt(settings.wrpResolution, settings.wrpVRAM * 1024 * 1024, settings.wrpFBO, settings.wrpAnisotropic);
-  }
 
   // Initialize Glide
   grGlideInit ();

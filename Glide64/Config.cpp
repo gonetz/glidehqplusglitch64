@@ -1025,6 +1025,8 @@ void ConfigNotebook::SaveSettings()
     else
       WriteSettings (is_advanced_changed != 0);
   }
+  void ConfigWrapper();
+  ConfigWrapper();
 }
 
 Glide64ConfigDialog::Glide64ConfigDialog(wxWindow* parent, int id, const wxString& title, const wxPoint& pos, const wxSize& size, long style):
