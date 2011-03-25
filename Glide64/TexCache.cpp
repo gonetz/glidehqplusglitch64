@@ -69,7 +69,7 @@ typedef struct TEXINFO_t {
   wxUint32 crc;
   wxUint32 flags;
   int splits, splitheight;
-#ifdef TEXTURE_FILTER 
+#ifdef TEXTURE_FILTER
   uint64 ricecrc;
 #endif
 } TEXINFO;
@@ -77,7 +77,7 @@ typedef struct TEXINFO_t {
 TEXINFO texinfo[2];
 int tex_found[2][MAX_TMU];
 
-#ifdef TEXTURE_FILTER 
+#ifdef TEXTURE_FILTER
 typedef struct HIRESTEX_t {
   int width, height;
   wxUint16 format;
@@ -331,7 +331,7 @@ void GetTexInfo (int id, int tile)
   }
 
   line = rdp.tiles[tile].line;
-  if (rdp.tiles[tile].size == 3) 
+  if (rdp.tiles[tile].size == 3)
     line <<= 1;
   wxUint32 crc = 0;
   if (settings.fast_crc)
@@ -491,7 +491,7 @@ int ChooseBestTmu (int tmu1, int tmu2)
 }
 
 //****************************************************************
-// SelectTBuffTex - select texture from texture buffer 
+// SelectTBuffTex - select texture from texture buffer
 static void SelectTBuffTex(TBUFF_COLOR_IMAGE * pTBuffTex)
 {
   FRDP ("SelectTBuffTex: tex: %d, tmu: %d, tile: %d\n", rdp.tex, pTBuffTex->tmu, pTBuffTex->tile);
@@ -508,11 +508,11 @@ void TexCache ()
 #ifdef TEXTURE_FILTER /* Hiroshi Morii <koolsmoky@users.sourceforge.net> */ // POSTNAPALM
   if (settings.ghq_use && settings.ghq_hirs_dump) {
     /* Force reload hi-res textures. Useful for texture artists */
-    if (CheckKeyPressed(G64_VK_R, 0x0001)) { 
+    if (CheckKeyPressed(G64_VK_R, 0x0001)) {
       if (ext_ghq_reloadhirestex()) ClearCache();
     }
     /* Turn on texture dump */
-    else if (CheckKeyPressed(G64_VK_D, 0x0001)) { 
+    else if (CheckKeyPressed(G64_VK_D, 0x0001)) {
       extern void DisplayLoadProgress(const wchar_t *format, ...);
       ghq_dmptex_toggle_key = !ghq_dmptex_toggle_key;
       if (ghq_dmptex_toggle_key) {
@@ -718,13 +718,13 @@ void TexCache ()
           ColorCombinerToExtension ();
         if (!(cmb.cmb_ext_use & COMBINE_EXT_ALPHA))
           AlphaCombinerToExtension ();
-        cmb.grColorCombineExt(cmb.c_ext_a, cmb.c_ext_a_mode, 
-          cmb.c_ext_b, cmb.c_ext_b_mode, 
-          cmb.c_ext_c, cmb.c_ext_c_invert, 
+        cmb.grColorCombineExt(cmb.c_ext_a, cmb.c_ext_a_mode,
+          cmb.c_ext_b, cmb.c_ext_b_mode,
+          cmb.c_ext_c, cmb.c_ext_c_invert,
           cmb.c_ext_d, cmb.c_ext_d_invert, 0, 0);
-        cmb.grAlphaCombineExt(cmb.a_ext_a, cmb.a_ext_a_mode, 
-          cmb.a_ext_b, cmb.a_ext_b_mode, 
-          cmb.a_ext_c, cmb.a_ext_c_invert, 
+        cmb.grAlphaCombineExt(cmb.a_ext_a, cmb.a_ext_a_mode,
+          cmb.a_ext_b, cmb.a_ext_b_mode,
+          cmb.a_ext_c, cmb.a_ext_c_invert,
           cmb.a_ext_d, cmb.a_ext_d_invert, 0, 0);
       }
       else
@@ -747,13 +747,13 @@ void TexCache ()
           TexColorCombinerToExtension (GR_TMU1);
         if (!(cmb.tex_cmb_ext_use & TEX_COMBINE_EXT_ALPHA))
           TexAlphaCombinerToExtension (GR_TMU1);
-        cmb.grTexColorCombineExt(tmu_1, cmb.t1c_ext_a, cmb.t1c_ext_a_mode, 
-          cmb.t1c_ext_b, cmb.t1c_ext_b_mode, 
-          cmb.t1c_ext_c, cmb.t1c_ext_c_invert, 
+        cmb.grTexColorCombineExt(tmu_1, cmb.t1c_ext_a, cmb.t1c_ext_a_mode,
+          cmb.t1c_ext_b, cmb.t1c_ext_b_mode,
+          cmb.t1c_ext_c, cmb.t1c_ext_c_invert,
           cmb.t1c_ext_d, cmb.t1c_ext_d_invert, 0, 0);
-        cmb.grTexAlphaCombineExt(tmu_1, cmb.t1a_ext_a, cmb.t1a_ext_a_mode, 
-          cmb.t1a_ext_b, cmb.t1a_ext_b_mode, 
-          cmb.t1a_ext_c, cmb.t1a_ext_c_invert, 
+        cmb.grTexAlphaCombineExt(tmu_1, cmb.t1a_ext_a, cmb.t1a_ext_a_mode,
+          cmb.t1a_ext_b, cmb.t1a_ext_b_mode,
+          cmb.t1a_ext_c, cmb.t1a_ext_c_invert,
           cmb.t1a_ext_d, cmb.t1a_ext_d_invert, 0, 0);
         cmb.grConstantColorValueExt(tmu_1, cmb.tex_ccolor);
       }
@@ -775,13 +775,13 @@ void TexCache ()
           TexColorCombinerToExtension (GR_TMU0);
         if (!(cmb.tex_cmb_ext_use & TEX_COMBINE_EXT_ALPHA))
           TexAlphaCombinerToExtension (GR_TMU0);
-        cmb.grTexColorCombineExt(tmu_0, cmb.t0c_ext_a, cmb.t0c_ext_a_mode, 
-          cmb.t0c_ext_b, cmb.t0c_ext_b_mode, 
-          cmb.t0c_ext_c, cmb.t0c_ext_c_invert, 
+        cmb.grTexColorCombineExt(tmu_0, cmb.t0c_ext_a, cmb.t0c_ext_a_mode,
+          cmb.t0c_ext_b, cmb.t0c_ext_b_mode,
+          cmb.t0c_ext_c, cmb.t0c_ext_c_invert,
           cmb.t0c_ext_d, cmb.t0c_ext_d_invert, 0, 0);
-        cmb.grTexAlphaCombineExt(tmu_0, cmb.t0a_ext_a, cmb.t0a_ext_a_mode, 
-          cmb.t0a_ext_b, cmb.t0a_ext_b_mode, 
-          cmb.t0a_ext_c, cmb.t0a_ext_c_invert, 
+        cmb.grTexAlphaCombineExt(tmu_0, cmb.t0a_ext_a, cmb.t0a_ext_a_mode,
+          cmb.t0a_ext_b, cmb.t0a_ext_b_mode,
+          cmb.t0a_ext_c, cmb.t0a_ext_c_invert,
           cmb.t0a_ext_d, cmb.t0a_ext_d_invert, 0, 0);
         cmb.grConstantColorValueExt(tmu_0, cmb.tex_ccolor);
       }
@@ -886,7 +886,7 @@ void TexCache ()
       {
         wxUint32 mode_s, mode_t;
         int clamp_s, clamp_t;
-        if (rdp.force_wrap && !rdp.texrecting) 
+        if (rdp.force_wrap && !rdp.texrecting)
         {
           clamp_s = rdp.tiles[tile].clamp_s && rdp.tiles[tile].lr_s-rdp.tiles[tile].ul_s < 256;
           clamp_t = rdp.tiles[tile].clamp_t && rdp.tiles[tile].lr_t-rdp.tiles[tile].ul_t < 256;
@@ -940,7 +940,7 @@ void TexCache ()
 }
 
 
-#ifdef TEXTURE_FILTER 
+#ifdef TEXTURE_FILTER
 /** cite from RiceVideo */
 inline wxUint32 CalculateDXT(wxUint32 txl2words)
 {
@@ -990,7 +990,7 @@ void LoadTex (int id, int tmu)
   int lod, aspect;
   CACHE_LUT *cache;
 
-  if (texinfo[id].width < 0 || texinfo[id].height < 0) 
+  if (texinfo[id].width < 0 || texinfo[id].height < 0)
     return;
 
   // Clear the cache if it's full
@@ -1034,7 +1034,7 @@ void LoadTex (int id, int tmu)
   cache->f_mirror_t = FALSE;
   cache->f_wrap_s = FALSE;
   cache->f_wrap_t = FALSE;
-#ifdef TEXTURE_FILTER 
+#ifdef TEXTURE_FILTER
   cache->ricecrc    = texinfo[id].ricecrc;
 #endif
 
@@ -1256,12 +1256,12 @@ void LoadTex (int id, int tmu)
   // NOTE: Loading Hi-res texture packs and filtering should be done
   // before the texture is modified with color palettes, etc.
   //
-  // Since the internal texture identification needs Glide64CRC, (RiceCRC 
-  // doesn't always return unique values) it seems reasonable that the 
-  // extra CRC calculation for hires textures should be executed only 
-  // when we get passed the texture ram cache and texture buffers for 
+  // Since the internal texture identification needs Glide64CRC, (RiceCRC
+  // doesn't always return unique values) it seems reasonable that the
+  // extra CRC calculation for hires textures should be executed only
+  // when we get passed the texture ram cache and texture buffers for
   // minimal calculation overhead.
-  // 
+  //
 #ifdef TEXTURE_FILTER // Hiroshi Morii <koolsmoky@users.sourceforge.net>
   GHQTexInfo ghqTexInfo;
   memset(&ghqTexInfo, 0, sizeof(GHQTexInfo));
@@ -1338,7 +1338,7 @@ void LoadTex (int id, int tmu)
   // ** handle texture splitting **
   if (ghqTexInfo.data)
     ;//do nothing
-  else 
+  else
 #endif
     if (splits > 1)
     {
@@ -1371,7 +1371,7 @@ void LoadTex (int id, int tmu)
     }
     // ** end texture splitting **
     else
-    {	
+    {
       result = load_table[rdp.tiles[td].size][rdp.tiles[td].format]
       (wxPtrToUInt(texture), wxPtrToUInt(rdp.tmem)+(rdp.tiles[td].t_mem<<3),
         texinfo[id].wid_64, texinfo[id].height, texinfo[id].line, real_x, td);
@@ -1639,16 +1639,16 @@ void LoadTex (int id, int tmu)
           if (!settings.ghq_enht_nobg || !rdp.texrecting || (texinfo[id].splits == 1 && texinfo[id].width <= 256))
             ext_ghq_txfilter((unsigned char*)texture, (int)real_x, (int)real_y, LOWORD(result), (uint64)g64_crc, &ghqTexInfo);
 
-        if (ghqTexInfo.data) 
+        if (ghqTexInfo.data)
         {
           if (ghqTexInfo.aspectRatioLog2 < GR_ASPECT_LOG2_1x8 ||
             ghqTexInfo.aspectRatioLog2 > GR_ASPECT_LOG2_8x1 ||
             ghqTexInfo.largeLodLog2 > GR_LOD_LOG2_2048 ||
-            ghqTexInfo.largeLodLog2 < GR_LOD_LOG2_1) 
+            ghqTexInfo.largeLodLog2 < GR_LOD_LOG2_1)
           {
             /* invalid dimensions */
-          } 
-          else 
+          }
+          else
           {
             texture = (wxUint8 *)ghqTexInfo.data;
             lod = ghqTexInfo.largeLodLog2;
@@ -1695,7 +1695,7 @@ void LoadTex (int id, int tmu)
                     cache->c_scl_x *= mscale;
                   }
                   /*
-                  else 
+                  else
                   {
                   if (rdp.tiles[td].mirror_s && sup_mirroring)
                   cache->f_mirror_s = TRUE;
