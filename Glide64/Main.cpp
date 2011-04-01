@@ -184,6 +184,7 @@ wxString capture_path;
 wxString pluginPath;
 wxString iniPath;
 wxString iniName;
+wxMutex *mutexProcessDList = NULL;
 
 /******************************************************************
    NOTE: THIS HAS BEEN ADDED FOR MUPEN64PLUS AND IS NOT PART OF THE
@@ -872,12 +873,10 @@ void DisplayLoadProgress(const wchar_t *format, ...)
 }
 #endif
 
-int InitGfx (int evoodoo_using_window)
+int InitGfx ()
 {
   if (fullscreen)
-  {
     ReleaseGfx ();
-  }
 
   OPEN_RDP_LOG ();  // doesn't matter if opens again; it will check for it
   OPEN_RDP_E_LOG ();
@@ -935,16 +934,34 @@ int InitGfx (int evoodoo_using_window)
   }
   //*/
 
-  gfx_context = 0;
   wxUint32 res_data = settings.res_data;
-  res_data |= ((evoodoo_using_window)?0x80000000:0x00000000);
-
-  // punt if windowed mode is requested but the gfx
-  // does not have windowed glide3x capabilities
-  if (!evoodoo && evoodoo_using_window) {
-    grGlideShutdown ();
-    return FALSE;
+  char strWrapperFullScreenResolutionExt[] = "grWrapperFullScreenResolutionExt";
+  if (ev_fullscreen)
+  {
+      GRWRAPPERFULLSCREENRESOLUTIONEXT grWrapperFullScreenResolutionExt =
+        (GRWRAPPERFULLSCREENRESOLUTIONEXT)grGetProcAddress(strWrapperFullScreenResolutionExt);
+      if (grWrapperFullScreenResolutionExt) {
+        wxUint32 _width, _height = 0;
+        settings.res_data = grWrapperFullScreenResolutionExt(&_width, &_height);
+        settings.scr_res_x = settings.res_x = _width;
+        settings.scr_res_y = settings.res_y = _height;
+      }
+      res_data = settings.res_data;
   }
+  else if (evoodoo)
+  {
+      GRWRAPPERFULLSCREENRESOLUTIONEXT grWrapperFullScreenResolutionExt =
+        (GRWRAPPERFULLSCREENRESOLUTIONEXT)grGetProcAddress(strWrapperFullScreenResolutionExt);
+      if (grWrapperFullScreenResolutionExt != NULL)
+      {
+        settings.res_data = settings.res_data_org;
+        settings.scr_res_x = settings.res_x = resolutions[settings.res_data][0];
+        settings.scr_res_y = settings.res_y = resolutions[settings.res_data][1];
+      }
+      res_data = settings.res_data | 0x80000000;
+  }
+
+  gfx_context = 0;
 
   // Select the window
 
@@ -978,6 +995,18 @@ int InitGfx (int evoodoo_using_window)
     grGlideShutdown ();
     return FALSE;
   }
+
+  fullscreen = TRUE;
+  to_fullscreen = FALSE;
+
+#ifdef __WINDOWS__
+    if (ev_fullscreen)
+    {
+      if (gfx.hStatusBar)
+        ShowWindow( gfx.hStatusBar, SW_HIDE );
+      ShowCursor( FALSE );
+    }
+#endif
 
   // get the # of TMUs available
   grGet (GR_NUM_TMU, 4, (FxI32*)&voodoo.num_tmu);
@@ -1066,14 +1095,6 @@ int InitGfx (int evoodoo_using_window)
   voodoo.num_tmu = 1;
   voodoo.sup_mirroring = 1;
 #endif
-
-  fullscreen = TRUE;
-  to_fullscreen = FALSE;
-
-  if (evoodoo_using_window)
-    ev_fullscreen = FALSE;
-  else
-    ev_fullscreen = TRUE;
 
   grCoordinateSpace (GR_WINDOW_COORDS);
   grVertexLayout (GR_PARAM_XY, offsetof(VERTEX,x), GR_PARAM_ENABLE);
@@ -1216,8 +1237,6 @@ void ReleaseGfx ()
 //
 // DllMain - called when the DLL is loaded, use this to get the DLL's instance
 //
-wxMutex *mutexProcessDList = NULL;
-
 class wxDLLApp : public wxApp
 {
 public:
@@ -1392,39 +1411,20 @@ EXPORT void CALL ChangeWindow (void)
 
   if (evoodoo)
   {
-    char strWrapperFullScreenResolutionExt[] = "grWrapperFullScreenResolutionExt";
     if (!ev_fullscreen)
     {
       to_fullscreen = TRUE;
-      if (!fullscreen)
-        ev_fullscreen = TRUE;
+      ev_fullscreen = TRUE;
 #ifdef __WINDOWS__
       if (gfx.hStatusBar)
         ShowWindow( gfx.hStatusBar, SW_HIDE );
       ShowCursor( FALSE );
 #endif
-      GRWRAPPERFULLSCREENRESOLUTIONEXT grWrapperFullScreenResolutionExt =
-        (GRWRAPPERFULLSCREENRESOLUTIONEXT)grGetProcAddress(strWrapperFullScreenResolutionExt);
-      if (grWrapperFullScreenResolutionExt) {
-        wxUint32 _width, _height = 0;
-        settings.res_data_org = settings.res_data;
-        settings.res_data = grWrapperFullScreenResolutionExt(&_width, &_height);
-        settings.scr_res_x = settings.res_x = _width;
-        settings.scr_res_y = settings.res_y = _height;
-      }
     }
     else
     {
-      ReleaseGfx ();
-      GRWRAPPERFULLSCREENRESOLUTIONEXT grWrapperFullScreenResolutionExt =
-        (GRWRAPPERFULLSCREENRESOLUTIONEXT)grGetProcAddress(strWrapperFullScreenResolutionExt);
-      if (grWrapperFullScreenResolutionExt != NULL)
-      {
-        settings.res_data = settings.res_data_org;
-        settings.scr_res_x = settings.res_x = resolutions[settings.res_data][0];
-        settings.scr_res_y = settings.res_y = resolutions[settings.res_data][1];
-      }
-      InitGfx (TRUE);
+      ev_fullscreen = FALSE;
+      InitGfx ();
 #ifdef __WINDOWS__
       ShowCursor( TRUE );
       if (gfx.hStatusBar)
@@ -1583,6 +1583,7 @@ int CALL InitiateGFX (GFX_INFO Gfx_Info)
   ReadSettings ();
   char name[21] = "DEFAULT";
   ReadSpecialSettings (name);
+  settings.res_data_org = settings.res_data;
 
 #ifdef FPS
   fps_last = wxDateTime::UNow();
@@ -1701,8 +1702,6 @@ output:   none
 *******************************************************************/
 void CALL RomOpen (void)
 {
-  if (fullscreen && evoodoo)
-    ReleaseGfx ();
   LOG ("RomOpen ()\n");
   no_dlist = TRUE;
   romopen = TRUE;
@@ -1757,15 +1756,7 @@ void CALL RomOpen (void)
       evoodoo = 0;
 
     if (evoodoo)
-      InitGfx (!ev_fullscreen);
-#ifdef __WINDOWS__
-    if (ev_fullscreen)
-    {
-      if (gfx.hStatusBar)
-        ShowWindow( gfx.hStatusBar, SW_HIDE );
-      ShowCursor( FALSE );
-    }
-#endif
+      InitGfx ();
   }
 
   if (strstr (extensions, "ROMNAME"))
@@ -1847,16 +1838,7 @@ static void DrawFrameBuffer ()
     drawNoFullscreenMessage();
   }
   if (to_fullscreen)
-  {
-    to_fullscreen = FALSE;
-
-    if (!InitGfx (FALSE))
-    {
-      LOG ("FAILED!!!\n");
-      return;
-    }
-    fullscreen = TRUE;
-  }
+    GoToFullScreen();
 
   if (fullscreen)
   {

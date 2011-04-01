@@ -952,6 +952,7 @@ void ConfigNotebook::SaveSettings()
 
   settings.lang_id = lang_id;
   settings.res_data = cmbResolution->GetSelection();
+  settings.res_data_org = settings.res_data;
   settings.scr_res_x = settings.res_x = resolutions[settings.res_data][0];
   settings.scr_res_y = settings.res_y = resolutions[settings.res_data][1];
   settings.vsync = (int)cbxVSync->GetValue();
@@ -1260,7 +1261,7 @@ void CloseConfig()
       ZLUT_init();
     // re-init evoodoo graphics to resize window
     if (evoodoo)// && !ev_fullscreen)
-      InitGfx (TRUE);
+      InitGfx ();
     else
       rdp_reset ();
   }
