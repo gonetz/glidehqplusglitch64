@@ -280,7 +280,7 @@ extern int ev_fullscreen;
 extern int exception;
 extern wxMutex *mutexProcessDList;
 
-int InitGfx (int);
+int InitGfx ();
 void ReleaseGfx ();
 
 // The highest 8 bits are the segment # (1-16), and the lower 24 bits are the offset to
@@ -298,7 +298,7 @@ __inline wxUint32 segoffset (wxUint32 so)
 #define CALL						_cdecl
 #else
 #define EXPORT					extern
-#define CALL						
+#define CALL
 #endif
 
 /***** Structures *****/

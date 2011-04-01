@@ -568,6 +568,20 @@ static void CopyFrameBuffer (GrBuffer_t buffer = GR_BUFFER_BACKBUFFER)
   }
 }
 
+void GoToFullScreen()
+{
+    if (!InitGfx ())
+    {
+      LOG ("FAILED!!!\n");
+      return;
+    }
+#ifdef __WINDOWS__
+    if (gfx.hStatusBar)
+      ShowWindow( gfx.hStatusBar, SW_HIDE );
+    ShowCursor( FALSE );
+#endif
+}
+
 class SoftLocker
 {
 public:
@@ -588,7 +602,6 @@ private:
   bool     _isOk;
   wxMutex* _mutex;
 };
-
 
 /******************************************************************
 Function: ProcessDList
@@ -670,28 +683,10 @@ EXPORT void CALL ProcessDList(void)
 
   // Switch to fullscreen?
   if (to_fullscreen)
-  {
-    to_fullscreen = FALSE;
+    GoToFullScreen();
 
-    if (!InitGfx (FALSE))
-    {
-      LOG ("FAILED!!!\n");
-      return;
-    }
-    fullscreen = TRUE;
-#ifdef __WINDOWS__
-    //if (evoodoo) //cursor must be hidden for glide too, otherwise it causes garbage with 1964
-    {
-      if (gfx.hStatusBar)
-        ShowWindow( gfx.hStatusBar, SW_HIDE );
-      ShowCursor( FALSE );
-    }
-#endif
-  }
   if (!fullscreen && !settings.run_in_window)
-  {
     return;
-  }
 
   // Clear out the RDP log
 #ifdef RDP_LOGGING
