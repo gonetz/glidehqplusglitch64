@@ -45,7 +45,7 @@ typedef struct _texlist
   struct _texlist *next;
 } texlist;
 
-static int nbTex = 0, szTex = 0;
+static int nbTex = 0;
 static texlist *list = NULL;
 
 #ifdef _WIN32
@@ -332,7 +332,7 @@ int grTexFormat2GLPackedFmt(int fmt, int * gltexfmt, int * glpixfmt, int * glpac
     *glpackfmt = GL_UNSIGNED_SHORT_1_5_5_5_REV;
     break;
   case GR_TEXFMT_ALPHA_INTENSITY_88:
-    factor = 2;                     
+    factor = 2;
     *gltexfmt = GL_LUMINANCE8_ALPHA8;
     *glpixfmt = GL_LUMINANCE_ALPHA;
     *glpackfmt = GL_UNSIGNED_BYTE;
