@@ -2827,8 +2827,8 @@ void grTexChromaModeExt(GrChipID_t tmu, GrChromakeyMode_t mode)
 
 
 // VP debug
-int dumping;
 #ifdef VPDEBUG
+int dumping = 0;
 static int tl_i;
 static int tl[10240];
 
