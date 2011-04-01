@@ -11,6 +11,8 @@
 #endif // _WIN32
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
+#include <fstream>
 #include <math.h>
 #include "glide.h"
 #include "g3ext.h"
@@ -231,18 +233,26 @@ void display_error()
 #endif // _WIN32
 
 #ifdef LOGGING
-FILE *log_file = NULL;
+char out_buf[256];
+bool log_open = false;
+std::ofstream log_file;
 
 void OPEN_LOG()
 {
-  log_file = fopen("wrapper_log.txt", "wb+");
+  if (!log_open)
+  {
+    log_file.open ("wrapper_log.txt", std::ios_base::out|std::ios_base::app);
+    log_open = true;
+  }
 }
 
 void CLOSE_LOG()
 {
-  if(log_file == NULL) return;
-  fclose(log_file);
-  log_file = NULL;
+  if (log_open)
+  {
+    log_file.close();
+    log_open = false;
+  }
 }
 
 void LOG(const char *text, ...)
@@ -250,14 +260,28 @@ void LOG(const char *text, ...)
 #ifdef VPDEBUG
   if (!dumping) return;
 #endif
-  va_list ap;
-
-  if(log_file == NULL) return;
-  va_start(ap, text);
-  vfprintf(log_file, text, ap);
-  vfprintf(stderr, text, ap);
-  va_end(ap);
+	if (!log_open)
+    return;
+	va_list ap;
+	va_start(ap, text);
+	vsprintf(out_buf, text, ap);
+  log_file << out_buf;
+  log_file.flush();
+	va_end(ap);
 }
+
+class LogManager {
+public:
+	LogManager() {
+		OPEN_LOG();
+	}
+	~LogManager() {
+		CLOSE_LOG();
+	}
+};
+
+LogManager logManager;
+
 #else // LOGGING
 #define OPEN_LOG()
 #define CLOSE_LOG()
@@ -318,7 +342,6 @@ grColorMask( FxBool rgb, FxBool a )
 FX_ENTRY void FX_CALL
 grGlideInit( void )
 {
-  OPEN_LOG();
   LOG("grGlideInit()\r\n");
 }
 
@@ -451,7 +474,7 @@ grSstWinOpen(
   int pfm;
 #endif // _WIN32
 
-  LOG("grSstWinOpen(%d, %d, %d, %d, %d, %d %d)\r\n", hWnd, screen_resolution, refresh_rate, color_format, origin_location, nColBuffers, nAuxBuffers);
+  LOG("grSstWinOpen(%08lx, %d, %d, %d, %d, %d %d)\r\n", hWnd, screen_resolution&~0x80000000, refresh_rate, color_format, origin_location, nColBuffers, nAuxBuffers);
 
 #ifdef _WIN32
   if ((HWND)hWnd == NULL) hWnd = (FxU32)GetActiveWindow();
@@ -989,7 +1012,6 @@ FX_ENTRY void FX_CALL
 grGlideShutdown( void )
 {
   LOG("grGlideShutdown\r\n");
-  CLOSE_LOG();
 }
 
 static void clear_resolutions()
