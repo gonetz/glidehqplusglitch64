@@ -195,7 +195,7 @@ extern int64 perf_next;
 
 #ifdef LOGGING
 extern std::ofstream loga;
-#define LOG(x) loga.open("log.txt",std::ios::app); loga << x; loga.flush(); loga.close();
+#define LOG(x) loga.open("glide64_log.txt",std::ios::app); loga << x; loga.flush(); loga.close();
 #else
 #define LOG(x)
 #endif
