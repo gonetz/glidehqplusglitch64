@@ -3312,6 +3312,28 @@ static void cc__t0_sub_t1__mul_prim_mul_shade_add_prim_mul_env ()
   MULSHADE_PRIM ();
 }
 
+static void cc__t0_mul_prim_mul_env__add__prim_mul_shade ()
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+    GR_COMBINE_FACTOR_TEXTURE_RGB,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_CONSTANT);
+  CC_PRIMMULENV ();
+  MULSHADE_PRIM ();
+  USE_T0 ();
+}
+
+static void cc__t1_mul_prim_mul_env__add__prim_mul_shade ()
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+    GR_COMBINE_FACTOR_TEXTURE_RGB,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_CONSTANT);
+  CC_PRIMMULENV ();
+  MULSHADE_PRIM ();
+  USE_T1 ();
+}
+
 //Added by Gonetz
 static void cc_t0_mul_one_sub_prim_mul_shade_add_prim_mul_env ()
 {
@@ -11126,6 +11148,12 @@ static COMBINER color_cmb_list[] = {
   // Enemy dying, quest64
   // (1-shade)*env+shade  **changed by Gonetz
   {0x85468546, cc_one_sub_shade_mul_env_add_shade},
+  // Arena, Pokemon Stadium
+  // (t0-0)*env+shade, (cmb-0)*prim+0
+  {0x85f1e3f0, cc__t0_mul_prim_mul_env__add__prim_mul_shade},
+  // Clouds, Pokemon Stadium
+  // (t1-0)*env+shade, (cmb-0)*prim+0
+  {0x85f2e3f0, cc__t1_mul_prim_mul_env__add__prim_mul_shade},
   // Sky, Beetle Adventure Racing ** INC **
   //(t0-shade)*t0_a+shade, (env-cmb)*enva+cmb
   {0x88410c05, cc_t0_sub_shade_mul_t0a_add_shade},
