@@ -1729,7 +1729,13 @@ void CALL RomOpen (void)
   while (name[strlen(name)-1] == ' ')
     name[strlen(name)-1] = 0;
 
-  rdp.RomName = wxString::FromAscii(name);
+  wxString strRomName = wxString::FromAscii(name);
+  if (settings.ghq_use && strRomName != rdp.RomName)
+  {
+    ext_ghq_shutdown();
+    settings.ghq_use = 0;
+  }
+  rdp.RomName = strRomName;
   ReadSpecialSettings (name);
   ClearCache ();
 
