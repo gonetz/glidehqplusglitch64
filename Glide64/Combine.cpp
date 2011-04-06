@@ -2370,6 +2370,16 @@ static void cc__t0_mul_t1__mul_shade_add_prim ()
   T0_MUL_T1 ();
 }
 
+static void cc__t0_mul_t1__mul_shade_add_env ()
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+    GR_COMBINE_FACTOR_TEXTURE_RGB,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  CC_ENV ();
+  T0_MUL_T1 ();
+}
+
 //Added by Gonetz
 static void cc__t0_add_t1__mul_shade_add_env ()
 {
@@ -4152,6 +4162,35 @@ static void cc_t1_sub_k4_mul_prima_add_t0 ()
   }
 }
 
+static void cc__t0_sub_prim_mul_shade_add_env__mul_shade ()
+{
+  if (cmb.combine_ext)
+  {
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ITRGB, 0,
+      GR_CMBX_ZERO, 0);
+    cmb.tex |= 1;
+    cmb.tex_ccolor = rdp.prim_color;
+    CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_X,
+      GR_CMBX_ITRGB, 0,
+      GR_CMBX_ZERO, 0);
+    CC_ENV ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_TEXTURE_RGB,
+      GR_COMBINE_LOCAL_CONSTANT,
+      GR_COMBINE_OTHER_ITERATED);
+    CC_ENV ();
+    MOD_0 (TMOD_TEX_SUB_COL);
+    MOD_0_COL (rdp.prim_color & 0xFFFFFF00);
+    USE_T0 ();
+  }
+}
+
 static void cc__t0_sub_prim_mul_shade_add_env__mul_shadea ()
 {
   if (cmb.combine_ext)
@@ -4165,7 +4204,7 @@ static void cc__t0_sub_prim_mul_shade_add_env__mul_shadea ()
     CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
       GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_X,
       GR_CMBX_ITALPHA, 0,
-      GR_CMBX_B, 0);
+      GR_CMBX_ZERO, 0);
     CC_ENV ();
   }
   else
@@ -11496,6 +11535,9 @@ static COMBINER color_cmb_list[] = {
   // background, pokemon stadium 2
   // (t0-prim)*shade+env
   {0xa431a431, cc_t0_sub_prim_mul_shade_add_env},
+  // Arena, pokemon stadium 2
+  // (t0-prim)*shade+env, (cmb-0)*shade+0
+  {0xa431e4f0, cc__t0_sub_prim_mul_shade_add_env__mul_shade},
   // Trophy, pokemon stadium 2
   // (t0-prim)*shade+env, (cmb-0)*shade_a+0
   {0xa431ebf0, cc__t0_sub_prim_mul_shade_add_env__mul_shadea},
@@ -11812,6 +11854,9 @@ static COMBINER color_cmb_list[] = {
   // Waterfall, duck dodgers. Added by Gonetz
   // (t0-0)*t1+0, (shade-env)*cmb+env
   {0xe2f1a054, cc_shade_sub_env_mul__t0_mul_t1__add_env},
+  // Arena, Pokemon Stadium 2 ** INC **
+  // (t0-0)*t1+0, (cmb-prim)*shade+env
+  {0xe2f1a430, cc__t0_mul_t1__mul_shade_add_env},
   // bikes, xg2
   // (t0-0)*t1+0, (shade-0)*cmb+0
   {0xe2f1e0f4, cc__t0_mul_t1__mul_shade},
