@@ -2311,6 +2311,7 @@ grLfbWriteRegion( GrBuffer_t dst_buffer,
     texture_number = GL_TEXTURE0_ARB;
     glActiveTextureARB(texture_number);
 
+    const unsigned int half_stride = src_stride / 2;
     switch(src_format)
     {
     case GR_LFB_SRC_FMT_1555:
@@ -2318,10 +2319,11 @@ grLfbWriteRegion( GrBuffer_t dst_buffer,
       {
         for (i=0; i<src_width; i++)
         {
-          buf[j*tex_width*4+i*4+0]=((frameBuffer[j*(src_stride/2)+i]>>10)&0x1F)<<3;
-          buf[j*tex_width*4+i*4+1]=((frameBuffer[j*(src_stride/2)+i]>> 5)&0x1F)<<3;
-          buf[j*tex_width*4+i*4+2]=((frameBuffer[j*(src_stride/2)+i]>> 0)&0x1F)<<3;
-          buf[j*tex_width*4+i*4+3]=(frameBuffer[j*(src_stride/2)+i]>>15)?0xFF:0;
+          const unsigned int col = frameBuffer[j*half_stride+i];
+          buf[j*tex_width*4+i*4+0]=((col>>10)&0x1F)<<3;
+          buf[j*tex_width*4+i*4+1]=((col>>5)&0x1F)<<3;
+          buf[j*tex_width*4+i*4+2]=((col>>0)&0x1F)<<3;
+          buf[j*tex_width*4+i*4+3]= (col>>15) ? 0xFF : 0;
         }
       }
       break;
@@ -2330,9 +2332,23 @@ grLfbWriteRegion( GrBuffer_t dst_buffer,
       {
         for (i=0; i<src_width; i++)
         {
-          buf[j*tex_width*4+i*4+0]=((frameBuffer[j*(src_stride/2)+i]>>10)&0x1F)<<3;
-          buf[j*tex_width*4+i*4+1]=((frameBuffer[j*(src_stride/2)+i]>> 5)&0x1F)<<3;
-          buf[j*tex_width*4+i*4+2]=((frameBuffer[j*(src_stride/2)+i]>> 0)&0x1F)<<3;
+          const unsigned int col = frameBuffer[j*half_stride+i];
+          buf[j*tex_width*4+i*4+0]=((col>>10)&0x1F)<<3;
+          buf[j*tex_width*4+i*4+1]=((col>>5)&0x1F)<<3;
+          buf[j*tex_width*4+i*4+2]=((col>>0)&0x1F)<<3;
+          buf[j*tex_width*4+i*4+3]=0xFF;
+        }
+      }
+      break;
+    case GR_LFBWRITEMODE_565:
+      for (j=0; j<src_height; j++)
+      {
+        for (i=0; i<src_width; i++)
+        {
+          const unsigned int col = frameBuffer[j*half_stride+i];
+          buf[j*tex_width*4+i*4+0]=((col>>11)&0x1F)<<3;
+          buf[j*tex_width*4+i*4+1]=((col>>5)&0x3F)<<2;
+          buf[j*tex_width*4+i*4+2]=((col>>0)&0x1F)<<3;
           buf[j*tex_width*4+i*4+3]=0xFF;
         }
       }
