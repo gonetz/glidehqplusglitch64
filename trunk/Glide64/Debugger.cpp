@@ -327,27 +327,15 @@ void debug_capture ()
     grBufferClear (0, 0, 0xFFFF);
 
     // Copy the screen capture back to the screen:
-    // Lock the backbuffer
-    GrLfbInfo_t info;
-    while (!grLfbLock (GR_LFB_WRITE_ONLY,
-      GR_BUFFER_BACKBUFFER,
-      GR_LFBWRITEMODE_565,
-      GR_ORIGIN_UPPER_LEFT,
+    grLfbWriteRegion(GR_BUFFER_BACKBUFFER,
+      (wxUint32)rdp.offset_x,
+      (wxUint32)rdp.offset_y,
+      GR_LFB_SRC_FMT_565,
+      settings.res_x,
+      settings.res_y,
       FXFALSE,
-      &info));
-
-    wxUint32 offset_src=0/*(settings.scr_res_y-settings.res_y)*info.strideInBytes*/, offset_dst=0;
-
-    // Copy the screen
-    for (wxUint32 y=0; y<settings.res_y; y++)
-    {
-      memcpy ((wxUint8*)info.lfbPtr + offset_src, _debugger.screen + offset_dst, settings.res_x << 1);
-      offset_dst += settings.res_x << 1;
-      offset_src += info.strideInBytes;
-    }
-
-    // Unlock the backbuffer
-    grLfbUnlock (GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER);
+      settings.res_x<<1,
+      _debugger.screen);
 
     // Do the cacheviewer
     debug_cacheviewer ();
