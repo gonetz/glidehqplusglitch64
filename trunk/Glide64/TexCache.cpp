@@ -1550,7 +1550,7 @@ void LoadTex (int id, int tmu)
         mod_tex_sub_col_mul_fac_add_tex ((wxUint16*)texture, size, modcolor, modfactor);
         break;
       case TMOD_TEX_SCALE_COL_ADD_COL:
-        mod_tex_scale_col_add_col ((wxUint16*)texture, size, modcolor, modfactor);
+        mod_tex_scale_col_add_col ((wxUint16*)texture, size, modcolor, modcolor1);
         break;
       case TMOD_TEX_ADD_COL:
         mod_tex_add_col ((wxUint16*)texture, size, modcolor);
