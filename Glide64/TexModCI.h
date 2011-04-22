@@ -196,15 +196,18 @@ static void mod_tex_sub_col_mul_fac_add_tex_CI (wxUint32 color, wxUint32 factor)
 	}
 }
 
-static void mod_tex_scale_col_add_col_CI (wxUint32 color, wxUint32 factor)
+static void mod_tex_scale_col_add_col_CI (wxUint32 color0, wxUint32 color1)
 {
-	float percent = factor / 255.0f;
-	float percent_r = (1.0f - ((color >> 24) & 0xFF) / 255.0f) * percent;
-	float percent_g = (1.0f - ((color >> 16) & 0xFF) / 255.0f) * percent;
-	float percent_b = (1.0f - ((color >> 8)  & 0xFF) / 255.0f) * percent;
+	wxUint8 cr, cg, cb;
 	wxUint16 col;
-	float base = (1.0f - percent) * 255.0f;
 	wxUint8 a, r, g, b;
+
+	float percent_r = ((color0 >> 24) & 0xFF) / 255.0f;
+	float percent_g = ((color0 >> 16) & 0xFF) / 255.0f;
+	float percent_b = ((color0 >> 8)  & 0xFF) / 255.0f;
+	cr = (wxUint8)((color1 >> 24) & 0xFF);
+	cg = (wxUint8)((color1 >> 16) & 0xFF);
+	cb = (wxUint8)((color1 >> 8)  & 0xFF);
 
 	for (int i=0; i<256; i++)
 	{
@@ -213,16 +216,15 @@ static void mod_tex_scale_col_add_col_CI (wxUint32 color, wxUint32 factor)
 		r = (wxUint8)((float)((col&0xF800) >> 11) / 31.0f * 255.0f);
         g = (wxUint8)((float)((col&0x07C0) >> 6) / 31.0f * 255.0f);
         b = (wxUint8)((float)((col&0x003E) >> 1) / 31.0f * 255.0f);
-		r = (wxUint8)(min(base + percent_r * r, 255));
-		g = (wxUint8)(min(base + percent_g * g, 255));
-		b = (wxUint8)(min(base + percent_b * b, 255));
+		r = (wxUint8)(min(255, percent_r * r + cr));
+		g = (wxUint8)(min(255, percent_g * g + cg));
+		b = (wxUint8)(min(255, percent_b * b + cb));
         rdp.pal_8[i] = (wxUint16)(((wxUint16)(r >> 3) << 11) |
 		          ((wxUint16)(g >> 3) << 6) |
 		          ((wxUint16)(b >> 3) << 1) |
-				  (wxUint16)(a) );
+				  ((wxUint16)(a ) << 0));
 	}
 }
-
 
 static void mod_tex_add_col_CI (wxUint32 color)
 {
@@ -409,7 +411,7 @@ static void ModifyPalette(wxUint32 mod, wxUint32 modcolor, wxUint32 modcolor1, w
 			mod_tex_sub_col_mul_fac_add_tex_CI (modcolor, modfactor);
 			break;
 		case TMOD_TEX_SCALE_COL_ADD_COL:
-			mod_tex_scale_col_add_col_CI (modcolor, modfactor);
+			mod_tex_scale_col_add_col_CI (modcolor, modcolor1);
 			break;
 		case TMOD_TEX_ADD_COL:
 			mod_tex_add_col_CI (modcolor);

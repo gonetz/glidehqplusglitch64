@@ -328,23 +328,32 @@ static void mod_tex_sub_col_mul_fac_add_tex (wxUint16 *dst, int size, wxUint32 c
 	}
 }
 
-static void mod_tex_scale_col_add_col (wxUint16 *dst, int size, wxUint32 color, wxUint32 factor)
+static void mod_tex_scale_col_add_col (wxUint16 *dst, int size, wxUint32 color0, wxUint32 color1)
 {
-	float percent = factor / 255.0f;
-	float percent_r = (1.0f - ((color>>12)&0xF) / 15.0f) * percent;
-	float percent_g = (1.0f - ((color>>8)&0xF) / 15.0f) * percent;
-	float percent_b = (1.0f - ((color>>4)&0xF) / 15.0f) * percent;
+	wxUint32 cr0, cg0, cb0, cr1, cg1, cb1;
 	wxUint16 col;
-	float base = (1.0f - percent) * 15.0f;
-	float r, g, b;
+	wxUint8 r, g, b;
+	wxUint16 a;
+	float percent_r, percent_g, percent_b;
+
+	cr0 = (color0 >> 12) & 0xF;
+	cg0 = (color0 >> 8) & 0xF;
+	cb0 = (color0 >> 4) & 0xF;
+	cr1 = (color1 >> 12) & 0xF;
+	cg1 = (color1 >> 8) & 0xF;
+	cb1 = (color1 >> 4) & 0xF;
 
 	for (int i=0; i<size; i++)
 	{
 		col = *dst;
-		r = base + percent_r * (float)((col>>8)&0xF);
-		g = base + percent_g * (float)((col>>4)&0xF);
-		b = base + percent_b * (float)(col&0xF);
-		*(dst++) = (col&0xF000) | ((wxUint8)r << 8) | ((wxUint8)g << 4) | (wxUint8)b;
+		a = col & 0xF000;
+		percent_r = ((col >> 8) & 0xF) / 15.0f;
+		percent_g = ((col >> 4) & 0xF) / 15.0f;
+		percent_b = (col & 0xF) / 15.0f;
+		r = min(15, (wxUint8)(percent_r * cr0 + cr1 + 0.0001f));
+		g = min(15, (wxUint8)(percent_g * cg0 + cg1 + 0.0001f));
+		b = min(15, (wxUint8)(percent_b * cb0 + cb1 + 0.0001f));
+		*(dst++) = a | (r << 8) | (g << 4) | b;
 	}
 }
 
