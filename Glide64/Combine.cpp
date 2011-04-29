@@ -3570,6 +3570,36 @@ static void cc_t0_mul_prim_mul_shadea_add_env ()
 }
 
 // (A*B+C)*D
+static void cc__t0_mul_prim_add_shade__mul_env ()
+{
+  if (cmb.combine_ext)
+  {
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_ITRGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_TMU_CCOLOR, 0,
+      GR_CMBX_B, 0);
+    cmb.tex |= 1;
+    cmb.tex_ccolor = rdp.prim_color;
+    CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_ITRGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_CONSTANT_COLOR, 0,
+      GR_CMBX_ZERO, 0);
+    CC_ENV ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_ITERATED,
+      GR_COMBINE_OTHER_TEXTURE);
+    MULSHADE_ENV ();
+    MOD_0 (TMOD_TEX_MUL_COL);
+    CC_PRIMMULENV ();
+    MOD_0_COL (cmb.ccolor & 0xFFFFFF00);
+    USE_T0 ();
+  }
+}
+
 static void cc__t0a_mul_prim_add_t0__mul_shade ()
 {
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
@@ -3590,6 +3620,26 @@ static void cc__t0a_mul_env_add_t0__mul_shade ()
   MOD_0 (TMOD_COL_MUL_TEXA_ADD_TEX);
   MOD_0_COL (rdp.env_color & 0xFFFFFF00);
   USE_T0 ();
+}
+
+static void cc__prim_mul_shade_add_env__mul_shade () //Aded by Gonetz
+{
+  if (!cmb.combine_ext)
+  {
+    cc_prim_mul_shade_add_env ();
+    return;
+  }
+  T0CCMBEXT(GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_X,
+    GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+    GR_CMBX_ITRGB, 0,
+    GR_CMBX_ZERO, 0);
+  cmb.tex |= 1;
+  cmb.tex_ccolor = rdp.prim_color;
+  CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+    GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_X,
+    GR_CMBX_ITRGB, 0,
+    GR_CMBX_ZERO, 0);
+  CC_ENV ();
 }
 
 // ** A*B*C+D*E **
@@ -5482,6 +5532,32 @@ static void cc_t0_sub_shade_mul_shadea_add_shade ()  //Aded by Gonetz
   USE_T0 ();
 }
 
+static void cc__t0_mul_t1_add_env__mul_shadea_add_shade ()
+{
+  if (cmb.combine_ext)
+  {
+    T1CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ZERO, 0,
+      GR_CMBX_B, 0);
+    T0CCMBEXT(GR_CMBX_OTHER_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_ZERO,
+      GR_CMBX_LOCAL_TEXTURE_RGB, 0,
+      GR_CMBX_B, 0);
+    cmb.tex_ccolor = rdp.env_color;
+    cmb.tex |= 3;
+  }
+  else
+  {
+    T0_MUL_T1 ();
+  }
+  // * not guaranteed to work if another iterated alpha is set
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+    GR_COMBINE_FACTOR_LOCAL_ALPHA,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_TEXTURE);
+}
+
 static void cc_prim_sub_t0_mul_env_add_t0 ()  //Aded by Gonetz
 {
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
@@ -5493,6 +5569,29 @@ static void cc_prim_sub_t0_mul_env_add_t0 ()  //Aded by Gonetz
   SETSHADE_ENV ();
   USE_T0 ();
   //(prim-t0)*env+t0 == prim*env + t0*(1-env)
+}
+
+static void cc_prim_sub_t0_mul_t1_add_t0 ()  //Aded by Gonetz
+{
+  if (!cmb.combine_ext)
+  {
+    cc_t0_mul_t1 ();
+    return;
+  }
+  T1CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+    GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+    GR_CMBX_ZERO, 0,
+    GR_CMBX_B, 0);
+  T0CCMBEXT(GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_X,
+    GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_NEGATIVE_X,
+    GR_CMBX_OTHER_TEXTURE_RGB, 0,
+    GR_CMBX_B, 0);
+  cmb.tex_ccolor = rdp.prim_color;
+  cmb.tex |= 3;
+  CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+    GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+    GR_CMBX_ZERO, 0,
+    GR_CMBX_B, 0);
 }
 
 static void cc_env_sub_t0_mul_prim_add_t0 ()  //Aded by Gonetz
@@ -5642,6 +5741,30 @@ static void cc_prim_sub_env_mul__t0_sub_t0_mul_prima__add_env ()
   cmb.tmu0_fac = GR_COMBINE_FACTOR_DETAIL_FACTOR;
   percent = (float)(rdp.prim_color&0xFF) / 255.0f;
   cmb.dc0_detailmax = cmb.dc1_detailmax = percent;
+}
+
+static void cc_prim_sub_env_mul__one_sub_t0_mul_primlod_add_prim__add_env ()
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL_ADD_LOCAL,
+    GR_COMBINE_FACTOR_TEXTURE_RGB,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  CC_ENV ();
+  SETSHADE_PRIM ();
+  if (cmb.combine_ext)
+  {
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ONE_MINUS_X,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_ZERO,
+      GR_CMBX_DETAIL_FACTOR, 0,
+      GR_CMBX_B, 0);
+    cmb.tex_ccolor = rdp.prim_color;
+    cmb.tex |= 1;
+    cmb.dc0_detailmax = cmb.dc1_detailmax = (float)lod_frac / 255.0f;
+  }
+  else
+  {
+    USE_T0 ();
+  }
 }
 
 static void cc_prim_sub_env_mul__t0_add_t1a__add_env ()
@@ -6671,6 +6794,18 @@ static void cc_env_sub_shade_mul__t0_mul_t1__add_shade () //Added by Gonetz
   T0_MUL_T1 ();
 }
 
+static void cc_env_sub_prim_mul__t0a_mul_t1a__add_prim ()
+{
+  CCMB (GR_COMBINE_FUNCTION_BLEND,
+    GR_COMBINE_FACTOR_TEXTURE_ALPHA,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  CC_PRIM ();
+  SETSHADE_ENV ();
+  A_T0_MUL_T1 ();
+}
+
+
 static void cc_env_sub_prim_mul_prima_add_prim ()  //Aded by Gonetz
 {
   // * not guaranteed to work if another iterated alpha is set
@@ -6693,6 +6828,28 @@ static void cc_env_sub_prim_mul_enva_add_prim ()  //Aded by Gonetz
   CC_ENV ();
   CA_ENV ();
   SETSHADE_PRIM ();
+}
+
+static void cc__t0_sub_env_mul_shade__sub_prim_mul_shade_add_prim ()
+{
+  if (cmb.combine_ext)
+  {
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ITRGB, 0,
+      GR_CMBX_ZERO, 0);
+    cmb.tex_ccolor = rdp.env_color;
+    cmb.tex |= 1;
+    CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ITRGB, 0,
+      GR_CMBX_B, 0);
+    CC_PRIM ();
+  }
+  else
+  {
+    cc_t0_mul_shade ();
+  }
 }
 
 static void cc_env_sub_prim_mul_shade_add_prim () //Added by Gonetz
@@ -7471,6 +7628,33 @@ static void cc_env_inter_prim_using_primlod ()
     SETSHADE_PRIMLOD ();
     CC_ENV ();
   }
+}
+
+static void cc_prim_inter__t0_mul_t1_add_env__using_shadea ()
+{
+  if (cmb.combine_ext)
+  {
+    T1CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ZERO, 0,
+      GR_CMBX_B, 0);
+    T0CCMBEXT(GR_CMBX_OTHER_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_ZERO,
+      GR_CMBX_LOCAL_TEXTURE_RGB, 0,
+      GR_CMBX_B, 0);
+    cmb.tex_ccolor = rdp.env_color;
+    cmb.tex |= 3;
+  }
+  else
+  {
+    T0_MUL_T1 ();
+  }
+  // * not guaranteed to work if another iterated alpha is set
+  CCMB (GR_COMBINE_FUNCTION_BLEND,
+    GR_COMBINE_FACTOR_LOCAL_ALPHA,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_TEXTURE);
+  SETSHADE_PRIM ();
 }
 
 static void cc_env_inter__prim_inter_shade_using_t0__using_shadea ()
@@ -9818,7 +10002,7 @@ static void ac__t0_add_prim_mul_shade__mul_shade ()
   {
     T0ACMBEXT(GR_CMBX_ITALPHA, GR_FUNC_MODE_X,
       GR_CMBX_LOCAL_TEXTURE_ALPHA, GR_FUNC_MODE_ZERO,
-      GR_CMBX_CONSTANT_ALPHA, 0,
+      GR_CMBX_TMU_CALPHA, 0,
       GR_CMBX_B, 0);
     cmb.tex |= 1;
     cmb.tex_ccolor = (cmb.tex_ccolor&0xFFFFFF00) | (rdp.prim_color&0xFF);
@@ -9941,18 +10125,81 @@ static void ac_t1_add_prim_mul_env () //Aded by Gonetz
   //(t1+prim)*env = t1*env + prim*env
 }
 
-// ** A-B*C **
+// ** (A-B)*C **
 static void ac_t0_sub_prim_mul_shade ()
 {
-  ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
-    GR_COMBINE_FACTOR_ONE,
-    GR_COMBINE_LOCAL_ITERATED,
-    GR_COMBINE_OTHER_TEXTURE);
-  MULSHADE_A_PRIM ();
-  A_USE_T0 ();
+  if (cmb.combine_ext)
+  {
+    T0ACMBEXT(GR_CMBX_LOCAL_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CALPHA, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ITALPHA, 0,
+      GR_CMBX_ZERO, 0);
+    cmb.tex |= 1;
+    cmb.tex_ccolor = (cmb.tex_ccolor&0xFFFFFF00) | (rdp.prim_color&0xFF);
+    ACMBEXT(GR_CMBX_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_ITALPHA, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ZERO, 1,
+      GR_CMBX_ZERO, 0);
+  } else {
+    ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_ITERATED,
+      GR_COMBINE_OTHER_TEXTURE);
+    MULSHADE_A_PRIM ();
+    A_USE_T0 ();
+  }
 }
 
-// ** (A-B)*C **
+static void ac_t0_sub_prim_mul_shade_mul_env ()
+{
+  if (cmb.combine_ext)
+  {
+    T0ACMBEXT(GR_CMBX_LOCAL_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CALPHA, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ITALPHA, 0,
+      GR_CMBX_ZERO, 0);
+    cmb.tex |= 1;
+    cmb.tex_ccolor = (cmb.tex_ccolor&0xFFFFFF00) | (rdp.prim_color&0xFF);
+    ACMBEXT(GR_CMBX_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_ITALPHA, GR_FUNC_MODE_ZERO,
+      GR_CMBX_CONSTANT_ALPHA, 0,
+      GR_CMBX_ZERO, 0);
+    CA_ENV ();
+  } else {
+    ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_ITERATED,
+      GR_COMBINE_OTHER_TEXTURE);
+    MULSHADE_A_PRIM ();
+    MULSHADE_A_ENV ();
+    A_USE_T0 ();
+  }
+}
+
+static void ac_t0_sub_shade_mul_prim ()
+{
+  if (cmb.combine_ext)
+  {
+    T0ACMBEXT(GR_CMBX_LOCAL_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_ITALPHA, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_TMU_CALPHA, 0,
+      GR_CMBX_ZERO, 0);
+    cmb.tex |= 1;
+    cmb.tex_ccolor = (cmb.tex_ccolor&0xFFFFFF00) | (rdp.prim_color&0xFF);
+    ACMBEXT(GR_CMBX_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_ITALPHA, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ZERO, 1,
+      GR_CMBX_ZERO, 0);
+  } else {
+    ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_ITERATED,
+      GR_COMBINE_OTHER_TEXTURE);
+    MULSHADE_A_PRIM ();
+    A_USE_T0 ();
+  }
+}
+
 static void ac__t0_mul_t1__sub_prim_mul_shade ()  //Aded by Gonetz
 {
   if (cmb.combine_ext)
@@ -10985,6 +11232,15 @@ static void ac__t0_inter_t1_using_t1a__mul_prim ()
   A_T0_INTER_T1_USING_T1A ();
 }
 
+static void ac__t0_inter_t1_using_t1a__mul_shade ()
+{
+  ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_LOCAL,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_TEXTURE);
+  A_T0_INTER_T1_USING_T1A ();
+}
+
 //Added by Gonetz
 static void ac__t0_inter_t1_using_shadea__mul_prim ()
 {
@@ -11233,6 +11489,9 @@ static COMBINER color_cmb_list[] = {
   // teleportation, Spacestation Silicon Valley. Added by Gonetz
   // (t1-t0)*t1+t0, (prim-env)*cmb+env
   {0x2212a053, cc_prim_sub_env_mul__t0_inter_t1_using_t1__add_env},
+  // pokemon fainted, Pokemon Stadium 2
+  // (prim-t0)*t1+t0
+  {0x22132213, cc_prim_sub_t0_mul_t1_add_t0},
   // Some gannon spell, zelda
   // (t1-0)*t1+t0, (prim-0)*cmb+0
   {0x22f2e0f3, cc__t1_mul_t1_add_t0__mul_prim},
@@ -12297,6 +12556,9 @@ static COMBINER color_cmb_list[] = {
   // zelda 2. Added by Gonetz
   // (t1-t0)*primlod+prim, (cmb-0)*shade+0  ** INC **
   {0x6e12e4f0, cc__t1_sub_t0_mul_primlod_add_prim__mul_shade},
+  // mini games quiz monitor backround, Pokemon Stadium 2
+  // (noise-t0)*primlod+prim, (prim-env)*cmb+env  ** INC **
+  {0x6e17a053, cc_prim_sub_env_mul__one_sub_t0_mul_primlod_add_prim__add_env},
   // Morning Sun attack, pokemon stadium 2
   // (t0-prim)*primlod+prim, (prim-env)*0+cmb
   {0x6e311f53, cc_t0_sub_prim_mul_primlod_add_prim},
@@ -12309,6 +12571,10 @@ static COMBINER color_cmb_list[] = {
   // Earthquake pokemon attack, Pokemon Stadium 2 [gokuss4]. Added by Gonetz
   // (t0-0)*primlod+prim, (cmb-env)*cmb_a+env ** INC **
   {0x6ef1a750, cc_t0_mul_primlod_add_prim},
+  // mini games quiz monitor backround, Pokemon Stadium 2
+  // (noise-0)*primlod+prim, (env-cmb)*cmb_a+cmb ** INC **
+  // use cmb_a which is ac_t0_mul_t1
+  {0x6ef70705, cc_env_sub_prim_mul__t0a_mul_t1a__add_prim},
   // rope, CBFD
   // (t0-env)*k5+prim
   {0x6f516f51, cc_t0_sub_env_mul_k5_add_prim},
@@ -12435,6 +12701,9 @@ static COMBINER color_cmb_list[] = {
   // huge water lilies, zelda 2 [Ogy]. Added by Gonetz
   // (t0-0)*prim+shade, (cmb-env)*shade+0  ** INC **
   {0x83f1e450, cc__t0_mul_prim_add_shade__sub_env_mul_shade},
+  // cynnabar gym fire shield, pokemon stadium 2
+  // (t0-0)*prim+shade, (cmb-0)*env+0  ** INC **
+  {0x83f1e5f0, cc__t0_mul_prim_add_shade__mul_env},
   // Objects in arena, pokemon stadium 2
   // (t1-0)*prim+shade, (cmb-0)*prim_a+0  - not going to bother with prim_a since it is FF
   {0x83f2eaf0, cc_t1_mul_prim_add_shade},
@@ -12679,6 +12948,12 @@ static COMBINER color_cmb_list[] = {
   // Quake 2 intro. Added by Gonetz
   // (t0-0)*t1+env, (t0-0)*primlod+cmb  ** INC **
   {0xa2f10ef1, cc__t0_mul_t1__add_env},
+  // silver cave, pokemon stadium 2
+  // (t0-0)*t1+env, (cmb-prim)*shadea+prim
+  {0xa2f16b30, cc_prim_inter__t0_mul_t1_add_env__using_shadea},
+  // silver cave, pokemon stadium 2
+  // (t0-0)*t1+env, (cmb-0)*shadea+shade
+  {0xa2f18bf0, cc__t0_mul_t1_add_env__mul_shadea_add_shade},
   // Quake64. Added by Gonetz
   // (t0-0)*t1+env
   {0xa2f1a2f1, cc__t0_mul_t1__add_env},
@@ -12722,6 +12997,9 @@ static COMBINER color_cmb_list[] = {
   // paper mario. Added by Gonetz
   // (shade-0)*prim+env
   {0xa3f4a3f4, cc_prim_mul_shade_add_env},
+  // Sharpen attack, pokemon stadium 2
+  // (shade-0)*prim+env, (cmb-0)*shade+0
+  {0xa3f4e4f0, cc__prim_mul_shade_add_env__mul_shade},
   // Doraemon 2. Added by Gonetz
   // (1-0)*prim+env
   {0xa3f6a3f6, cc_prim_add_env},
@@ -13140,6 +13418,9 @@ static COMBINER color_cmb_list[] = {
   // vehicle, Star Wars Ep.1 Racer, [Raziel64]. Added by Gonetz
   // (t0-0)*prim+0, (shade-0)*cmb+0
   {0xe3f1e0f4, cc_t0_mul_prim_mul_shade},
+  // mini game, Pokemon Stadium 2
+  // (t0-0)*prim+0, (1-0)*cmb+0
+  {0xe3f1e0f6, cc_t0_mul_prim},
   // magic stuff, buck bumble. Added by Gonetz
   // (t0-0)*prim+0, (cmb-0)*prim+0
   {0xe3f1e3f0, cc_t0_mul_prim_mul_prim},
@@ -13201,6 +13482,9 @@ static COMBINER color_cmb_list[] = {
   // Arena, Pokemon Stadium 2
   // (t0-prim)*shade+0
   {0xe431e431, cc_t0_sub_prim_mul_shade},
+  // silver cave, pokemon stadium 2
+  // (t0-env)*shade+0, (cmb-prim)*shade+prim
+  {0xe4516430, cc__t0_sub_env_mul_shade__sub_prim_mul_shade_add_prim},
   // bomb mask, zelda 2. Added by Gonetz
   // (t0-env)*shade+0, (cmb-prim)*shade+shade ** INC **
   {0xe4518430, cc__t0_sub_env_mul_shade__sub_prim_mul_shade},
@@ -13517,6 +13801,9 @@ static COMBINER color_cmb_list[] = {
   // zelda2 [Ogy]. Added by Gonetz
   // (t1-0)*t0_a+0, (cmb-0)*shade+0
   {0xe8f2e4f0, cc__t0a_mul_t1__mul_shade},
+  // mini quiz, Pokemon Stadium 2
+  // (prim-0)*t0_a+0, (cmb-t1)*primlod+t1 ** INC **
+  {0xe8f34e20, cc_t0},
   // Major League Baseball Featuring Ken Griffey Jr.
   // (prim-0)*t0_a+0
   {0xe8f3e8f3, cc_t0a_mul_prim},
@@ -13766,6 +14053,9 @@ static COMBINER alpha_cmb_list[] = {
   // mega shock, paper mario. Added by Gonetz
   // (t1-t0)*t1+t0, (cmb-0)*prim+0
   {0x028a0ef8, ac__t0_inter_t1_using_t1a__mul_prim},
+  // mini game, Pokemon Stadium 2
+  // (t1-t0)*t1+t0, (cmb-0)*shade+0
+  {0x028a0f38, ac__t0_inter_t1_using_t1a__mul_shade},
   // Magnitude, pokemon stadium 2
   // (shade-t0)*t1+t0, (cmb-0)*shade+env
   {0x028c0b38, ac__t0_mul_t1__mul_shade},
@@ -14284,6 +14574,9 @@ static COMBINER alpha_cmb_list[] = {
   // Dobutsu no Mori. Added by Gonetz
   // (t0-0)*primlod+prim
   {0x07b907b9, ac_t0_mul_primlod_add_prim},
+  // Lock-On attack, Pokemon Stadium 2
+  // (t1-t0)*0+prim, (cmb-0)*0+cmb
+  {0x07ca01f8, ac_prim},
   // water, DK64
   // (0-0)*0+0, (0-t1)*0+prim
   {0x07d707d7, ac_prim},
@@ -14591,6 +14884,9 @@ static COMBINER alpha_cmb_list[] = {
   // paper mario. Added by Gonetz
   // (t1-0)*t0+0, (cmb-env)*prim+env  ** INC **
   {0x0e7a0ae8, ac_t1_mul_prim},
+  // mini games quiz monitor backround, Pokemon Stadium 2
+  // (t1-0)*t0+0, (0-0)*0+1
+  {0x0e7a0dff, ac_one},
   // Tony Hawk's Pro Skater. Added by Gonetz
   // (t1-0)*t0+0, (cmb-0)*t0+0
   {0x0e7a0e78, ac_t0_mul_t1},
@@ -14718,8 +15014,8 @@ static COMBINER alpha_cmb_list[] = {
   // (1-t0)*prim+0, (cmb-0)*shade+0
   {0x0ece0f38, ac_one_sub_t0_mul_primshade},
   // iguana, Forsaken, [Raziel64]. Added by Gonetz
-  // (t0-shade)*prim+0    ** INC **
-  {0x0ee10ee1, ac_t0_sub_prim_mul_shade},
+  // (t0-shade)*prim+0
+  {0x0ee10ee1, ac_t0_sub_shade_mul_prim},
   // stands, NASCAR 2000
   // (prim-shade)*prim+0
   {0x0ee30ee3, ac_prim_sub_shade_mul_prim},
@@ -14804,6 +15100,9 @@ static COMBINER alpha_cmb_list[] = {
   // mahogany town statue, Pokemon Stadium 2
   // (t0-prim)*shade+0
   {0x0f190f19, ac_t0_sub_prim_mul_shade},
+  // silver cave, pokemon stadium 2
+  // (t0-prim)*shade+0, (cmb-0)*env+0
+  {0x0f190f78, ac_t0_sub_prim_mul_shade_mul_env},
   // Boomerang circle, zelda
   // (t0-0)*shade+0, (1-cmb)*t0+cmb
   {0x0f390046, ac_t0_mul_shade},
