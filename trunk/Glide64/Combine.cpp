@@ -5876,6 +5876,25 @@ static void cc_prim_sub_env_mul__t1_sub_prim_mul_prima_add_t0__add_env ()
   }
 }
 
+static void cc__prim_sub_env_mul_t0_add_env__mul_primlod ()
+{
+  CCMB (GR_COMBINE_FUNCTION_BLEND,
+    GR_COMBINE_FACTOR_TEXTURE_RGB,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_CONSTANT);
+  float factor = (float)rdp.prim_lodfrac / 255.0f;
+  wxUint8 r = (wxUint8)((rdp.prim_color >> 24) & 0xFF);
+  r = (wxUint8)((float)r * factor);
+  wxUint8 g = (wxUint8)((rdp.prim_color >> 16) & 0xFF);
+  g = (wxUint8)((float)g * factor);
+  wxUint8 b = (wxUint8)((rdp.prim_color >>  8) & 0xFF);
+  b = (wxUint8)((float)b * factor);
+  CC ((r<<24) | (g<<16) | (b<<8));
+  SETSHADE_ENV ();
+  MULSHADE_PRIMLOD ();
+  USE_T0 ();
+}
+
 static void cc__prim_sub_env_mul_t0_add_env__mul_k5 ()
 {
   CCMB (GR_COMBINE_FUNCTION_BLEND,
@@ -5894,7 +5913,6 @@ static void cc__prim_sub_env_mul_t0_add_env__mul_k5 ()
   MULSHADE_K5 ();
   USE_T0 ();
 }
-
 
 static void cc_prim_sub_env_mul_t1_add_env ()
 {
@@ -6511,13 +6529,55 @@ static void cc__prim_sub_env_mul_prim_add_t0__mul_prim ()
 //Added by Gonetz
 static void cc_prim_sub_env_mul_prim_add_env ()
 {
-  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
-    GR_COMBINE_FACTOR_ONE,
-    GR_COMBINE_LOCAL_CONSTANT,
-    GR_COMBINE_OTHER_ITERATED);
-  SETSHADE_PRIMSUBENV ();
-  SETSHADE_PRIM ();
-  CC_ENV ();
+  if (cmb.combine_ext)
+  {
+    CCMBEXT(GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_X,
+      GR_CMBX_ITRGB, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_CONSTANT_COLOR, 0,
+      GR_CMBX_B, 0);
+    SETSHADE_ENV();
+    CC_PRIM ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_CONSTANT,
+      GR_COMBINE_OTHER_ITERATED);
+    SETSHADE_PRIMSUBENV ();
+    SETSHADE_PRIM ();
+    CC_ENV ();
+  }
+}
+
+static void cc_prim_sub_env_mul_primlod_add_env ()
+{
+  if (cmb.combine_ext)
+  {
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ZERO, 0,
+      GR_CMBX_B, 0);
+    cmb.tex |= 1;
+    CC_PRIMLOD ();
+    cmb.tex_ccolor = cmb.ccolor;
+    CCMBEXT(GR_CMBX_ITRGB, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_TEXTURE_RGB, 0,
+      GR_CMBX_B, 0);
+    SETSHADE_PRIM();
+    CC_ENV ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_CONSTANT,
+      GR_COMBINE_OTHER_ITERATED);
+    SETSHADE_PRIMSUBENV ();
+    SETSHADE_PRIMLOD ();
+    CC_ENV ();
+  }
 }
 
 //Added by Gonetz
@@ -6534,13 +6594,32 @@ static void cc_prim_sub_env_mul_enva_add_t0 ()
 
 static void cc_prim_sub_env_mul_enva_add_env ()
 {
-  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
-    GR_COMBINE_FACTOR_ONE,
-    GR_COMBINE_LOCAL_CONSTANT,
-    GR_COMBINE_OTHER_ITERATED);
-  SETSHADE_PRIMSUBENV ();
-  SETSHADE_ENVA ();
-  CC_ENV ();
+  if (cmb.combine_ext)
+  {
+    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_TMU_CCOLOR, GR_FUNC_MODE_ZERO,
+      GR_CMBX_ZERO, 0,
+      GR_CMBX_B, 0);
+    cmb.tex |= 1;
+    CC_ENVA ();
+    cmb.tex_ccolor = cmb.ccolor;
+    CCMBEXT(GR_CMBX_ITRGB, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_TEXTURE_RGB, 0,
+      GR_CMBX_B, 0);
+    SETSHADE_PRIM();
+    CC_ENV ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_ONE,
+      GR_COMBINE_LOCAL_CONSTANT,
+      GR_COMBINE_OTHER_ITERATED);
+    SETSHADE_PRIMSUBENV ();
+    SETSHADE_ENVA ();
+    CC_ENV ();
+  }
 }
 
 //Added by Gonetz
@@ -11387,6 +11466,29 @@ static void ac__t1_sub_one_mul_enva_add_t0__mul_prim ()
   }
 }
 
+static void ac__one_inter_t0_using_prim__mul_env ()
+{
+  if (cmb.combine_ext)
+  {
+    T0ACMBEXT(GR_CMBX_LOCAL_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_TMU_CALPHA, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_DETAIL_FACTOR, 0,
+      GR_CMBX_B, 0);
+    cmb.tex_ccolor = (cmb.tex_ccolor&0xFFFFFF00) | (0xFF) ;
+    cmb.tex |= 1;
+    cmb.dc0_detailmax = cmb.dc1_detailmax = (float)(rdp.prim_color&0xFF) / 255.0f;
+    ACMBEXT(GR_CMBX_TEXTURE_ALPHA, GR_FUNC_MODE_X,
+      GR_CMBX_CONSTANT_ALPHA, GR_FUNC_MODE_ZERO,
+      GR_CMBX_CONSTANT_ALPHA, 0,
+      GR_CMBX_ZERO, 0);
+    CA_ENV ();
+  }
+  else
+  {
+	ac_t0_mul_prim_add_env ();
+  }
+}
+
 static void ac__t1_sub_one_mul_enva_add_t0__mul_shade ()
 {
   ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
@@ -12896,6 +12998,9 @@ static COMBINER color_cmb_list[] = {
   // roof, Kirby 64. Added by Gonetz
   // (prim-env)*t0+env, (cmb-0)*env+0   ** INC **
   {0xa153e5f0, cc_prim_sub_env_mul_t0_add_env},
+  // hall of fame, Pokemon Stadium
+  // (prim-env)*t0+env, (cmb-0)*primlod+0
+  {0xa153eef0, cc__prim_sub_env_mul_t0_add_env__mul_primlod},
   // Something weird in intro, monster truck madness
   // (prim-env)*t0+env, (cmb-0)*k5+0
   {0xa153eff0, cc__prim_sub_env_mul_t0_add_env__mul_k5},
@@ -13894,7 +13999,7 @@ static COMBINER color_cmb_list[] = {
   // car, Top Gear Rally. Added by Gonetz
   // (env-0)*enva+0
   {0xecf5ecf5, cc_env_mul_enva},
-  // Pokemon attack, pokemon Stadium (J)
+  // Sand attack, pokemon Stadium (J)
   // (noise-0)*enva+0, (prim-env)*cmb+env
   {0xecf7a053, cc_prim_sub_env_mul_enva_add_env},
   // Walls of well through lens of truth, zelda
@@ -13914,7 +14019,7 @@ static COMBINER color_cmb_list[] = {
   {0xeef1e4f0, cc_t0_mul_primlod_mul_shade},
   // Haze/(all powder status changers}, Pokemon Stadium 2 [gokuss4]. Added by Gonetz
   // (noise-0)*primlod+0, (prim-env)*cmb+env  ** INC **
-  {0xeef7a053, cc_env},
+  {0xeef7a053, cc_prim_sub_env_mul_primlod_add_env},
   // pokemon attack, Pokemon Stadium 2. Added by Gonetz
   // (noise-0)*primlod+0, (prim-cmb)*cmb+0  ** INC **
   {0xeef7e003, cc_zero},
@@ -14773,6 +14878,9 @@ static COMBINER alpha_cmb_list[] = {
   // flame, paper mario. Added by Gonetz
   // (1-t0)*t1+1, (cmb-t1)*t1+t1
   {0x0c8e0490, ac_t0_mul_t1},
+  // hall of fame, Pokemon Stadium
+  // (t0-1)*prim+1, (cmb-0)*env+0
+  {0x0cf10f78, ac__one_inter_t0_using_prim__mul_env},
   // Ring boundary, dual heroes
   // (0-1)*prim+1
   {0x0cf70cf7, ac_one_sub_prim},
