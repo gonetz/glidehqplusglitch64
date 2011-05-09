@@ -2530,14 +2530,35 @@ static void cc__t0_mul_t1__mul_prim_add_env ()
 }
 
 //Aded by Gonetz
-static void cc__t0_mul_t1__mul_env_add_shade ()
+static void cc__t0_mul_t1__sub_prim_mul_env_add_shade ()
 {
-  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
-    GR_COMBINE_FACTOR_TEXTURE_RGB,
-    GR_COMBINE_LOCAL_ITERATED,
-    GR_COMBINE_OTHER_CONSTANT);
-  CC_ENV ();
-  T0_MUL_T1 ();
+  if (cmb.combine_ext)
+  {
+    T1CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_TMU_CCOLOR, 0,
+      GR_CMBX_ZERO, 0);
+    T0CCMBEXT(GR_CMBX_OTHER_TEXTURE_RGB, GR_FUNC_MODE_X,
+      GR_CMBX_ITRGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_LOCAL_TEXTURE_RGB, 0,
+      GR_CMBX_B, 0);
+    cmb.tex_ccolor = rdp.env_color;
+    cmb.tex |= 3;
+    CCMBEXT(GR_CMBX_ITRGB, GR_FUNC_MODE_ZERO,
+      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_NEGATIVE_X,
+      GR_CMBX_ZERO, 1,
+      GR_CMBX_TEXTURE_RGB, 0);
+    CC_PRIMMULENV ();
+  }
+  else
+  {
+    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+      GR_COMBINE_FACTOR_TEXTURE_RGB,
+      GR_COMBINE_LOCAL_ITERATED,
+      GR_COMBINE_OTHER_CONSTANT);
+    CC_ENV ();
+    T0_MUL_T1 ();
+  }
 }
 
 static void cc__t0_sub_prim_mul_t1_add_t1__mul_env_add_shade ()
@@ -13337,7 +13358,7 @@ static COMBINER color_cmb_list[] = {
   {0xe1f28450, cc__t0_mul_t1__sub_env_mul_shade_add_shade},
   // Zelda 2, [Ogy]. Added by Gonetz
   // (t1-0)*t0+0, (cmb-prim)*env+shade  ** INC **
-  {0xe1f28530, cc__t0_mul_t1__mul_env_add_shade},
+  {0xe1f28530, cc__t0_mul_t1__sub_prim_mul_env_add_shade},
   // pokemon attack, Pokemon Stadium 2. Added by Gonetz
   // (t1-0)*t0+0, (prim-env)*cmb+env
   {0xe1f2a053, cc_prim_sub_env_mul__t0_mul_t1__add_env},
