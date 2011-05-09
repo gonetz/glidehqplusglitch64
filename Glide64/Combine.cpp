@@ -1069,7 +1069,14 @@ static void cc_t1_mul_prim ()
     GR_COMBINE_LOCAL_CONSTANT,
     GR_COMBINE_OTHER_TEXTURE);
   CC_PRIM ();
-  USE_T1 ();
+  if ((rdp.cycle1 & 0xFFFF) == (rdp.cycle2 & 0xFFFF)) // 1 cycle, use t0
+  {
+    USE_T0 ();
+  }
+  else
+  {
+    USE_T1 ();
+  }
 }
 
 static void cc_t0a_mul_prim ()
