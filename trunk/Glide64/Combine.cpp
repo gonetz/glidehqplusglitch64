@@ -8275,34 +8275,15 @@ static void cc__env_inter_prim_using_t0__mul_shade ()
     USE_T0 ();
     return;
   }
-  if (cmb.combine_ext && (settings.hacks&hack_Zelda))
-  {
-    //(prim-env)*t0+env, (shade-0)*cmb+0
-    T0CCMBEXT(GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_X,
-      GR_CMBX_LOCAL_TEXTURE_RGB, GR_FUNC_MODE_ZERO,
-      GR_CMBX_TMU_CCOLOR, 0,
-      GR_CMBX_ZERO, 0);
-    CC_PRIMSUBENV ();
-    cmb.tex_ccolor = cmb.ccolor;
-    cmb.tex |= 1;
-    CCMBEXT(GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_X,
-      GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_X,
-      GR_CMBX_ITRGB, 0,
-      GR_CMBX_ZERO, 0);
-    CC_ENV ();
-  }
-  else
-  {
-    //(prim-env)*t0+env, (shade-0)*cmb+0
-    MOD_0 (TMOD_COL_INTER_COL1_USING_TEX);
-    MOD_0_COL (rdp.env_color & 0xFFFFFF00);
-    MOD_0_COL1 (rdp.prim_color & 0xFFFFFF00);
-    USE_T0 ();
-    CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
-      GR_COMBINE_FACTOR_LOCAL,
-      GR_COMBINE_LOCAL_ITERATED,
-      GR_COMBINE_OTHER_TEXTURE);
-  }
+  //(prim-env)*t0+env, (shade-0)*cmb+0
+  MOD_0 (TMOD_COL_INTER_COL1_USING_TEX);
+  MOD_0_COL (rdp.env_color & 0xFFFFFF00);
+  MOD_0_COL1 (rdp.prim_color & 0xFFFFFF00);
+  USE_T0 ();
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_LOCAL,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_TEXTURE);
 }
 
 static void cc__env_inter_one_using_t0__mul_shade ()
