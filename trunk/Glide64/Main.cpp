@@ -501,6 +501,8 @@ void ReadSpecialSettings (const char * name)
     settings.hacks |= hack_Makers;
   else if (strstr(name, (const char *)"GOLDENEYE"))
     settings.hacks |= hack_GoldenEye;
+  else if (strstr(name, (const char *)"PUZZLE LEAGUE"))
+    settings.hacks |= hack_PPL;
 
   wxString groupName = wxT("/");
   groupName += wxString::FromAscii(name);
@@ -511,7 +513,6 @@ void ReadSpecialSettings (const char * name)
 
   ini->Read(_T("alt_tex_size"), &(settings.alt_tex_size));
   ini->Read(_T("use_sts1_only"), &(settings.use_sts1_only));
-  if (ini->Read(_T("PPL"), -1) == 1) settings.hacks |= hack_PPL;
   ini->Read(_T("force_calc_sphere"), &(settings.force_calc_sphere));
   ini->Read(_T("correct_viewport"), &(settings.correct_viewport));
   ini->Read(_T("increase_texrect_edge"), &(settings.increase_texrect_edge));
