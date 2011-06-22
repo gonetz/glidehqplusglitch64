@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Glide64 Chinese Translation v1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2010-06-15 18:19+0700\n"
-"PO-Revision-Date: 2010-06-16 00:12+0800\n"
-"Last-Translator: Pokefan999\n"
+"PO-Revision-Date: 2011-04-02 15:23+0800\n"
+"Last-Translator: marchbiggg <marchbiggg@hotmail.com>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -35,7 +35,7 @@ msgstr "時間"
 
 #: Config.cpp:68
 msgid "On screen display"
-msgstr "屏幕上顯示"
+msgstr "在螢幕上顯示"
 
 #: Config.cpp:69
 msgid "OpenGL settings"
@@ -44,27 +44,27 @@ msgstr "OpenGL設置"
 #: Config.cpp:70
 #: Config.cpp:137
 msgid "Frame buffer emulation"
-msgstr "幀緩衝區仿真"
+msgstr "幀緩衝區模擬"
 
 #: Config.cpp:71
 msgid ""
 "Windowed or\n"
 "3dfx card resolution:"
 msgstr ""
-"窗口或\n"
-"3dfx分辨率:"
+"視窗或\n"
+"3dfx解析度:"
 
 #: Config.cpp:99
 msgid "Vertical sync"
-msgstr "直同步"
+msgstr "垂直同步"
 
 #: Config.cpp:100
 msgid "Show advanced emulation options"
-msgstr "顯示高級仿真選項"
+msgstr "顯示高級模擬選項"
 
 #: Config.cpp:101
 msgid "Show texture enhancement options"
-msgstr "顯示紋理增強選項"
+msgstr "顯示材質增強選項"
 
 #: Config.cpp:102
 msgid "Screenshot format:"
@@ -76,7 +76,7 @@ msgstr "語言： "
 
 #: Config.cpp:106
 msgid "LANGUAGE_NAME"
-msgstr "華語（繁體）"
+msgstr "中文（繁體）"
 
 #: Config.cpp:112
 msgid "FPS counter"
@@ -89,11 +89,11 @@ msgstr "VI/s 計數器"
 #: Config.cpp:114
 #, c-format
 msgid "% speed"
-msgstr "％ 速度 "
+msgstr "% 速度 "
 
 #: Config.cpp:115
 msgid "Clock enabled"
-msgstr "時鍾啟用"
+msgstr "時鐘啟用"
 
 #: Config.cpp:116
 msgid "Clock is 24-hour"
@@ -101,15 +101,15 @@ msgstr "時鐘為24小時"
 
 #: Config.cpp:117
 msgid "Transparent text background"
-msgstr "透明文字的背景"
+msgstr "透明文字背景"
 
 #: Config.cpp:118
 msgid ""
 "Full screen\n"
 "resolution:"
 msgstr ""
-"全屏幕\n"
-"分辨率:"
+"全螢幕\n"
+"解析度:"
 
 #: Config.cpp:121
 msgid "Anisotropic filtering"
@@ -121,11 +121,11 @@ msgstr "自動檢測 "
 
 #: Config.cpp:123
 msgid "VRAM size"
-msgstr "顯存大小"
+msgstr "顯卡記憶體大小"
 
 #: Config.cpp:125
 msgid "Mb"
-msgstr "兆"
+msgstr "Mb"
 
 #: Config.cpp:126
 msgid "Use frame buffer objects"
@@ -133,11 +133,11 @@ msgstr "使用幀緩衝對象"
 
 #: Config.cpp:133
 msgid "Current game emulation settings. Change with care!"
-msgstr "目前的遊戲仿真設置。更改時要小心！"
+msgstr "目前的遊戲模擬設置。更改時要小心！"
 
 #: Config.cpp:135
 msgid "Default emulation settings. Not recommended to change!"
-msgstr "默認仿真設置。不推薦更改！"
+msgstr "默認模擬設置。不推薦更改！"
 
 #: Config.cpp:136
 msgid "General options"
@@ -145,7 +145,7 @@ msgstr "一般選項"
 
 #: Config.cpp:138
 msgid "Depth buffer emulation"
-msgstr "深度緩衝仿真"
+msgstr "深度緩衝模擬"
 
 #: Config.cpp:139
 msgid "Filtering mode:"
@@ -157,11 +157,11 @@ msgstr "自動"
 
 #: Config.cpp:142
 msgid "Force Bilinear"
-msgstr "強行支持雙線性"
+msgstr "強制啟用雙線性"
 
 #: Config.cpp:143
 msgid "Force Point-sampled"
-msgstr "強行支持點採樣"
+msgstr "強制啟用點取樣"
 
 #: Config.cpp:146
 msgid "Buffer swapping method:"
@@ -185,11 +185,11 @@ msgstr "LOD計算："
 
 #: Config.cpp:155
 msgid "off"
-msgstr "關"
+msgstr "關閉"
 
 #: Config.cpp:156
 msgid "fast"
-msgstr "快"
+msgstr "快速"
 
 #: Config.cpp:157
 msgid "precise"
@@ -197,7 +197,7 @@ msgstr "精確"
 
 #: Config.cpp:160
 msgid "Aspect ratio:"
-msgstr "寬高比："
+msgstr "長寬比："
 
 #: Config.cpp:162
 msgid "4:3 (default)"
@@ -205,15 +205,15 @@ msgstr "4:3 （默認）"
 
 #: Config.cpp:163
 msgid "Force 16:9"
-msgstr "强行支持 16:9"
+msgstr "強制啟用 16:9"
 
 #: Config.cpp:164
 msgid "Stretch"
-msgstr "伸展"
+msgstr "拉伸"
 
 #: Config.cpp:167
 msgid "Fog"
-msgstr "霧"
+msgstr "霧化"
 
 #: Config.cpp:168
 msgid "Buffer clear on every frame"
@@ -221,23 +221,23 @@ msgstr "清除每一幀緩衝"
 
 #: Config.cpp:169
 msgid "Enable frame buffer emulation"
-msgstr "啟用幀緩衝仿真"
+msgstr "啟用幀緩衝模擬"
 
 #: Config.cpp:170
 msgid "Hardware frame buffer emulation"
-msgstr "硬件仿真幀緩衝"
+msgstr "硬體模擬幀緩衝"
 
 #: Config.cpp:171
 msgid "Get frame buffer info"
-msgstr "取幀緩衝信息"
+msgstr "取得幀緩衝訊息"
 
 #: Config.cpp:172
 msgid "Read every frame (slow!)"
-msgstr "讀取每一幀（慢！）"
+msgstr "讀取每一幀（緩慢！）"
 
 #: Config.cpp:173
 msgid "Render N64 frame buffer as texture"
-msgstr "呈現N64幀緩衝為紋理"
+msgstr "呈現N64幀緩衝材質"
 
 #: Config.cpp:174
 msgid "Detect CPU write to the N64 frame buffer"
@@ -245,16 +245,16 @@ msgstr "檢測CPU寫入到N64幀緩衝"
 
 #: Config.cpp:175
 msgid "Software depth buffer rendering"
-msgstr "呈現軟件深度緩衝"
+msgstr "呈現軟體深度緩衝"
 
 #: Config.cpp:199
 #: Config.cpp:618
 msgid "Texture enhancement"
-msgstr "紋理增強"
+msgstr "材質增強"
 
 #: Config.cpp:200
 msgid "Hi-resolution textures"
-msgstr "高清晰度的紋理"
+msgstr "高解析材質"
 
 #: Config.cpp:201
 msgid "Common"
@@ -267,11 +267,11 @@ msgstr "預置"
 #: Config.cpp:203
 #: Config.cpp:204
 msgid "Performance tweaks"
-msgstr "性能調整"
+msgstr "效能調整"
 
 #: Config.cpp:205
 msgid "Filter"
-msgstr "過濾器"
+msgstr "濾鏡"
 
 #: Config.cpp:207
 #: Config.cpp:218
@@ -313,25 +313,25 @@ msgstr "儲存"
 
 #: Config.cpp:229
 msgid "Texture cache"
-msgstr "紋理緩存"
+msgstr "材質快取"
 
 #: Config.cpp:231
 msgid "Mbytes"
-msgstr "兆"
+msgstr "MBytes"
 
 #: Config.cpp:232
 msgid "Ignore Backgrounds"
-msgstr "忽視背景"
+msgstr "忽略背景"
 
 #: Config.cpp:233
 #: Config.cpp:244
 msgid "Apply texture compression"
-msgstr "應用紋理壓縮"
+msgstr "應用材質壓縮"
 
 #: Config.cpp:234
 #: Config.cpp:245
 msgid "Compress texture cache"
-msgstr "壓縮紋理緩存"
+msgstr "壓縮材質快取"
 
 #: Config.cpp:235
 msgid "Format"
@@ -343,11 +343,11 @@ msgstr "Rice 格式"
 
 #: Config.cpp:241
 msgid "Tile textures"
-msgstr "圖磚紋理"
+msgstr "圖磚材質"
 
 #: Config.cpp:242
 msgid "Force 16bpp textures"
-msgstr "強行支持16位紋理"
+msgstr "強制啟用16位元材質"
 
 #: Config.cpp:243
 msgid "Alternative CRC calculation"
@@ -359,23 +359,23 @@ msgstr "充分利用透明通道"
 
 #: Config.cpp:247
 msgid "Texture dumping/editing mode"
-msgstr "紋理轉儲與編輯模式"
+msgstr "材質轉儲與編輯模式"
 
 #: Config.cpp:248
 msgid "Texture compression method"
-msgstr "紋理壓縮方法"
+msgstr "材質壓縮方式"
 
 #: Config.cpp:254
 msgid "Save texture cache to hard disk"
-msgstr "保存紋理緩存到硬盤"
+msgstr "保存材質快取到硬碟"
 
 #: Config.cpp:255
 msgid "Best performance"
-msgstr "最佳性能"
+msgstr "最佳效能"
 
 #: Config.cpp:256
 msgid "Best texture quality"
-msgstr "最佳紋理質量"
+msgstr "最佳材質質量"
 
 #: Config.cpp:262
 msgid "Developers settings"
@@ -383,7 +383,7 @@ msgstr "開發人員設置"
 
 #: Config.cpp:263
 msgid "Debug/Misc"
-msgstr "調試與雜項"
+msgstr "偵錯與雜項"
 
 #: Config.cpp:264
 msgid "Autodetect Microcode"
@@ -391,7 +391,7 @@ msgstr "自動檢測微碼"
 
 #: Config.cpp:265
 msgid "Force Microcode:"
-msgstr "強行支持微碼："
+msgstr "強制啟用微碼："
 
 #: Config.cpp:278
 msgid "Wireframe using:"
@@ -399,23 +399,23 @@ msgstr "線框使用："
 
 #: Config.cpp:280
 msgid "Original colors"
-msgstr "原來的顏色"
+msgstr "原始顏色"
 
 #: Config.cpp:281
 msgid "Vertex colors"
-msgstr "頂點的顏色"
+msgstr "頂點顏色"
 
 #: Config.cpp:282
 msgid "Red only"
-msgstr "僅紅"
+msgstr "僅紅色"
 
 #: Config.cpp:285
 msgid "Log to rdp.txt (SLOW)"
-msgstr "登錄到 rdp.txt（慢）"
+msgstr "登錄到 rdp.txt（緩慢）"
 
 #: Config.cpp:286
 msgid "Unknown combiners as red"
-msgstr "未知合成器為紅色"
+msgstr "未知的合成器為紅色"
 
 #: Config.cpp:287
 msgid "Log clear every frame"
@@ -427,7 +427,7 @@ msgstr "合成器記錄"
 
 #: Config.cpp:289
 msgid "Run (+log) in window"
-msgstr "窗口運行（+記錄）"
+msgstr "視窗執行（+記錄）"
 
 #: Config.cpp:290
 msgid "Cmb. clear every frame"
@@ -439,7 +439,7 @@ msgstr "錯誤記錄（rdp_e.txt）"
 
 #: Config.cpp:292
 msgid "Bilinear filter texture cache"
-msgstr "雙線性過濾紋理緩存"
+msgstr "雙線性過濾材質快取"
 
 #: Config.cpp:324
 #: Config.cpp:545
@@ -469,11 +469,11 @@ msgid ""
 "(note again that for 3dfx cards the plugin must be in fullscreen mode to see anything).\n"
 "[Recommended: 640x480, 800x600, 1024x768]"
 msgstr ""
-"分辨率\n"
+"解析度\n"
 "--------\n"
-"此選項選擇3dfx卡為全屏分辨率和其它窗口分辨率。\n"
+"此選項選擇3dfx卡為全螢幕解析度和其他視窗解析度。\n"
 "注意：\t對於3dfx卡上的插件必須\n"
-"\t在全屏模式才能看到東西\n"
+"\t在全螢幕模式才能看到東西\n"
 "[推薦：640x480，800x600，1024X768]"
 
 #: Config.cpp:490
@@ -482,15 +482,15 @@ msgid ""
 "This option will enable the vertical sync, which will prevent tearing.\n"
 "Note: this option will ONLY have effect if vsync is set to \"Software Controlled\".\n"
 msgstr ""
-"直同步\n"
+"垂直同步\n"
 "-------\n"
-"此選項將啟用直同步，它將防止撕裂。\n"
-"注意：\t如果直同步設置為\"軟件控制\"，\n"
+"此選項將啟用垂直同步，它將防止撕裂。\n"
+"注意：\t如果垂直同步設置為\"軟體控制\"，\n"
 "\t此選項才會生效。\n"
 
 #: Config.cpp:492
 msgid "Select a format, in which screen shots will be saved"
-msgstr "選擇屏幕截圖被保存的一種格式"
+msgstr "選擇螢幕截圖所要儲存的一種格式"
 
 #: Config.cpp:499
 msgid ""
@@ -500,8 +500,8 @@ msgid ""
 msgstr ""
 "語言選擇:\n"
 "----------\n"
-"按下按鈕調用語言選擇對話框。\n"
-"選擇的語言會在重新啟動配置對話框後生效。"
+"按下按鈕調用語言選擇視窗。\n"
+"選擇的語言會在重新啟動設置視窗後生效。"
 
 #: Config.cpp:500
 msgid ""
@@ -512,8 +512,8 @@ msgid ""
 msgstr ""
 "FPS 計數器\n"
 "------------\n"
-"當選定，FPS（幀每秒）計數器\n"
-"會顯示在屏幕左下角的角落。\n"
+"當選擇後，FPS（幀每秒）計數器\n"
+"會顯示在螢幕左下角的角落。\n"
 "[推薦：您的偏好]"
 
 #: Config.cpp:502
@@ -527,10 +527,10 @@ msgid ""
 msgstr ""
 "VI/s 計數器\n"
 "------------\n"
-"當選定，VI/s（每秒垂直中斷）計數器\n"
-"將顯示在屏幕左下角的角落。\n"
-"它將在全速 NTSC(U)的遊戲裡保持 60VI/s\n"
-"或在全速 PAL(E)的遊戲裡保持 50VI/s。\n"
+"當選擇後，VI/s（每秒垂直中斷）計數器\n"
+"將顯示在螢幕左下角的角落。\n"
+"它將在全速的 NTSC(U)遊戲裡維持 60VI/s\n"
+"或在全速的 PAL(E)遊戲裡維持 50VI/s。\n"
 "[推薦：您的偏好]"
 
 #: Config.cpp:504
@@ -541,9 +541,9 @@ msgid ""
 "left corner of the screen.\n"
 "[Recommended: your preference]"
 msgstr ""
-"％ 速度\n"
+"% 速度\n"
 "--------\n"
-"在屏幕左下角的角落，\n"
+"在螢幕左下角的角落，\n"
 "將顯示N64實際速度的百分比。\n"
 "[推薦：您的偏好]"
 
@@ -553,10 +553,10 @@ msgid ""
 "This option will put a clock in the lower right corner of the screen, showing the current time.\n"
 "[Recommended: your preference]"
 msgstr ""
-"時鍾啟用\n"
+"時鐘啟用\n"
 "----------\n"
-"此選項將在屏幕的右下角\n"
-"擺放時鐘，顯示當前時間。\n"
+"此選項將在螢幕的右下角\n"
+"擺放時鐘，顯示目前時間。\n"
 "[推薦：您的偏好]"
 
 #: Config.cpp:509
@@ -573,9 +573,9 @@ msgid ""
 "If this is checked, all on-screen messages will have a transparent background.  Otherwise, it will have a solid black background.\n"
 "[Recommended: your preference]"
 msgstr ""
-"透明文字的背景\n"
+"透明文字背景\n"
 "-----------------\n"
-"當選定，所有在屏幕上的信息\n"
+"當選擇後，所有在螢幕上的訊息\n"
 "將有一個透明的背景。\n"
 "否則，將有黑色背景。\n"
 "[推薦：您的偏好]"
@@ -585,18 +585,18 @@ msgid ""
 "Enable \"Emulation settings\" panel. For experienced users only!\n"
 "It shows default emulation settings when game is not loaded, or current game settings otherwise."
 msgstr ""
-"啟用\"仿真設置\"面板。於有經驗的用戶！\n"
-"它顯示了尚未加載遊戲的默認仿真設置，\n"
-"或當前遊戲設置。"
+"啟用\"模擬設置\"面板。給有經驗的用戶！\n"
+"它顯示了尚未加載遊戲的默認模擬設置，\n"
+"或目前的遊戲設置。"
 
 #: Config.cpp:515
 msgid ""
 "Enable \"Texture enhancement\" panel.\n"
 "It shows various enhancement options for original textures as well as options for hi-resolution textures."
 msgstr ""
-"啟用\"紋理增強\"面板。\n"
-"它顯示原來的紋理增強選項\n"
-"以及高清晰度的紋理選項。"
+"啟用\"材質增強\"面板。\n"
+"它顯示原來的材質增強選項\n"
+"以及高解析材質選項。"
 
 #: Config.cpp:516
 msgid ""
@@ -605,11 +605,11 @@ msgid ""
 "All the resolutions that your video card/monitor support should be displayed.\n"
 "[Recommended: native (max) resolution of your monitor - unless performance becomes an issue]"
 msgstr ""
-"全屏幕分辨率：\n"
+"全螢幕解析度：\n"
 "---------------\n"
-"這將設置非 3dfx卡的全屏幕分辨率。\n"
-"您的視頻卡與顯示器所支持的分辨率將會顯示。\n"
-"[推薦：顯示器的原始（最大）分辨率- 除非性能成為問題]"
+"這將設置非 3dfx卡的全螢幕解析度。\n"
+"您的顯示卡與顯示器所支援的解析度將會顯示。\n"
+"[推薦：顯示器的原始（最大）解析- 除非性能成為問題]"
 
 #: Config.cpp:519
 msgid ""
@@ -621,9 +621,9 @@ msgid ""
 msgstr ""
 "各向異性過濾：\n"
 "---------------\n"
-"該過濾器會銳化和帶出在遠方退去的紋理細節。\n"
-"啟用時，它將使用視頻卡所支持的最大各向異性。\n"
-"不過，這將覆蓋原始的紋理過濾方式，\n"
+"該過濾器會銳化和帶出在遠方退去的材質細節。\n"
+"啟用時，它將使用顯示卡所支援的最大各向異性。\n"
+"不過，這將覆蓋原始的材質過濾方式，\n"
 "並可能導致某些遊戲展示視覺干擾。\n"
 "[推薦：您的偏好，取決於遊戲]"
 
@@ -635,12 +635,12 @@ msgid ""
 "But if this appears wrong, please uncheck and set it to correct value.\n"
 "[Recommended: on]"
 msgstr ""
-"自動檢測顯存大小：\n"
+"自動檢測顯卡記憶體大小：\n"
 "-------------------\n"
-"由於 OpenGL不能可靠地做到，因此可以選擇手動設置。\n"
-"當選定，插件將嘗試自動檢測顯存的大小。\n"
-"如果出現錯誤，請取消選擇並將其設置為正確的值。\n"
-"[推薦：選]"
+"由於 OpenGL目前無法可靠地做到確實檢測，因此可以選擇手動設置。\n"
+"當選擇後，插件將嘗試自動檢測顯卡記憶體的大小。\n"
+"如果出現錯誤，請取消選擇並將其設置為正確數值。\n"
+"[推薦：選用]"
 
 #: Config.cpp:522
 msgid ""
@@ -654,21 +654,21 @@ msgid ""
 msgstr ""
 "使用幀緩衝對象：\n"
 "-----------------\n"
-"當選定，即使沒有使用OpenGL幀緩衝對象 (FBO)擴展，\n"
+"當選擇後，即使沒有使用OpenGL幀緩衝對象 (FBO)擴展，\n"
 "它仍然會改變幀緩衝效果的呈現方式。\n"
-"您的選擇取決於你的遊戲和視頻卡。對於NVIDIA視頻卡，\n"
+"您的選擇取決於你的遊戲和顯示卡。對於Nvidia顯示卡，\n"
 "不要選擇FBO而對於ATI視頻卡，FBO通常是一個很好的選擇。\n"
 "\n"
-"另外，一些幀緩衝效果只適用其中之一的方法，而不管視頻卡。\n"
-"整體而言，不選FBO將會增加遊戲兼容性與準確性，例如，\n"
+"另外，一些幀緩衝效果只適用其中之一的方法，而不管顯示卡。\n"
+"整體而言，不選FBO將會增加遊戲相容性與準確性，例如，\n"
 "Resident Evil 2。\n"
 "\n"
 "然而，在某些系統上，FBO的選擇會加速一些遊戲。\n"
-"[推薦：取決於視頻卡和遊戲]"
+"[推薦：取決於顯示卡和遊戲]"
 
 #: Config.cpp:577
 msgid "Emulation settings"
-msgstr "仿真設置"
+msgstr "模擬設置"
 
 #: Config.cpp:578
 msgid ""
@@ -683,8 +683,8 @@ msgstr ""
 "----------\n"
 "過濾方式有三種：\n"
 "*自動過濾\t: 與N64的過濾是相同的。\n"
-"*點採樣過濾\t: 使紋理元素出現正方形和尖銳。\n"
-"*雙線性過濾\t: 插值紋理，使其看起來更光滑。\n"
+"*點取樣過濾\t: 使材質元素出現正方形和尖銳。\n"
+"*雙線性過濾\t: 插補材質，使其看起來更光滑。\n"
 "[推薦：自動]"
 
 #: Config.cpp:582
@@ -726,14 +726,14 @@ msgid ""
 msgstr ""
 "每個像素詳細程度計算\n"
 "------------------------\n"
-"N64使用特殊的紋理映射,幾乎是不可能在電腦硬件\n"
-"上很正確地複制。此選項將啟用此功能近似仿真。\n"
+"N64使用特殊的材質映射,幾乎是不可能在電腦硬體\n"
+"上很正確地複製。此選項將啟用此功能近似模擬。\n"
 "例如，應用在\"Super Mario 64\"遊戲內的\n"
 "Peach與Bowser肖像的過渡。\n"
 "\n"
 "有3種模式：\n"
-"*關\t: 不進行LOD計算。\n"
-"*快\t: 快而不准的LOD計算。\n"
+"*關閉\t: 不進行LOD計算。\n"
+"*快速\t: 快而不準確的LOD計算。\n"
 "*準確\t: 最精確的LOD計算，但更慢。\n"
 "[推薦：您的偏好]"
 
@@ -745,12 +745,12 @@ msgid ""
 "In \"Stretch\" mode the output will be stretched to the entire screen,\n"
 "other modes may add black borders if necessary"
 msgstr ""
-"寬高比的輸出\n"
+"長寬比的輸出\n"
 "---------------\n"
-"大多數N64 的遊戲使用4:3的比例，但一些支持寬屏了。\n"
-"你可以在這裡選擇合適的比例，並在遊戲上設置寬屏模式。\n"
-"在\"伸展 \"模式下，輸出將被拉伸到整個屏幕，\n"
-"其它模式可能在必要時加黑色邊境。"
+"大多數N64 的遊戲使用4:3的比例，但有些支援寬螢幕了。\n"
+"你可以在這裡選擇合適的比例，並在遊戲上設置寬螢幕模式。\n"
+"在\"拉伸 \"模式下，輸出將被拉伸到整個螢幕，\n"
+"其它模式可能在必要時加黑色邊框。"
 
 #: Config.cpp:594
 msgid ""
@@ -758,10 +758,10 @@ msgid ""
 "Sets fog emulation on//off.\n"
 "[Recommended: on]"
 msgstr ""
-"啟用霧\n"
+"啟用霧化\n"
 "-------\n"
-"設置霧仿真的開與關\n"
-"[推薦：選]"
+"設置霧化模擬的開與關\n"
+"[推薦：選用]"
 
 #: Config.cpp:596
 msgid ""
@@ -775,12 +775,12 @@ msgid ""
 msgstr ""
 "清除每一幀緩衝\n"
 "-----------------\n"
-"強行在每一幀中的繪製，清除幀緩衝。\n"
+"強制在每一幀中的繪製，清除幀緩衝。\n"
 "通常幀緩衝是由遊戲控制的。\n"
-"但是，在某些情況下，沒有很好地模擬，\n"
-"有些圖形垃圾可能會殘留在屏幕上。\n"
+"但是，在某些情況下可能並沒有很好地模擬，\n"
+"有些圖形垃圾或許會殘留在螢幕上。\n"
 "在這種情況下，此選項必須設置。\n"
-"[推薦：選]"
+"[推薦：選用]"
 
 #: Config.cpp:598
 msgid ""
@@ -788,11 +788,11 @@ msgid ""
 "If on, plugin will try to detect frame buffer usage and apply appropriate frame buffer emulation.\n"
 "[Recommended: on for games which use frame buffer effects]"
 msgstr ""
-"啟用幀緩衝仿真\n"
+"啟用幀緩衝模擬\n"
 "-----------------\n"
-"當選定，插件將嘗試檢測幀緩衝區的\n"
-"使用情況而採用適當的幀緩衝仿真。\n"
-"[推薦：遊戲使用幀緩衝效果- 選]"
+"當選擇時，插件將嘗試檢測幀緩衝區的\n"
+"使用情況而採用適當的幀緩衝模擬。\n"
+"[推薦：遊戲使用幀緩衝效果- 選用]"
 
 #: Config.cpp:600
 msgid ""
@@ -803,23 +803,23 @@ msgid ""
 "Voodoo 4/5 cards and partially by Voodoo3 and Banshee. Modern cards also fully support it.\n"
 "[Recommended: on, if supported by your hardware]"
 msgstr ""
-"啟用硬件幀緩衝仿真\n"
+"啟用硬體幀緩衝模擬\n"
 "----------------------\n"
-"當選定，插件將在視頻內存中創建輔助的幀緩衝器，\n"
-"而不是複製到主存儲器。這允許插件運行幀緩衝效果\n"
-"而不放緩，並不縮放圖像到N64的原始分辨率。\n"
+"當選擇後，插件將在顯卡記憶體中創建輔助的幀緩衝器，\n"
+"而不是複製到主記憶體。這允許插件運行幀緩衝效果\n"
+"而不緩衝，並不縮放圖像到N64的原始解析率。\n"
 "\n"
-"此功能會完全支持Voodoo 4與5卡和部分Voodoo3\n"
-"和 Banshee。現代卡也完全支持。\n"
-"[推薦：硬件支持 - 選]"
+"此功能會完全支援Voodoo 4與5卡和部分Voodoo3\n"
+"和 Banshee。近期顯卡也完全支援。\n"
+"[推薦：硬體支援 - 選用]"
 
 #: Config.cpp:603
 msgid ""
 "Get information about frame buffers\n"
 "This is compatibility option. It must be set on for Mupen64 and off for 1964"
 msgstr ""
-"取幀緩衝器的有關信息\n"
-"這是兼容性選項。在Mupen64上，必須設置為開\n"
+"取得幀緩衝器的有關訊息\n"
+"這是相容性選項。在Mupen64上，必須設置為開\n"
 "而在1964必須設置為關"
 
 #: Config.cpp:605
@@ -834,7 +834,7 @@ msgstr ""
 "------------\n"
 "在一些遊戲上，插件無法檢測到幀緩衝區的使用。\n"
 "在這種情況下，您需要啟用該選項才能看到幀緩衝效果。\n"
-"每一個幀的繪製將從視頻卡讀取->這是非常的緩慢。\n"
+"每一個幀的繪製將從顯示卡讀取->這將是非常的緩慢。\n"
 "[推薦：大多不選（運用在少數遊戲上）]"
 
 #: Config.cpp:607
@@ -845,11 +845,11 @@ msgid ""
 "but may cause slowdowns and various glitches in some games.\n"
 "[Recommended: mostly off]"
 msgstr ""
-"呈現N64的幀緩衝為紋理\n"
+"呈現N64的幀緩衝到材質\n"
 "--------------------------\n"
-"當選定，每個 N64的幀緩衝的內容將由插件\n"
-"在幀上呈現為紋理。這可以防止圖形的流失，\n"
-"但可能會導致速度下降，和一些遊戲的各種故障。\n"
+"當選擇後，每個 N64的幀緩衝的內容將由插件\n"
+"在幀上呈現材質。這可以防止圖形的流失，\n"
+"但可能會導致速度下降，和一些遊戲的各種錯誤。\n"
 "[推薦：大多不選]"
 
 #: Config.cpp:609
@@ -881,10 +881,10 @@ msgid ""
 msgstr ""
 "啟用深度緩衝渲染\n"
 "-------------------\n"
-"此選項用於完全模仿N64的深度緩衝區。\n"
-"這是需要正確的仿真深度緩衝的效果。\n"
+"此選項用於完全模擬N64的深度緩衝區。\n"
+"這是需要正確的模擬深度緩衝的效果。\n"
 "但是，它需要快速（>1GHz）的CPU才能達到全速。\n"
-"[推薦：快速電腦 - 選]"
+"[推薦：快速電腦 - 選用]"
 
 #: Config.cpp:619
 msgid ""
@@ -896,12 +896,12 @@ msgid ""
 "Be aware that performance may have an impact depending on the game and/or the PC.\n"
 "[Recommended: your preference]"
 msgstr ""
-"過濾器：\n"
+"濾鏡：\n"
 "--------\n"
-"應用一個過濾器來平滑或銳化紋理。\n"
-"有4種不同的平滑過濾器和2個不同的銳化過濾器。\n"
+"應用一個濾鏡來平滑或銳化材質。\n"
+"有4種不同的平滑濾鏡和2個不同的銳化濾鏡。\n"
 "- 數字越高，效果越強。\n"
-"- 例如，平滑過濾器4將比1有更明顯的效果。\n"
+"- 例如，平滑濾鏡4將比1有更明顯的效果。\n"
 "\n"
 "注意:\t遊戲性能可能會受到影響，\n"
 "\t取決於遊戲與或電腦。\n"
@@ -918,13 +918,13 @@ msgid ""
 "\n"
 "[Recommended: your preference]"
 msgstr ""
-"紋理增強：\n"
+"材質增強：\n"
 "----------\n"
-"在這裡可選擇 7種不同的過濾器，每一個具有獨特的外觀。\n"
+"在這裡可選擇 7種不同的濾鏡，每一個具有獨特的外觀。\n"
 "注意:\t可能會有性能影響。\n"
 "\n"
-"要點:\t \"存儲\"模式- 儲存在緩存的紋理為\"原狀\"。\n"
-"\t它可以提高遊戲的性能，但載有很多紋理。\n"
+"要點:\t \"存儲\"模式- 儲存在快取的材質為\"原狀\"。\n"
+"\t它可以提高遊戲的性能，但載有很多材質。\n"
 "\t禁用\"忽略背景\"選項，讓效果更佳。\n"
 "[推薦：您的偏好]"
 
@@ -940,20 +940,20 @@ msgid ""
 "'0' disables cache.\n"
 "[Recommended: PC and game dependant]"
 msgstr ""
-"紋理緩存大小：\n"
+"材質快取大小：\n"
 "---------------\n"
-"加強和過濾的紋理可被緩存已助性能。\n"
-"此設置將調整多少電腦內存為紋理緩存專用。\n"
-"如果是相同的紋理（通常如此）有後續請求，\n"
-"這將有助於提高性能。一般情況下，\n"
-"128兆應該是綽綽有餘，但每個遊戲有其甜點。\n"
+"加強和過濾後的材質可被快取以輔助效能。\n"
+"此設置將調整多少電腦主記憶體為材質快取專用。\n"
+"如果是相同的材質（通常如此）有後續請求，\n"
+"這將有助於提高效能。一般情況下，\n"
+"128MB應該是綽綽有餘，但每個遊戲有其不同特點。\n"
 "\n"
-"\"Super Mario\"可能不需要比32 兆多，\n"
-"但\"Conker \"用很多紋理，因而用256兆+\n"
-"可提高性能。如果你遇到速度問題，\n"
-"可根據實際情況調整。\n"
+"\"Super Mario\"可能不需要比32 MB還多，\n"
+"但\"Conker \"使用很多材質，因而用256MB+\n"
+"可提高效能。如果你遇到速度問題，\n"
+"可依據實際情況調整。\n"
 "\n"
-"'0'禁用緩存。\n"
+"'0'禁用快取。\n"
 "[推薦：取決於電腦和遊戲]"
 
 #: Config.cpp:633
@@ -965,8 +965,8 @@ msgid ""
 msgstr ""
 "忽略背景：\n"
 "----------\n"
-"它是用來跳過增強狹長紋理（通常為背景用）。\n"
-"這可能會大大節省紋理內存和提高性能。\n"
+"它是用來跳過增強狹長材質（通常為背景用）。\n"
+"這可能會大大節省材質儲存記憶體和提高性能。\n"
 "[推薦：選（\" 存儲\"模式- 不選）]"
 
 #: Config.cpp:635
@@ -982,18 +982,18 @@ msgid ""
 "However, due to the nature of lossy compression of FXT1 and S3TC, using this option can sometimes lead to quality degradation of small size textures and color banding of gradient colored textures.\n"
 "[Recommended: off]"
 msgstr ""
-"紋理壓縮：\n"
+"材質壓縮：\n"
 "----------\n"
-"紋理的壓縮是依照選定紋理壓縮方法。\n"
+"材質的壓縮是依照所選的材質壓縮方法。\n"
 "整體壓縮比大約是 1/6於FXT1或1/4於S3TC.\n"
-"除了節省紋理緩存的空間，在顯卡硬件的紋理內存\n"
-"所佔領的增強紋理空間，將大大減少。\n"
-"這將最大限度地減少紋理內存的使用，\n"
-"降低紋理在顯卡硬件的交換數次，導致提高效能。\n"
+"除了節省材質快取的空間，在顯卡硬體的材質記憶體\n"
+"所佔領的增強材質空間，將大大減少。\n"
+"這將最大限度地減少材質記憶體的使用，\n"
+"降低材質在顯卡硬體的交換數次，導致提高效能。\n"
 "\n"
 "然而，由於 FXT1和S3TC有損壓縮的性質，\n"
-"使用此選項有時會導致體積小紋理的質量退化\n"
-"和漸變色的紋理出現色帶。\n"
+"使用此選項有時會導致小體積的材質出現質量退化\n"
+"和漸變色的材質出現色帶。\n"
 "[推薦：不選]"
 
 #: Config.cpp:639
@@ -1006,14 +1006,14 @@ msgid ""
 "This option will still help save memory space even when using texture compression.\n"
 "[Recommended: on]"
 msgstr ""
-"壓縮紋理緩存：\n"
+"壓縮材質快取：\n"
 "---------------\n"
-"內存將被壓縮，使更多的紋理可以存儲在紋理緩存。\n"
-"壓縮比率會因紋理而各有不同，但1/5的原來大小\n"
-"將是一個溫和的逼近。\n"
-"他們將立即被解壓縮，然後被下載到顯卡硬件。\n"
-"即使使用紋理壓縮，此選項仍會節省內存空間。\n"
-"[推薦：選]"
+"主記憶體將被壓縮，使更多的材質可以存儲在材質快取。\n"
+"壓縮比率會因材質而各有不同，大約1/5的原始大小\n"
+"是個較普遍的壓縮效率。\n"
+"他們將立即被解壓縮，然後被下載到顯卡硬體。\n"
+"即使使用材質壓縮，此選項仍會節省主記憶體空間。\n"
+"[推薦：選用]"
 
 #: Config.cpp:641
 msgid ""
@@ -1023,11 +1023,11 @@ msgid ""
 "Leave on \"None\" if you will not be needing to load hi-res packs.\n"
 "[Recommended: Rice's format. Default: \"None\"]"
 msgstr ""
-"高清晰度包格式：\n"
+"高解析材質包格式：\n"
 "------------------\n"
-"選擇哪種方法來加載高分辨率紋理包。\n"
+"選擇哪種方法來加載高解析材質包。\n"
 "目前只能用 Rice's 格式。\n"
-"如果你不需要加載高清晰度包，請選擇\"無\"。\n"
+"如果你不需要加載高解析材質包，請選擇\"無\"。\n"
 "[推薦：Rice's 格式。默認：無]"
 
 #: Config.cpp:645
@@ -1039,10 +1039,10 @@ msgid ""
 "- various issues are possible, including black lines and polygons distortions.\n"
 "[Recommended: off]"
 msgstr ""
-"圖磚紋理：\n"
+"圖磚材質：\n"
 "----------\n"
-"當選定，寬紋理將被分割在幾個瓦片，以適應一個256寬的紋理。\n"
-"這平鋪紋理花費更少的視頻內存空間，因此整體性能會有所增加。\n"
+"當選擇後，寬材質將被分割在幾個瓦片，以適應一個256寬的材質。\n"
+"這平鋪材質花費更少的顯卡記憶體空間，因此整體性能會有所增加。\n"
 "但是，必須相應的多邊形也需要分割，卻尚未完全開發出來。\n"
 "- 各種問題都有可能的，包括黑線和多邊形的扭曲。\n"
 "[推薦：不選]"
@@ -1058,15 +1058,15 @@ msgid ""
 "Sometimes though, it can be: skies are a good example.\n"
 "[Recommended: off]"
 msgstr ""
-"強行支持16位紋理：\n"
+"強制啟用16位元材質：\n"
 "--------------------\n"
-"該紋理色彩將減少為16位。\n"
-"這是另一種節省空間和性能增強。\n"
-"這將節省一半的紋理緩存和\n"
-"顯卡硬件的紋理內存使用的空間。\n"
+"該材質色彩將減少為16位元。\n"
+"這是另一種節省空間和性能增強的方式。\n"
+"將節省一半的材質快取和\n"
+"顯卡硬體存放材質的記憶體使用空間。\n"
 "\n"
-"色彩還原將盡可能保留其原來的顏色。\n"
-"根據不同的紋理，這通常是難以察覺的。\n"
+"色彩還原將盡可能的保留其原來顏色。\n"
+"根據不同的材質，這通常是難以察覺的。\n"
 "但，並非不可能：天空是一個很好的例子。\n"
 "[推薦：不選]"
 
@@ -1078,13 +1078,13 @@ msgid ""
 "\n"
 "Hotkeys: \"R\" reloads hires textures from the texture pack - \"D\" toggles texture dumps on/off."
 msgstr ""
-"紋理轉儲方式：\n"
+"材質轉儲方式：\n"
 "---------------\n"
-"在這模式下，你可將屏幕上的紋理轉儲到適當的文件夾。\n"
-"您也可以在遊戲運行時重新載入紋理，而馬上看到結果\n"
+"在這模式下，你可將螢幕上的材質轉儲到適當的資料夾。\n"
+"您也可以在遊戲運行時重新載入材質，而馬上看到結果\n"
 "- 大大節省時間！\n"
-"熱鍵：\tR - 重載高分辨率紋理的紋理包\n"
-"\tD - 將切換紋理轉儲開與關"
+"熱鍵：\tR - 重新載入高解析材質包\n"
+"\tD - 將切換材質轉儲開與關"
 
 #: Config.cpp:651
 msgid ""
@@ -1095,9 +1095,9 @@ msgid ""
 msgstr ""
 "另一種CRC 計算：\n"
 "-----------------\n"
-"此選項可以仿真RiceVideo在調色板上的CRC計算錯誤。\n"
-"如果某些紋理不能加載，請嘗試設置此選項開與關。\n"
-"[推薦：取決於紋理包，大多選]"
+"此選項可以模擬RiceVideo在調色板上的CRC計算錯誤。\n"
+"如果某些材質不能加載，請嘗試設置此選項開與關。\n"
+"[推薦：取決於材質包，大多選用]"
 
 #: Config.cpp:656
 msgid ""
@@ -1109,16 +1109,16 @@ msgid ""
 "This option will still help save memory space even when using texture compression.\n"
 "[Recommended: on]"
 msgstr ""
-"壓縮紋理緩存：\n"
+"壓縮材質快取：\n"
 "---------------\n"
-"當遊戲開始，插件加載所有\n"
-"的高清晰度紋理在電腦內存。\n"
-"由於高清晰度的紋理通常很大，\n"
-"整個包可以利用數百兆的內存。\n"
-"緩存壓縮可以大大節省存儲空間。\n"
-"紋理將立即被解壓縮，然後下載到顯卡硬件。\n"
-"即使使用紋理壓縮，此選項仍會節省內存空間。\n"
-"[推薦：選]"
+"當遊戲開始後，插件將加載所有\n"
+"的高解析材質在電腦主記憶體。\n"
+"由於高解析材質通常很大，\n"
+"整個材質包可以利用幾百MB的主記憶體。\n"
+"快取壓縮可以大大節省存儲空間。\n"
+"材質將立即被解壓縮，然後下載到顯卡硬體。\n"
+"即使使用材質壓縮，此選項仍會節省主記憶體空間。\n"
+"[推薦：選用]"
 
 #: Config.cpp:658
 msgid ""
@@ -1135,13 +1135,13 @@ msgstr ""
 "充分利用透明通道：\n"
 "--------------------\n"
 "如不選此選項，使用RiceVideo風格會加載\n"
-"16位RGBA紋理與1位透明通道。\n"
-"當選定，GlideHQ將檢查高清晰度的紋理如何\n"
+"16位元RGBA材質與1位元透明通道。\n"
+"當選擇後，GlideHQ將檢查高解析材質如何\n"
 "使用透明通道，並選擇最適當的格式。\n"
-"它讓設計者自由發揮紋理透明的使用，\n"
-"不論其原來的 N64的紋理格式。\n"
-"對於舊或設計不良的紋理包，可能會出現不必要的黑邊。\n"
-"[推薦：取決於紋理包]"
+"它讓設計者自由發揮材質透明的使用，\n"
+"不論其原來的 N64的材質格式。\n"
+"對於老舊或設計不良的材質包，可能會出現不必要的黑邊。\n"
+"[推薦：取決於材質包]"
 
 #: Config.cpp:661
 msgid ""
@@ -1160,26 +1160,26 @@ msgid ""
 "\n"
 "[Highly Recommended: on]"
 msgstr ""
-"保存紋理緩到硬盤：\n"
+"保存材質快取到硬碟：\n"
 "--------------------\n"
-"增強紋理緩存：\n"
+"增強材質快取：\n"
 "---------------\n"
-"這將保存所有之前加載和增強紋理到硬盤。\n"
-"下一次遊戲開始後，所有的紋理將即刻加載，\n"
+"這將保存所有之前加載和增強材質到硬碟。\n"
+"下一次遊戲開始後，所有的材質將即刻加載，\n"
 "導致更順暢的性能。\n"
 "\n"
-"高分辨率的紋理緩存：\n"
+"高解析材質快取：\n"
 "----------------------\n"
-"創建後，當遊戲啟動時，加載高清晰度的紋理只需幾秒鐘。\n"
-"如果沒有這個緩存文件，載入紋理包需要5-60秒。\n"
-"唯一的缺點是在更改紋理包時，緩存文件將需要手動刪除。\n"
+"在創建後，當遊戲啟動時，加載高解析材質只需幾秒鐘。\n"
+"如果沒有這個快取檔案，載入材質包可能需要5-60秒。\n"
+"唯一的缺點是在更改材質包時，快取檔案將需要手動刪除。\n"
 "\n"
-"保存的緩存文將被保存到Plugins文件夾內的Cache文件夾。\n"
-"[強烈推薦：選]"
+"儲存的快取檔案將被儲存到Plugins資料夾內的Cache資料夾。\n"
+"[強烈推薦：選用]"
 
 #: Config.cpp:684
 msgid "Debug"
-msgstr "調試"
+msgstr "偵錯"
 
 #: Config.cpp:685
 msgid ""
@@ -1191,9 +1191,9 @@ msgid ""
 "[Recommended: on]"
 msgstr ""
 "自動檢測微碼\n"
-"當選定，遊戲的微碼會自動從INI檢測到。\n"
-"因此它不需要在此配置對話框中設置。\n"
-"[推薦：選]"
+"當選擇後，遊戲的微碼會自動從INI檢測到。\n"
+"因此它不需要在此設置視窗中設置。\n"
+"[推薦：選用]"
 
 #: Config.cpp:687
 msgid ""
@@ -1205,7 +1205,7 @@ msgid ""
 "select the microcode to use\n"
 "[Recommended: any, turn on Autodetect Microcode]"
 msgstr ""
-"強行支持微碼\n"
+"強制啟用微碼\n"
 "此選項是在以下情況才有效:\n"
 "1. 如果沒選定自動檢測微碼，\n"
 "2. 遊戲的CRC在INI找不到，或\n"
@@ -1222,7 +1222,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 "線框\n"
-"當選定，插件會畫出對象的輪廓。\n"
+"當選擇後，插件會畫出對象的輪廓。\n"
 "在組合框中指定的顏色，將決定線框顏色的顯示。\n"
 "[推薦：不選]"
 
@@ -1239,9 +1239,9 @@ msgstr ""
 "線框顏色\n"
 "這將選擇用於線框的顏色（如線框模式已啟用）。\n"
 "有3種模式：\n"
-"*原始顏色\t: 紋理和所有，是與原來相同的顏色來繪製線框。\n"
+"*原始顏色\t: 材質和所有，是與原來相同的顏色來繪製線框。\n"
 "*頂點顏色\t: 使用指定的頂點來繪製線框的顏色。\n"
-"*僅紅\t: 利用固定的紅色來繪製線框。\n"
+"*僅紅色\t: 利用固定的紅色來繪製線框。\n"
 "[推薦：頂點顏色]"
 
 #: Config.cpp:695
@@ -1253,8 +1253,8 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 "登錄到RDP.txt\n"
-"推薦僅調試- 當選定，將記錄該插件程序的\n"
-"每一個命令到當前目錄的RDP.txt。\n"
+"推薦僅用於偵錯- 當選擇後，將記錄該插件程序的\n"
+"每一個命令到目前目錄的RDP.txt。\n"
 "這是令人難以置信的慢，所以我建議保持禁用。\n"
 "[推薦：不選]"
 
@@ -1266,9 +1266,9 @@ msgid ""
 "and at least have a guess at the correct combine mode.\n"
 "[Recommended: off]"
 msgstr ""
-"未知合成器為紅色\n"
+"未知的合成器為紅色\n"
 "如果對象使用一個未知的合成模式，它會顯示為紅色而不是\n"
-"假設紋理具有完全透明的功能。禁用此選項，刪除紅色的東西，\n"
+"假設材質具有完全透明的功能。禁用此選項，刪除紅色的東西，\n"
 "並至少能對正確的合成模式作出猜測。\n"
 "[推薦：不選]"
 
@@ -1281,7 +1281,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 "在每一幀清除記錄\n"
-"推薦僅調試- 這個選項沒有任何作用，除非選擇\"記錄到RDP.txt\"。\n"
+"推薦僅用於偵錯- 這個選項沒有任何作用，除非選擇\"記錄到RDP.txt\"。\n"
 "這將讓這個記錄RDP.txt，在每一幀的開始清除。\n"
 "[推薦：不選]"
 
@@ -1295,9 +1295,9 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 "登錄不明合成器\n"
-"推薦僅調試- 當選定，這個選項將導致所有未執行\n"
+"推薦僅用於偵錯- 當選擇後，這個選項將導致所有未執行\n"
 "的繪製合成器被記錄到Unimp.txt的文件。\n"
-"如果有未執行的合成器在屏幕上，它會變得緩慢，\n"
+"如果有未執行的合成器在螢幕上，它會變得緩慢，\n"
 "所以我建議保持禁用。\n"
 "[推薦：不選]"
 
@@ -1309,9 +1309,9 @@ msgid ""
 "in fullscreen, possibly allowing you to debug a crash.\n"
 "[Recommended: off]"
 msgstr ""
-"運行並登錄窗口\n"
-"推薦僅調試- 這個選項將讓插件仍然會在窗口模式處理dlists。\n"
-"雖然不是在全屏，但仍允許記錄，可能讓你調試崩潰的原因。\n"
+"運行並紀錄於視窗\n"
+"推薦僅用於偵錯- 這個選項將讓插件仍然會在視窗模式處理dlists。\n"
+"雖然不是在全螢幕，但仍允許記錄，可以讓你測試崩潰的原因。\n"
 "[推薦：不選]"
 
 #: Config.cpp:705
@@ -1323,7 +1323,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 "在每一幀清除未知合成器記錄\n"
-"推薦僅調試- 這個選項很像\"在每一幀清除記錄\"，\n"
+"推薦僅用於偵錯- 這個選項很像\"在每一幀清除記錄\"，\n"
 "除了它在每一幀的開始清除合成器記錄（Unimp.txt），\n"
 "而不是RDP.txt。\n"
 "如果\"合成器記錄\"被禁用，這個選項不會起作用。\n"
@@ -1338,11 +1338,11 @@ msgid ""
 "point-sampled filtering.\n"
 "[Recommended: off]"
 msgstr ""
-"雙線性過濾紋理緩存\n"
+"雙線性過濾材質快取\n"
 "---------------------\n"
-"推薦僅調試- 當選定，此選項將使圖形調試器的紋理緩存\n"
-"使用雙線性過濾紋理緩存，而不是點採樣過濾。\n"
-"閱讀\"過濾模式\"對雙線性和點採樣過濾的描述。\n"
+"推薦僅用於偵錯- 當選擇後，此選項將使圖形偵錯器的材質快取\n"
+"使用雙線性過濾材質快取，而不是點取樣過濾。\n"
+"閱讀\"過濾模式\"對雙線性和點取樣樣過濾的描述。\n"
 "[推薦：不選]"
 
 #: Config.cpp:1100
