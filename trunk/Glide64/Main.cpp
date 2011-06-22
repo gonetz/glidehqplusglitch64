@@ -2270,7 +2270,7 @@ void newSwapBuffers()
 
     if (fullscreen)
     {
-      if  (debugging || settings.wireframe || settings.buff_clear)
+      if  (debugging || settings.wireframe || settings.buff_clear || (settings.hacks&hack_PPL && settings.ucode == 6))
       {
         if (settings.hacks&hack_RE2 && fb_depth_render_enabled)
           grDepthMask (FXFALSE);
