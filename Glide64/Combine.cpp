@@ -822,6 +822,7 @@ COMBINE cmb;
 #define SETSHADE_A(color) XSHADE_A(color, CMB_A_SET)
 #define SETSHADE_A_PRIM() SETSHADE_A(rdp.prim_color)
 #define SETSHADE_A_ENV() SETSHADE_A(rdp.env_color)
+#define SETSHADE_A_PRIMSUBENV() XSHADEC1MC2_A(rdp.prim_color, rdp.env_color, CMB_A_SET)
 #define SETSHADE_A_INVENV() XSHADE1M_A(rdp.env_color, CMB_A_SET)
 
 #define XSHADEADD_A(color, flag) { \
@@ -1099,6 +1100,20 @@ static void cc__t1_inter_t0_using_enva__mul_prim ()
   CC_PRIM ();
   wxUint8 factor = (wxUint8)(rdp.env_color&0xFF);
   T1_INTER_T0_USING_FACTOR (factor);
+}
+
+static void cc__t0_inter_one_using_t1__mul_prim ()
+{
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_LOCAL,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_TEXTURE);
+  CC_PRIM ();
+  rdp.best_tex = 0;
+  cmb.tex |= 3;
+  cmb.tmu1_func = GR_COMBINE_FUNCTION_LOCAL;
+  cmb.tmu0_func = GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL;
+  cmb.tmu0_fac = GR_COMBINE_FACTOR_ONE_MINUS_LOCAL;
 }
 
 static void cc__t0_inter_one_using_primlod__mul_prim ()
@@ -5633,6 +5648,21 @@ static void cc_env_sub_t0_mul_prim_add_t0 ()  //Aded by Gonetz
   SETSHADE_ENV ();
   USE_T0 ();
   //(env-t0)*prim+t0 == prim*env + t0*(1-prim)
+}
+
+static void cc_env_sub_t0_mul_shade_add_t0 ()  //Aded by Gonetz
+{
+  if (!cmb.combine_ext)
+  {
+    cc_t0_mul_shade ();
+    return;
+  }
+  CCMBEXT(GR_CMBX_CONSTANT_COLOR, GR_FUNC_MODE_X,
+    GR_CMBX_TEXTURE_RGB, GR_FUNC_MODE_NEGATIVE_X,
+    GR_CMBX_ITRGB, 0,
+    GR_CMBX_B, 0);
+  CC_ENV ();
+  USE_T0 ();
 }
 
 static void cc_prim_sub_env_mul_t0_add_prim ()
@@ -10834,6 +10864,17 @@ static void ac_prim_sub_env_mul_t1_add_env ()
   A_USE_T1 ();
 }
 
+static void ac_prim_sub_env_mul_t0_add_one ()
+{
+  ACMB (GR_COMBINE_FUNCTION_SCALE_OTHER_ADD_LOCAL,
+    GR_COMBINE_FACTOR_TEXTURE_ALPHA,
+    GR_COMBINE_LOCAL_CONSTANT,
+    GR_COMBINE_OTHER_ITERATED);
+  CA (0xFF);
+  SETSHADE_A_PRIMSUBENV ();
+  A_USE_T0 ();
+}
+
 //Added by Gonetz
 static void ac_prim_sub_env_mul_shade_add_env ()
 {
@@ -11603,6 +11644,9 @@ static COMBINER color_cmb_list[] = {
   // pokemon fainted, Pokemon Stadium 2
   // (prim-t0)*t1+t0
   {0x22132213, cc_prim_sub_t0_mul_t1_add_t0},
+  // attack, Ogre Battle 64
+  // (1-t0)*t1+t0, (cmb-0)*prim+0
+  {0x2216e3f0, cc__t0_inter_one_using_t1__mul_prim},
   // Some gannon spell, zelda
   // (t1-0)*t1+t0, (prim-0)*cmb+0
   {0x22f2e0f3, cc__t1_mul_t1_add_t0__mul_prim},
@@ -12176,6 +12220,9 @@ static COMBINER color_cmb_list[] = {
   // intro of WWF WrestleMania 2000
   // ((0-0)*0+t0, (env-cmb)*prim+cmb
   {0x3fff0305, cc_env_sub_t0_mul_prim_add_t0},
+  // pistol fire, Turok
+  // ((0-0)*0+t0, (env-cmb)*shade+cmb
+  {0x3fff0405, cc_env_sub_t0_mul_shade_add_t0},
   // Tony Hawk's Pro Skater. Added by Gonetz
   // ((0-0)*0+t0, (t1-0)*shade+cmb ** INC **
   {0x3fff04f2, cc_t0},
@@ -14881,6 +14928,9 @@ static COMBINER alpha_cmb_list[] = {
   // Rocket Robot in Wheels intro
   // (0-0)*0+env, (cmb-0)*prim+0
   {0x0bff0ef8, ac_prim_mul_env},
+  // Background, Pokemon Snap   
+  // (prim-env)*t0+1
+  {0x0c6b0c6b, ac_prim_sub_env_mul_t0_add_one},
   // Tony Hawk's Pro Skater. Added by Gonetz
   // (1-t0)*t1+1, (cmb-t1)*t1+t1  ** INC **
   {0x0c770c77, ac_t0_mul_t1},
