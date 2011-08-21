@@ -12751,6 +12751,9 @@ static COMBINER color_cmb_list[] = {
   // sky, PGA European Tour
   // (0-0)*0+prim, (env-0)*t0+cmb
   {0x7fff01f5, cc_t1_mul_env_add_prim},
+  // WWF No Mercy?
+  // ((0-0)*0+prim, (env-cmb)*shade+cmb
+  {0x7fff0405, cc_env_sub_prim_mul_shade_add_prim},
   // sky, Spiderman. Added by Gonetz
   // (0-0)*0+prim, (t1-0)*shade+cmb
   {0x7fff04f2, cc_t1_mul_shade_add_prim},
