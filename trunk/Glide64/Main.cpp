@@ -298,21 +298,21 @@ void ChangeSize ()
   switch (settings.aspectmode)
   {
   case 0: //4:3
-    if (settings.scr_res_x >= settings.scr_res_y * 1.333333f) {
+    if (settings.scr_res_x >= settings.scr_res_y * 4.0f / 3.0f) {
       settings.res_y = settings.scr_res_y;
-      settings.res_x = (wxUint32)(settings.res_y * 1.333334f);
+      settings.res_x = (wxUint32)(settings.res_y * 4.0f / 3.0f);
     } else {
       settings.res_x = settings.scr_res_x;
-      settings.res_y = (wxUint32)(settings.res_x / 1.333334f);
+      settings.res_y = (wxUint32)(settings.res_x / 4.0f * 3.0f);
     }
     break;
   case 1: //16:9
-    if (settings.scr_res_x >= settings.scr_res_y * 1.777777f) {
+    if (settings.scr_res_x >= settings.scr_res_y * 16.0f / 9.0f) {
       settings.res_y = settings.scr_res_y;
-      settings.res_x = (wxUint32)(settings.res_y * 1.777778f);
+      settings.res_x = (wxUint32)(settings.res_y * 16.0f / 9.0f);
     } else {
       settings.res_x = settings.scr_res_x;
-      settings.res_y = (wxUint32)(settings.res_x / 1.777778f);
+      settings.res_y = (wxUint32)(settings.res_x / 16.0f * 9.0f);
     }
     break;
   default: //stretch
@@ -1704,7 +1704,7 @@ output:   none
 void CALL RomOpen (void)
 {
   LOG ("RomOpen ()\n");
-  no_dlist = TRUE;
+  no_dlist = true;
   romopen = TRUE;
   ucode_error_report = TRUE;	// allowed to report ucode errors
   rdp_reset ();
@@ -1784,17 +1784,17 @@ them again.
 input:    none
 output:   none
 *******************************************************************/
-int no_dlist = TRUE;
+bool no_dlist = true;
 void CALL ShowCFB (void)
 {
-  no_dlist = TRUE;
+  no_dlist = true;
   LOG ("ShowCFB ()\n");
 }
 
 void drawViRegBG()
 {
   LRDP("drawViRegBG\n");
-  wxUint32 VIwidth = *gfx.VI_WIDTH_REG;
+  const wxUint32 VIwidth = *gfx.VI_WIDTH_REG;
   FB_TO_SCREEN_INFO fb_info;
   fb_info.width  = VIwidth;
   fb_info.height = (wxUint32)rdp.vi_height;
@@ -1873,10 +1873,10 @@ void CALL UpdateScreen (void)
     LOG ("KEY!!!\n");
   }
 #endif
-  char out_buf[512];
-  sprintf (out_buf, "UpdateScreen (). distance: %d\n", (int)(*gfx.VI_ORIGIN_REG) - (int)((*gfx.VI_WIDTH_REG) << 2));
+  char out_buf[128];
+  sprintf (out_buf, "UpdateScreen (). Origin: %08lx, Old origin: %08lx, width: %d\n", *gfx.VI_ORIGIN_REG, rdp.vi_org_reg, *gfx.VI_WIDTH_REG);
   LOG (out_buf);
-  //  LOG ("UpdateScreen ()\n");
+  LRDP(out_buf);
 
   wxUint32 width = (*gfx.VI_WIDTH_REG) << 1;
   if (fullscreen && (*gfx.VI_ORIGIN_REG  > width))
@@ -1907,7 +1907,7 @@ void CALL UpdateScreen (void)
   {
     LRDP("DirectCPUWrite hack!\n");
     update_screen_count = 0;
-    no_dlist = TRUE;
+    no_dlist = true;
     ClearCache ();
     UpdateScreen();
     return;
@@ -1974,356 +1974,358 @@ static void GetGammaTable()
 wxUint32 curframe = 0;
 void newSwapBuffers()
 {
-  if (rdp.updatescreen)
+  if (!rdp.updatescreen)
+    return;
+
+  rdp.updatescreen = 0;
+
+  LRDP("swapped\n");
+
+  // Allow access to the whole screen
+  if (fullscreen)
   {
-    rdp.updatescreen = 0;
+    rdp.update |= UPDATE_SCISSOR | UPDATE_COMBINE | UPDATE_ZBUF_ENABLED | UPDATE_CULL_MODE;
+    grClipWindow (0, 0, settings.scr_res_x, settings.scr_res_y);
+    grDepthBufferFunction (GR_CMP_ALWAYS);
+    grDepthMask (FXFALSE);
+    grCullMode (GR_CULL_DISABLE);
 
-    LRDP("swapped\n");
-
-    // Allow access to the whole screen
-    if (fullscreen)
-    {
-      rdp.update |= UPDATE_SCISSOR | UPDATE_COMBINE | UPDATE_ZBUF_ENABLED | UPDATE_CULL_MODE;
-      grClipWindow (0, 0, settings.scr_res_x, settings.scr_res_y);
-      grDepthBufferFunction (GR_CMP_ALWAYS);
-      grDepthMask (FXFALSE);
-      grCullMode (GR_CULL_DISABLE);
-
-      if ((settings.show_fps & 0xF) || settings.clock)
-        set_message_combiner ();
+    if ((settings.show_fps & 0xF) || settings.clock)
+      set_message_combiner ();
 #ifdef FPS
-      float y = 0;//(float)settings.res_y;
-      if (settings.show_fps & 0x0F)
+    float y = 0;//(float)settings.res_y;
+    if (settings.show_fps & 0x0F)
+    {
+      if (settings.show_fps & 4)
       {
-        if (settings.show_fps & 4)
-        {
-          if (region)   // PAL
-            output (0, y, 1, "%d%% ", (int)pal_percent);
-          else
-            output (0, y, 1, "%d%% ", (int)ntsc_percent);
-          y += 16;
-        }
-        if (settings.show_fps & 2)
-        {
-          output (0, y, 1, "VI/s: %.02f ", vi);
-          y += 16;
-        }
-        if (settings.show_fps & 1)
-          output (0, y, 1, "FPS: %.02f ", fps);
+        if (region)   // PAL
+          output (0, y, 1, "%d%% ", (int)pal_percent);
+        else
+          output (0, y, 1, "%d%% ", (int)ntsc_percent);
+        y += 16;
       }
+      if (settings.show_fps & 2)
+      {
+        output (0, y, 1, "VI/s: %.02f ", vi);
+        y += 16;
+      }
+      if (settings.show_fps & 1)
+        output (0, y, 1, "FPS: %.02f ", fps);
+    }
 #endif
 
-      if (settings.clock)
+    if (settings.clock)
+    {
+      if (settings.clock_24_hr)
       {
-        if (settings.clock_24_hr)
-        {
-          output (956.0f, 0, 1, (char*)wxDateTime::Now().Format(wxT("%H:%M:%S")).char_str(), 0);
-        }
-        else
-        {
-          output (930.0f, 0, 1, (char*)wxDateTime::Now().Format(wxT("%I:%M:%S %p")).char_str(), 0);
-        }
+        output (956.0f, 0, 1, (char*)wxDateTime::Now().Format(wxT("%H:%M:%S")).char_str(), 0);
       }
-      //hotkeys
-      if (CheckKeyPressed(G64_VK_BACK, 0x0001))
+      else
       {
-        hotkey_info.hk_filtering = 100;
-        if (settings.filtering < 2)
-          settings.filtering++;
-        else
-          settings.filtering = 0;
-      }
-      if ((abs((int)(frame_count - curframe)) > 3 ) && CheckKeyPressed(G64_VK_ALT, 0x8000))  //alt +
-      {
-        if (CheckKeyPressed(G64_VK_B, 0x8000))  //b
-        {
-          hotkey_info.hk_motionblur = 100;
-          hotkey_info.hk_ref = 0;
-          curframe = frame_count;
-          settings.frame_buffer ^= fb_motionblur;
-        }
-        else if (CheckKeyPressed(G64_VK_V, 0x8000))  //v
-        {
-          hotkey_info.hk_ref = 100;
-          hotkey_info.hk_motionblur = 0;
-          curframe = frame_count;
-          settings.frame_buffer ^= fb_ref;
-        }
-      }
-      if (settings.buff_clear && (hotkey_info.hk_ref || hotkey_info.hk_motionblur || hotkey_info.hk_filtering))
-      {
-        set_message_combiner ();
-        char buf[256];
-        buf[0] = 0;
-        char * message = 0;
-        if (hotkey_info.hk_ref)
-        {
-          if (settings.frame_buffer & fb_ref)
-            message = strcat(buf, "FB READ ALWAYS: ON");
-          else
-            message = strcat(buf, "FB READ ALWAYS: OFF");
-          hotkey_info.hk_ref--;
-        }
-        if (hotkey_info.hk_motionblur)
-        {
-          if (settings.frame_buffer & fb_motionblur)
-            message = strcat(buf, "  MOTION BLUR: ON");
-          else
-            message = strcat(buf, "  MOTION BLUR: OFF");
-          hotkey_info.hk_motionblur--;
-        }
-        if (hotkey_info.hk_filtering)
-        {
-          switch (settings.filtering)
-          {
-          case 0:
-            message = strcat(buf, "  FILTERING MODE: AUTOMATIC");
-            break;
-          case 1:
-            message = strcat(buf, "  FILTERING MODE: FORCE BILINEAR");
-            break;
-          case 2:
-            message = strcat(buf, "  FILTERING MODE: FORCE POINT-SAMPLED");
-            break;
-          }
-          hotkey_info.hk_filtering--;
-        }
-        output (120.0f, 0.0f, 1, message, 0);
+        output (930.0f, 0, 1, (char*)wxDateTime::Now().Format(wxT("%I:%M:%S %p")).char_str(), 0);
       }
     }
-
-    if (capture_screen)
+    //hotkeys
+    if (CheckKeyPressed(G64_VK_BACK, 0x0001))
     {
-      //char path[256];
-      // Make the directory if it doesn't exist
-      if (!wxDirExists(capture_path))
-        wxMkdir(capture_path);
-      wxString path;
-      wxString romName = rdp.RomName;
-      romName.Replace(wxT(" "), wxT("_"), true);
-      romName.Replace(wxT(":"), wxT(";"), true);
-
-      for (int i=1; ; i++)
+      hotkey_info.hk_filtering = 100;
+      if (settings.filtering < 2)
+        settings.filtering++;
+      else
+        settings.filtering = 0;
+    }
+    if ((abs((int)(frame_count - curframe)) > 3 ) && CheckKeyPressed(G64_VK_ALT, 0x8000))  //alt +
+    {
+      if (CheckKeyPressed(G64_VK_B, 0x8000))  //b
       {
-        path = capture_path;
-        path += wxT("Glide64_");
-        path += romName;
-        path += wxT("_");
-        if (i < 10)
-          path += wxT("0");
-        path << i << wxT(".") << ScreenShotFormats[settings.ssformat].extension;
-        if (!wxFileName::FileExists(path))
+        hotkey_info.hk_motionblur = 100;
+        hotkey_info.hk_ref = 0;
+        curframe = frame_count;
+        settings.frame_buffer ^= fb_motionblur;
+      }
+      else if (CheckKeyPressed(G64_VK_V, 0x8000))  //v
+      {
+        hotkey_info.hk_ref = 100;
+        hotkey_info.hk_motionblur = 0;
+        curframe = frame_count;
+        settings.frame_buffer ^= fb_ref;
+      }
+    }
+    if (settings.buff_clear && (hotkey_info.hk_ref || hotkey_info.hk_motionblur || hotkey_info.hk_filtering))
+    {
+      set_message_combiner ();
+      char buf[256];
+      buf[0] = 0;
+      char * message = 0;
+      if (hotkey_info.hk_ref)
+      {
+        if (settings.frame_buffer & fb_ref)
+          message = strcat(buf, "FB READ ALWAYS: ON");
+        else
+          message = strcat(buf, "FB READ ALWAYS: OFF");
+        hotkey_info.hk_ref--;
+      }
+      if (hotkey_info.hk_motionblur)
+      {
+        if (settings.frame_buffer & fb_motionblur)
+          message = strcat(buf, "  MOTION BLUR: ON");
+        else
+          message = strcat(buf, "  MOTION BLUR: OFF");
+        hotkey_info.hk_motionblur--;
+      }
+      if (hotkey_info.hk_filtering)
+      {
+        switch (settings.filtering)
+        {
+        case 0:
+          message = strcat(buf, "  FILTERING MODE: AUTOMATIC");
           break;
-      }
-
-      wxUint32 offset_x = (wxUint32)rdp.offset_x;
-      wxUint32 offset_y = (wxUint32)rdp.offset_y;
-      wxUint32 image_width = settings.res_x - offset_x;
-      wxUint32 image_height = settings.res_y - offset_y;
-
-      GrLfbInfo_t info;
-      info.size = sizeof(GrLfbInfo_t);
-      if (grLfbLock (GR_LFB_READ_ONLY,
-        GR_BUFFER_BACKBUFFER,
-        GR_LFBWRITEMODE_565,
-        GR_ORIGIN_UPPER_LEFT,
-        FXFALSE,
-        &info))
-      {
-        wxUint8 *ssimg = (wxUint8*)malloc(image_width * image_height * 3);
-        int sspos = 0;
-        wxUint32 offset_src=0;
-
-        // Copy the screen
-        if (info.writeMode == GR_LFBWRITEMODE_8888)
-        {
-          wxUint32 col;
-          for (wxUint32 y=offset_y; y<settings.res_y; y++)
-          {
-            wxUint32 *ptr = (wxUint32*)((wxUint8*)info.lfbPtr + offset_src);
-            ptr+=offset_x;
-            for (wxUint32 x=offset_x; x<settings.res_x; x++)
-            {
-              col = *(ptr++);
-              ssimg[sspos++] = (wxUint8)((col >> 16) & 0xFF);
-              ssimg[sspos++] = (wxUint8)((col >> 8) & 0xFF);
-              ssimg[sspos++] = (wxUint8)(col & 0xFF);
-            }
-            offset_src += info.strideInBytes;
-          }
+        case 1:
+          message = strcat(buf, "  FILTERING MODE: FORCE BILINEAR");
+          break;
+        case 2:
+          message = strcat(buf, "  FILTERING MODE: FORCE POINT-SAMPLED");
+          break;
         }
-        else
-        {
-          wxUint16 col;
-          for (wxUint32 y=offset_y; y<settings.res_y; y++)
-          {
-            wxUint16 *ptr = (wxUint16*)((wxUint8*)info.lfbPtr + offset_src);
-            ptr+=offset_x;
-            for (wxUint32 x=offset_x; x<settings.res_x; x++)
-            {
-              col = *(ptr++);
-              ssimg[sspos++] = (wxUint8)((float)(col >> 11) / 31.0f * 255.0f);
-              ssimg[sspos++] = (wxUint8)((float)((col >> 5) & 0x3F) / 63.0f * 255.0f);
-              ssimg[sspos++] = (wxUint8)((float)(col & 0x1F) / 31.0f * 255.0f);
-            }
-            offset_src += info.strideInBytes;
-          }
-        }
-        // Unlock the backbuffer
-        grLfbUnlock (GR_LFB_READ_ONLY, GR_BUFFER_BACKBUFFER);
-        wxImage screenshot(image_width, image_height, ssimg);
-        screenshot.SaveFile(path, ScreenShotFormats[settings.ssformat].type);
-        capture_screen = 0;
+        hotkey_info.hk_filtering--;
       }
+      output (120.0f, 0.0f, 1, message, 0);
+    }
+  }
+
+  if (capture_screen)
+  {
+    //char path[256];
+    // Make the directory if it doesn't exist
+    if (!wxDirExists(capture_path))
+      wxMkdir(capture_path);
+    wxString path;
+    wxString romName = rdp.RomName;
+    romName.Replace(wxT(" "), wxT("_"), true);
+    romName.Replace(wxT(":"), wxT(";"), true);
+
+    for (int i=1; ; i++)
+    {
+      path = capture_path;
+      path += wxT("Glide64_");
+      path += romName;
+      path += wxT("_");
+      if (i < 10)
+        path += wxT("0");
+      path << i << wxT(".") << ScreenShotFormats[settings.ssformat].extension;
+      if (!wxFileName::FileExists(path))
+        break;
     }
 
-    // Capture the screen if debug capture is set
-    if (_debugger.capture)
+    wxUint32 offset_x = (wxUint32)rdp.offset_x;
+    wxUint32 offset_y = (wxUint32)rdp.offset_y;
+    wxUint32 image_width = settings.res_x - offset_x;
+    wxUint32 image_height = settings.res_y - offset_y;
+
+    GrLfbInfo_t info;
+    info.size = sizeof(GrLfbInfo_t);
+    if (grLfbLock (GR_LFB_READ_ONLY,
+      GR_BUFFER_BACKBUFFER,
+      GR_LFBWRITEMODE_565,
+      GR_ORIGIN_UPPER_LEFT,
+      FXFALSE,
+      &info))
     {
-      // Allocate the screen
-      _debugger.screen = new wxUint8 [(settings.res_x*settings.res_y) << 1];
-
-      // Lock the backbuffer (already rendered)
-      GrLfbInfo_t info;
-      info.size = sizeof(GrLfbInfo_t);
-      while (!grLfbLock (GR_LFB_READ_ONLY,
-        GR_BUFFER_BACKBUFFER,
-        GR_LFBWRITEMODE_565,
-        GR_ORIGIN_UPPER_LEFT,
-        FXFALSE,
-        &info));
-
-      wxUint32 offset_src=0, offset_dst=0;
+      wxUint8 *ssimg = (wxUint8*)malloc(image_width * image_height * 3);
+      int sspos = 0;
+      wxUint32 offset_src=0;
 
       // Copy the screen
-      for (wxUint32 y=0; y<settings.res_y; y++)
+      if (info.writeMode == GR_LFBWRITEMODE_8888)
       {
-        if (info.writeMode == GR_LFBWRITEMODE_8888)
+        wxUint32 col;
+        for (wxUint32 y=offset_y; y<settings.res_y; y++)
         {
-          wxUint32 *src = (wxUint32*)((wxUint8*)info.lfbPtr + offset_src);
-          wxUint16 *dst = (wxUint16*)(_debugger.screen + offset_dst);
-          wxUint8 r, g, b;
-          wxUint32 col;
-          for (unsigned int x = 0; x < settings.res_x; x++)
+          wxUint32 *ptr = (wxUint32*)((wxUint8*)info.lfbPtr + offset_src);
+          ptr+=offset_x;
+          for (wxUint32 x=offset_x; x<settings.res_x; x++)
           {
-            col = src[x];
-            r = (wxUint8)((col >> 19) & 0x1F);
-            g = (wxUint8)((col >> 10) & 0x3F);
-            b = (wxUint8)((col >> 3)  & 0x1F);
-            dst[x] = (r<<11)|(g<<5)|b;
+            col = *(ptr++);
+            ssimg[sspos++] = (wxUint8)((col >> 16) & 0xFF);
+            ssimg[sspos++] = (wxUint8)((col >> 8) & 0xFF);
+            ssimg[sspos++] = (wxUint8)(col & 0xFF);
           }
+          offset_src += info.strideInBytes;
         }
-        else
-        {
-          memcpy (_debugger.screen + offset_dst, (wxUint8*)info.lfbPtr + offset_src, settings.res_x << 1);
-        }
-        offset_dst += settings.res_x << 1;
-        offset_src += info.strideInBytes;
       }
-
+      else
+      {
+        wxUint16 col;
+        for (wxUint32 y=offset_y; y<settings.res_y; y++)
+        {
+          wxUint16 *ptr = (wxUint16*)((wxUint8*)info.lfbPtr + offset_src);
+          ptr+=offset_x;
+          for (wxUint32 x=offset_x; x<settings.res_x; x++)
+          {
+            col = *(ptr++);
+            ssimg[sspos++] = (wxUint8)((float)(col >> 11) / 31.0f * 255.0f);
+            ssimg[sspos++] = (wxUint8)((float)((col >> 5) & 0x3F) / 63.0f * 255.0f);
+            ssimg[sspos++] = (wxUint8)((float)(col & 0x1F) / 31.0f * 255.0f);
+          }
+          offset_src += info.strideInBytes;
+        }
+      }
       // Unlock the backbuffer
       grLfbUnlock (GR_LFB_READ_ONLY, GR_BUFFER_BACKBUFFER);
+      wxImage screenshot(image_width, image_height, ssimg);
+      screenshot.SaveFile(path, ScreenShotFormats[settings.ssformat].type);
+      capture_screen = 0;
     }
+  }
 
-    if (fullscreen && debugging)
+  // Capture the screen if debug capture is set
+  if (_debugger.capture)
+  {
+    // Allocate the screen
+    _debugger.screen = new wxUint8 [(settings.res_x*settings.res_y) << 1];
+
+    // Lock the backbuffer (already rendered)
+    GrLfbInfo_t info;
+    info.size = sizeof(GrLfbInfo_t);
+    while (!grLfbLock (GR_LFB_READ_ONLY,
+      GR_BUFFER_BACKBUFFER,
+      GR_LFBWRITEMODE_565,
+      GR_ORIGIN_UPPER_LEFT,
+      FXFALSE,
+      &info));
+
+    wxUint32 offset_src=0, offset_dst=0;
+
+    // Copy the screen
+    for (wxUint32 y=0; y<settings.res_y; y++)
     {
-      debug_keys ();
-      debug_cacheviewer ();
-      debug_mouse ();
-    }
-
-    if (settings.frame_buffer & fb_read_back_to_screen)
-      DrawWholeFrameBufferToScreen();
-
-    if (fullscreen)
-    {
-      if (fb_hwfbe_enabled && !(settings.hacks&hack_RE2) && !evoodoo)
-        grAuxBufferExt( GR_BUFFER_AUXBUFFER );
-      LOG ("BUFFER SWAPPED\n");
-      grBufferSwap (settings.vsync);
-      fps_count ++;
-      if (*gfx.VI_STATUS_REG&0x08) //gamma correction is used
+      if (info.writeMode == GR_LFBWRITEMODE_8888)
       {
-        if (!voodoo.gamma_correction)
+        wxUint32 *src = (wxUint32*)((wxUint8*)info.lfbPtr + offset_src);
+        wxUint16 *dst = (wxUint16*)(_debugger.screen + offset_dst);
+        wxUint8 r, g, b;
+        wxUint32 col;
+        for (unsigned int x = 0; x < settings.res_x; x++)
         {
-          if (voodoo.gamma_table_size && !voodoo.gamma_table_r)
-            GetGammaTable(); //save initial gamma tables
-          guGammaCorrectionRGB(2.0f, 2.0f, 2.0f); //with gamma=2.0 gamma table is the same, as in N64
-          voodoo.gamma_correction = 1;
+          col = src[x];
+          r = (wxUint8)((col >> 19) & 0x1F);
+          g = (wxUint8)((col >> 10) & 0x3F);
+          b = (wxUint8)((col >> 3)  & 0x1F);
+          dst[x] = (r<<11)|(g<<5)|b;
         }
       }
       else
       {
-        if (voodoo.gamma_correction)
-        {
-          if (voodoo.gamma_table_r)
-            grLoadGammaTable(voodoo.gamma_table_size, voodoo.gamma_table_r, voodoo.gamma_table_g, voodoo.gamma_table_b);
-          else
-            guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop
-          voodoo.gamma_correction = 0;
-        }
+        memcpy (_debugger.screen + offset_dst, (wxUint8*)info.lfbPtr + offset_src, settings.res_x << 1);
       }
+      offset_dst += settings.res_x << 1;
+      offset_src += info.strideInBytes;
     }
 
-    if (_debugger.capture)
-      debug_capture ();
+    // Unlock the backbuffer
+    grLfbUnlock (GR_LFB_READ_ONLY, GR_BUFFER_BACKBUFFER);
+  }
 
-    if (fullscreen)
+  if (fullscreen && debugging)
+  {
+    debug_keys ();
+    debug_cacheviewer ();
+    debug_mouse ();
+  }
+
+  if (settings.frame_buffer & fb_read_back_to_screen)
+    DrawWholeFrameBufferToScreen();
+
+  if (fullscreen)
+  {
+    if (fb_hwfbe_enabled && !(settings.hacks&hack_RE2) && !evoodoo)
+      grAuxBufferExt( GR_BUFFER_AUXBUFFER );
+    LOG ("BUFFER SWAPPED\n");
+    grBufferSwap (settings.vsync);
+    fps_count ++;
+    if (*gfx.VI_STATUS_REG&0x08) //gamma correction is used
     {
-      if  (debugging || settings.wireframe || settings.buff_clear || (settings.hacks&hack_PPL && settings.ucode == 6))
+      if (!voodoo.gamma_correction)
       {
-        if (settings.hacks&hack_RE2 && fb_depth_render_enabled)
-          grDepthMask (FXFALSE);
+        if (voodoo.gamma_table_size && !voodoo.gamma_table_r)
+          GetGammaTable(); //save initial gamma tables
+        guGammaCorrectionRGB(2.0f, 2.0f, 2.0f); //with gamma=2.0 gamma table is the same, as in N64
+        voodoo.gamma_correction = 1;
+      }
+    }
+    else
+    {
+      if (voodoo.gamma_correction)
+      {
+        if (voodoo.gamma_table_r)
+          grLoadGammaTable(voodoo.gamma_table_size, voodoo.gamma_table_r, voodoo.gamma_table_g, voodoo.gamma_table_b);
         else
-          grDepthMask (FXTRUE);
-        grBufferClear (0, 0, 0xFFFF);
+          guGammaCorrectionRGB(1.3f, 1.3f, 1.3f); //1.3f is default 3dfx gamma for everything but desktop
+        voodoo.gamma_correction = 0;
       }
-      /* //let the game to clear the buffers
-      else
-      {
-      grDepthMask (FXTRUE);
-      grColorMask (FXFALSE, FXFALSE);
-      grBufferClear (0, 0, 0xFFFF);
-      grColorMask (FXTRUE, FXTRUE);
-      }
-      */
     }
+  }
 
-    if (settings.frame_buffer & fb_read_back_to_screen2)
-      DrawWholeFrameBufferToScreen();
+  if (_debugger.capture)
+    debug_capture ();
 
-    frame_count ++;
-
-    // Open/close debugger?
-    if (CheckKeyPressed(G64_VK_SCROLL, 0x0001))
+  if (fullscreen)
+  {
+    if  (debugging || settings.wireframe || settings.buff_clear || (settings.hacks&hack_PPL && settings.ucode == 6))
     {
-      if (!debugging)
+      if (settings.hacks&hack_RE2 && fb_depth_render_enabled)
+        grDepthMask (FXFALSE);
+      else
+        grDepthMask (FXTRUE);
+      grBufferClear (0, 0, 0xFFFF);
+    }
+    /* //let the game to clear the buffers
+    else
+    {
+    grDepthMask (FXTRUE);
+    grColorMask (FXFALSE, FXFALSE);
+    grBufferClear (0, 0, 0xFFFF);
+    grColorMask (FXTRUE, FXTRUE);
+    }
+    */
+  }
+
+  if (settings.frame_buffer & fb_read_back_to_screen2)
+    DrawWholeFrameBufferToScreen();
+
+  frame_count ++;
+
+  // Open/close debugger?
+  if (CheckKeyPressed(G64_VK_SCROLL, 0x0001))
+  {
+    if (!debugging)
+    {
+      //if (settings.scr_res_x == 1024 && settings.scr_res_y == 768)
       {
-        //if (settings.scr_res_x == 1024 && settings.scr_res_y == 768)
-        {
-          debugging = 1;
+        debugging = 1;
 
-          // Recalculate screen size, don't resize screen
-          settings.res_x = (wxUint32)(settings.scr_res_x * 0.625f);
-          settings.res_y = (wxUint32)(settings.scr_res_y * 0.625f);
-
-          ChangeSize ();
-        }
-      } else {
-        debugging = 0;
-
-        settings.res_x = settings.scr_res_x;
-        settings.res_y = settings.scr_res_y;
+        // Recalculate screen size, don't resize screen
+        settings.res_x = (wxUint32)(settings.scr_res_x * 0.625f);
+        settings.res_y = (wxUint32)(settings.scr_res_y * 0.625f);
 
         ChangeSize ();
       }
-    }
-
-    // Debug capture?
-    if (/*fullscreen && */debugging && CheckKeyPressed(G64_VK_INSERT, 0x0001))
+    } 
+    else
     {
-      _debugger.capture = 1;
+      debugging = 0;
+
+      settings.res_x = settings.scr_res_x;
+      settings.res_y = settings.scr_res_y;
+
+      ChangeSize ();
     }
+  }
+
+  // Debug capture?
+  if (/*fullscreen && */debugging && CheckKeyPressed(G64_VK_INSERT, 0x0001))
+  {
+    _debugger.capture = 1;
   }
 }
 
