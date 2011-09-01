@@ -360,7 +360,7 @@ typedef struct {
 
 extern GFX_INFO gfx;
 extern wxWindow * GFXWindow;
-extern int no_dlist;
+extern bool no_dlist;
 
 typedef GrContext_t (FX_CALL *GRWINOPENEXT)( FxU32                   hWnd,
                                              GrScreenResolution_t    resolution,
