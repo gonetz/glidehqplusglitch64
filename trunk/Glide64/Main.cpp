@@ -2104,10 +2104,10 @@ void newSwapBuffers()
         break;
     }
 
-    wxUint32 offset_x = (wxUint32)rdp.offset_x;
-    wxUint32 offset_y = (wxUint32)rdp.offset_y;
-    wxUint32 image_width = settings.res_x - offset_x;
-    wxUint32 image_height = settings.res_y - offset_y;
+    const wxUint32 offset_x = (wxUint32)rdp.offset_x;
+    const wxUint32 offset_y = (wxUint32)rdp.offset_y;
+    const wxUint32 image_width = settings.scr_res_x - offset_x*2;
+    const wxUint32 image_height = settings.scr_res_y - offset_y*2;
 
     GrLfbInfo_t info;
     info.size = sizeof(GrLfbInfo_t);
@@ -2118,19 +2118,19 @@ void newSwapBuffers()
       FXFALSE,
       &info))
     {
-      wxUint8 *ssimg = (wxUint8*)malloc(image_width * image_height * 3);
+      wxUint8 *ssimg = (wxUint8*)malloc(image_width * image_height * 3); // will be free in wxImage destructor
       int sspos = 0;
-      wxUint32 offset_src=0;
+      wxUint32 offset_src = info.strideInBytes * offset_y;
 
       // Copy the screen
       if (info.writeMode == GR_LFBWRITEMODE_8888)
       {
         wxUint32 col;
-        for (wxUint32 y=offset_y; y<settings.res_y; y++)
+        for (wxUint32 y = 0; y < image_height; y++)
         {
           wxUint32 *ptr = (wxUint32*)((wxUint8*)info.lfbPtr + offset_src);
-          ptr+=offset_x;
-          for (wxUint32 x=offset_x; x<settings.res_x; x++)
+          ptr += offset_x;
+          for (wxUint32 x = 0; x < image_width; x++)
           {
             col = *(ptr++);
             ssimg[sspos++] = (wxUint8)((col >> 16) & 0xFF);
@@ -2143,11 +2143,11 @@ void newSwapBuffers()
       else
       {
         wxUint16 col;
-        for (wxUint32 y=offset_y; y<settings.res_y; y++)
+        for (wxUint32 y = 0; y < image_height; y++)
         {
           wxUint16 *ptr = (wxUint16*)((wxUint8*)info.lfbPtr + offset_src);
-          ptr+=offset_x;
-          for (wxUint32 x=offset_x; x<settings.res_x; x++)
+          ptr += offset_x;
+          for (wxUint32 x = 0; x < image_width; x++)
           {
             col = *(ptr++);
             ssimg[sspos++] = (wxUint8)((float)(col >> 11) / 31.0f * 255.0f);
