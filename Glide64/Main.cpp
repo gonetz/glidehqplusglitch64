@@ -1810,21 +1810,8 @@ void drawViRegBG()
   fb_info.ul_y = 0;
   fb_info.lr_y = fb_info.height - 1;
   fb_info.opaque = 1;
-  if (settings.hacks&hack_RE2)
-  {
-    fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<2);
-    fb_info.size   = 3;
-  }
-  else if (rdp.ci_size > 1)
-  {
-    fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<(rdp.ci_size-1));
-    fb_info.size   = rdp.ci_size;
-  }
-  else
-  {
-    fb_info.addr   = (*gfx.VI_ORIGIN_REG) - (VIwidth<<1);
-    fb_info.size   = 2;
-  }
+  fb_info.addr = *gfx.VI_ORIGIN_REG;
+  fb_info.size = *gfx.VI_STATUS_REG & 3;
   rdp.last_bg = fb_info.addr;
 
   bool drawn = DrawFrameBufferToScreen(fb_info);
