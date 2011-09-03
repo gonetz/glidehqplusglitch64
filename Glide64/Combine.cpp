@@ -12889,9 +12889,9 @@ static COMBINER color_cmb_list[] = {
   // the "gekko" ( a monster in a room above the 3rd room of woodfall temple }, zelda 2 [Ogy]. Added by Gonetz
   // (t0-prim)*env+shade  ** INC **
   {0x85318531, cc_t0_sub_prim_mul_env_add_shade},
-  // clothes, zelda 2. Added by Gonetz
+  // flower, zelda 2. Added by Gonetz
   // (t0-prim)*env+shade, (cmb-0)*shade+0  ** INC **
-  {0x8531e4f0, cc_t0_mul_env_mul_shade},
+  {0x8531e4f0, cc_t0_sub_prim_mul_env_add_shade},
   // Robotron 64, [scorpiove]
   // (env-shade)*env+shade  ** INC **
   {0x85458545, cc_one_sub_env_mul_shade_add_env},
