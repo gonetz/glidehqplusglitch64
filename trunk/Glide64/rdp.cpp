@@ -1682,6 +1682,8 @@ void load_palette (wxUint32 addr, wxUint16 start, wxUint16 count)
 #endif
   start >>= 4;
   end = start + (count >> 4);
+  if (end == start) // it can be if count < 16
+    end = start + 1;
   for (wxUint16 p = start; p < end; p++)
   {
     rdp.pal_8_crc[p] = CRC32( 0xFFFFFFFF, &rdp.pal_8[(p << 4)], 32 );
