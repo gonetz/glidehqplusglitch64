@@ -1914,7 +1914,10 @@ void LoadTile32b (wxUint32 tile, wxUint32 ul_s, wxUint32 ul_t, wxUint32 width, w
 static void rdp_loadtile()
 {
   if (rdp.skip_drawing)
+  {
+    LRDP("loadtile skipped\n");
     return;
+  }
   rdp.timg.set_by = 1;  // load tile
 
   wxUint32 tile = (wxUint32)((rdp.cmd1 >> 24) & 0x07);
@@ -1975,29 +1978,27 @@ static void rdp_loadtile()
   info.tex_size = rdp.timg.size;
 #endif
 
-  wxUint32 wid_64 = rdp.tiles[tile].line;
+  int line_n = rdp.timg.width << rdp.tiles[tile].size >> 1;
+  wxUint32 offs = ul_t * line_n;
+  offs += ul_s << rdp.tiles[tile].size >> 1;
+  offs += rdp.timg.addr;
+  if (offs >= BMASK)
+    return;
+
   if (rdp.timg.size == 3)
   {
     LoadTile32b(tile, ul_s, ul_t, width, height);
   }
   else
   {
-    int line_n = rdp.timg.width << rdp.tiles[tile].size >> 1;
-
-    wxUint32 offs = ul_t * line_n;
-    offs += ul_s << rdp.tiles[tile].size >> 1;
-    offs += rdp.timg.addr;
-    if (offs >= BMASK)
-      return;
-
     // check if points to bad location
     if (offs + line_n*height > BMASK)
       height = (BMASK - offs) / line_n;
     if (height == 0)
       return;
 
+    wxUint32 wid_64 = rdp.tiles[tile].line;
     wxUIntPtr SwapMethod = wxPtrToUInt(reinterpret_cast<void*>(SwapBlock32));
-
     wxUIntPtr dst = wxPtrToUInt(rdp.tmem) + (rdp.tiles[tile].t_mem<<3);
     wxUIntPtr end = wxPtrToUInt(rdp.tmem) + 4096 - (wid_64<<3);
     asmLoadTile(wxPtrToUInt(gfx.RDRAM), dst, wid_64, height, line_n, offs, end, SwapMethod);
@@ -2006,7 +2007,7 @@ static void rdp_loadtile()
     ul_s, ul_t, lr_s, lr_t);
 
   if (fb_hwfbe_enabled)
-    setTBufTex(rdp.tiles[tile].t_mem, wid_64*height);
+    setTBufTex(rdp.tiles[tile].t_mem, rdp.tiles[tile].line*height);
 }
 
 static void rdp_settile()
