@@ -296,6 +296,7 @@ typedef struct {
   int pal230;    //set special scale for PAL games
   int correct_viewport; //correct viewport values
   int zmode_compare_less; //force GR_CMP_LESS for zmode=0 (opaque)and zmode=1 (interpenetrating)
+  int old_style_adither; //apply alpha dither regardless of alpha_dither_mode
   int n64_z_scale; //scale vertex z value before writing to depth buffer, as N64 does.
 
   //Special game hacks

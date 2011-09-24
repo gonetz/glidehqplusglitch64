@@ -2012,13 +2012,16 @@ void update ()
           LRDP (" |- alpha compare: none\n");
         }
       }
-      if (rdp.acmp == 3 && rdp.alpha_dither_mode != 3 && rdp.cycle_mode < 2)
+      if (rdp.acmp == 3 && rdp.cycle_mode < 2)
       {
-        if (grStippleModeExt)
+        if (grStippleModeExt != 0)
         {
-          LRDP (" |- alpha compare: dither\n");
-          grStippleModeExt(settings.stipple_mode);
-          //			    grStippleModeExt(GR_STIPPLE_PATTERN);
+          if (settings.old_style_adither || rdp.alpha_dither_mode != 3) {
+            LRDP (" |- alpha compare: dither\n");
+            grStippleModeExt(settings.stipple_mode);
+          }
+          else
+            grStippleModeExt(GR_STIPPLE_DISABLE);
         }
       }
       else
