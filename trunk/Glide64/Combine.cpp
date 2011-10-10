@@ -1922,6 +1922,27 @@ static void cc__shade_inter_t0_using_shadea__mul_shade ()
   }
 }
 
+static void cc__prim_inter_env_using_enva__mul_shade ()
+{
+  const float ea = ((float)(rdp.env_color&0xFF)) / 255.0f;
+  const float ea_i = 1.0f - ea;
+  wxUint32 pr = (rdp.prim_color >> 24)&0xFF;
+  wxUint32 pg = (rdp.prim_color >> 16)&0xFF;
+  wxUint32 pb = (rdp.prim_color >>  8)&0xFF;
+  wxUint32 er = (rdp.env_color >> 24)&0xFF;
+  wxUint32 eg = (rdp.env_color >> 16)&0xFF;
+  wxUint32 eb = (rdp.env_color >>  8)&0xFF;
+  wxUint32 r = min(255, (wxUint32)(er*ea + pr*ea_i));
+  wxUint32 g = min(255, (wxUint32)(eg*ea + pg*ea_i));
+  wxUint32 b = min(255, (wxUint32)(eb*ea + pb*ea_i));
+  wxUint32 col = (r << 24) | (g << 16) | (b << 8) | 0xFF;
+  CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER,
+    GR_COMBINE_FACTOR_LOCAL,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_CONSTANT);
+  CC (col);
+}
+
 //Added by Gonetz
 static void cc_prim_mul_env ()
 {
@@ -8734,6 +8755,17 @@ static void cc__t0_mul_shade__inter_one_using_shadea ()
   }
 }
 
+static void cc__prim_mul_shade__inter_env_using_enva ()
+{
+  CCMB (GR_COMBINE_FUNCTION_BLEND,
+    GR_COMBINE_FACTOR_LOCAL_ALPHA,
+    GR_COMBINE_LOCAL_ITERATED,
+    GR_COMBINE_OTHER_CONSTANT);
+  CC_ENV ();
+  MULSHADE_PRIM ();
+  SETSHADE_A_ENV ();
+}
+
 static void cc__prim_mul_shade__inter_env_using__prim_mul_shade_alpha ()
 {
   CCMB (GR_COMBINE_FUNCTION_BLEND,
@@ -12696,6 +12728,9 @@ static COMBINER color_cmb_list[] = {
   // button, Sin and Punishmen. Added by Gonetz
   // (env-prim)*env_a+prim
   {0x6c356c35, cc_env_sub_prim_mul_enva_add_prim},
+  // frame buffer effect, Glover2
+  // (env-prim)*env_a+prim, (cmb-0)*shade+0
+  {0x6c35e4f0, cc__prim_inter_env_using_enva__mul_shade},
   // fallen stars at star summit, Paper Mario. Added by Gonetz
   // (t0-env)*env_a+prim, (1-0)*primlod+cmb
   {0x6c510ef6, cc_t0_sub_env_mul_enva_add_prim},
@@ -13845,6 +13880,9 @@ static COMBINER color_cmb_list[] = {
   // circle, waverace. Added by Gonetz
   // (prim-0)*shade+0, (t0-cmb)*enva+cmb
   {0xe4f30c01, cc_t0_sub__prim_mul_shade__mul_enva_add__prim_mul_shade},
+  // enemy hit, Glover2
+  // (prim-0)*shade+0, (env-cmb)*enva+cmb
+  {0xe4f30c05, cc__prim_mul_shade__inter_env_using_enva},
   // player, super bowling
   // (prim-0)*shade+0, (0-0)*k5+cmb
   {0xe4f30fff, cc_prim_mul_shade},
