@@ -8872,6 +8872,16 @@ static void ac_primlod ()
   CA_PRIMLOD ();
 }
 
+static void ac_one_sub_t0 ()
+{
+    ACMB (GR_COMBINE_FUNCTION_BLEND_LOCAL,
+      GR_COMBINE_FACTOR_TEXTURE_ALPHA,
+      GR_COMBINE_LOCAL_CONSTANT,
+      GR_COMBINE_OTHER_NONE);
+    CA (0xFF);
+    A_USE_T0 ();
+}
+
 static void ac_one_sub_prim ()
 {
   ACMB (GR_COMBINE_FUNCTION_LOCAL,
@@ -14972,9 +14982,9 @@ static COMBINER alpha_cmb_list[] = {
   // Background, Pokemon Snap   
   // (prim-env)*t0+1
   {0x0c6b0c6b, ac_prim_sub_env_mul_t0_add_one},
-  // Tony Hawk's Pro Skater. Added by Gonetz
-  // (1-t0)*t1+1, (cmb-t1)*t1+t1  ** INC **
-  {0x0c770c77, ac_t0_mul_t1},
+  // Mario Golf
+  // (0-1)*t0+1
+  {0x0c770c77, ac_one_sub_t0},
   // flame, paper mario. Added by Gonetz
   // (1-t0)*t1+1, (cmb-t1)*t1+t1
   {0x0c8e0490, ac_t0_mul_t1},
@@ -15919,7 +15929,11 @@ void CombineBlender ()
   //  if (rdp.othermode_l & 0x2000)
   if ((rdp.othermode_l & 0x2000) && ((rdp.othermode_l & 0x7000) != 0x7000))
   {
-    if ((settings.hacks&hack_PMario) && ((rdp.othermode_l >> 16) == 0x5055))
+    if ((settings.hacks&hack_PMario) && (blendmode == 0x5055))
+    {
+      A_BLEND (GR_BLEND_ZERO, GR_BLEND_ONE);
+    }
+    else if (blendmode == 0x4055) // Mario Golf
     {
       A_BLEND (GR_BLEND_ZERO, GR_BLEND_ONE);
     }
