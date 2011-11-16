@@ -1078,14 +1078,19 @@ static void rdp_texrect()
     return;
   }
 
-  if (rdp.cycle_mode > 1 || settings.increase_texrect_edge)
+  if (rdp.cycle_mode > 1)
   {
     lr_x += 1.0f;
     lr_y += 1.0f;
-  }
-  if (lr_y - ul_y < 1.0f)
+  } else if (lr_y - ul_y < 1.0f)
+    lr_y = ceil(lr_y);
+
+  if (settings.increase_texrect_edge)
   {
-    lr_y = ul_y + 1.0f;
+    if (floor(lr_x) != lr_x)
+      lr_x = ceil(lr_x);
+    if (floor(lr_y) != lr_y)
+      lr_y = ceil(lr_y);
   }
 
   //*
