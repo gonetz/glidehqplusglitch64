@@ -378,6 +378,7 @@ void ReadSettings ()
   settings.clock_24_hr = ini->Read(_T("clock_24_hr"), 0l);
   settings.advanced_options = ini->Read(_T("advanced_options"), 0l);
   settings.texenh_options = ini->Read(_T("texenh_options"), 0l);
+  settings.use_hotkeys = ini->Read(_T("hotkeys"), 1l);
 
   settings.wrpResolution = ini->Read(_T("wrpResolution"), 0l);
   settings.wrpVRAM = ini->Read(_T("wrpVRAM"), 0l);
@@ -2363,6 +2364,8 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 int CheckKeyPressed(int key, int mask)
 {
 static Glide64Keys g64Keys;
+  if (settings.use_hotkeys == 0)
+    return 0;
 #ifdef __WINDOWS__
   return (GetAsyncKeyState(g64Keys[key]) & mask);
 #else

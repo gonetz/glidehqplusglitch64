@@ -211,6 +211,7 @@ typedef struct {
   int swapmode;
   int lodmode;
   int aspectmode;
+  int use_hotkeys;
 
   //Frame buffer emulation options
   #define  fb_emulation            (1<<0)   //frame buffer emulation
