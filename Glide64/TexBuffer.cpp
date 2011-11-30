@@ -437,7 +437,6 @@ int CloseTextureBuffer(int draw)
   }
   rdp.tbuff_tex = rdp.cur_image;
   rdp.cur_image = 0;
-  GrTextureFormat_t buf_format = rdp.tbuff_tex->info.format;
   rdp.tbuff_tex->info.format = TexBufSetupCombiner();
   float zero = 0.0f;
   float ul_x = rdp.offset_x;
@@ -461,7 +460,6 @@ int CloseTextureBuffer(int draw)
   grClipWindow (0, 0, settings.res_x, settings.res_y);
   grDrawTriangle (&v[0], &v[2], &v[1]);
   grDrawTriangle (&v[2], &v[3], &v[1]);
-  rdp.tbuff_tex->info.format = buf_format;
   rdp.update |= UPDATE_ZBUF_ENABLED | UPDATE_COMBINE | UPDATE_TEXTURE | UPDATE_ALPHA_COMPARE;
   if (settings.fog && (rdp.flags & FOG_ENABLED))
   {

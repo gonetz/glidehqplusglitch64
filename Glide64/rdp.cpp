@@ -1792,7 +1792,7 @@ static void rdp_settilesize()
     tile, ul_s, ul_t, lr_s, lr_t, rdp.tiles[tile].f_ul_s, rdp.tiles[tile].f_ul_t);
 }
 
-static void setTBufTex(wxUint16 t_mem, wxUint32 cnt)
+void setTBufTex(wxUint16 t_mem, wxUint32 cnt)
 {
   FRDP("setTBufTex t_mem=%d, cnt=%d\n", t_mem, cnt);
   TBUFF_COLOR_IMAGE * pTbufTex = rdp.tbuff_tex;
@@ -2420,15 +2420,7 @@ static void rdp_settextureimage()
   }
 
   if (fb_hwfbe_enabled) //search this texture among drawn texture buffers
-  {
-    if (settings.hacks&hack_Zelda)
-    {
-      if (rdp.timg.size == 2)
-        FindTextureBuffer(rdp.timg.addr, rdp.timg.width);
-    }
-    else
-      FindTextureBuffer(rdp.timg.addr, rdp.timg.width);
-  }
+    FindTextureBuffer(rdp.timg.addr, rdp.timg.width);
 
   FRDP("settextureimage: format: %s, size: %s, width: %d, addr: %08lx\n",
     format[rdp.timg.format], size[rdp.timg.size],
