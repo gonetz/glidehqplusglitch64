@@ -315,7 +315,7 @@ void ChangeSize ()
       settings.res_y = (wxUint32)(settings.res_x / 16.0f * 9.0f);
     }
     break;
-  default: //stretch
+  default: //stretch or original
     settings.res_x = settings.scr_res_x;
     settings.res_y = settings.scr_res_y;
   }
@@ -325,6 +325,12 @@ void ChangeSize ()
   settings.res_x += (wxUint32)rdp.offset_x;
   settings.res_y += (wxUint32)offset_y;
   rdp.offset_y += offset_y;
+  if (settings.aspectmode == 3) // original
+  {
+	  rdp.scale_x = rdp.scale_y = 1.0f;
+	  rdp.offset_x = (settings.scr_res_x - rdp.vi_width) / 2.0f;
+	  rdp.offset_y = (settings.scr_res_y - rdp.vi_height) / 2.0f;
+  }
   //	settings.res_x = settings.scr_res_x;
   //	settings.res_y = settings.scr_res_y;
 }

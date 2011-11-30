@@ -161,9 +161,10 @@ wxNotebook(parent, id, pos, size, 0)
     const wxString cmbAspect_choices[] = {
       _("4:3 (default)"),
       _("Force 16:9"),
-      _("Stretch")
+      _("Stretch"),
+      _("Original")
     };
-    cmbAspect = new wxComboBox(EmuSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 3, cmbAspect_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
+    cmbAspect = new wxComboBox(EmuSettingsPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 4, cmbAspect_choices, wxCB_DROPDOWN|wxCB_DROPDOWN|wxCB_READONLY);
     cbxFog = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Fog"));
     cbxBuffer = new wxCheckBox(EmuSettingsPanel, wxID_ANY, _("Buffer clear on every frame"));
     cbxFBEnable = new wxCheckBox(EmuSettingsPanel, wxID_FBEnable, _("Enable frame buffer emulation"));
