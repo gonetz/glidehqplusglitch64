@@ -46,7 +46,10 @@ static float set_sprite_combine_mode ()
     rdp.tex = 1;
     rdp.allow_combine = 0;
     // Now actually combine !
-    cmb.tmu1_func = cmb.tmu0_func = GR_COMBINE_FUNCTION_LOCAL;
+    GrCombineFunction_t color_source = GR_COMBINE_FUNCTION_LOCAL;
+    if (rdp.tbuff_tex && rdp.tbuff_tex->info.format == GR_TEXFMT_ALPHA_INTENSITY_88)
+		color_source = GR_COMBINE_FUNCTION_LOCAL_ALPHA;
+    cmb.tmu1_func = cmb.tmu0_func = color_source;
     cmb.tmu1_fac = cmb.tmu0_fac = GR_COMBINE_FACTOR_NONE;
     cmb.tmu1_a_func = cmb.tmu0_a_func = GR_COMBINE_FUNCTION_LOCAL;
     cmb.tmu1_a_fac = cmb.tmu0_a_fac = GR_COMBINE_FACTOR_NONE;
@@ -606,95 +609,19 @@ void DrawImage (DRAWIMAGE & d)
 
 void DrawHiresImage(DRAWIMAGE & d, int screensize = FALSE)
 {
-  FRDP("DrawHiresImage. addr: %08lx\n", d.imagePtr);
   if (!fullscreen)
     return;
-  TBUFF_COLOR_IMAGE *tbuff_tex;
+  TBUFF_COLOR_IMAGE *tbuff_tex = rdp.tbuff_tex;
   if (rdp.motionblur)
-    tbuff_tex = &(rdp.texbufs[rdp.cur_tex_buf^1].images[0]);
-  else if (rdp.tbuff_tex)
-    tbuff_tex = rdp.tbuff_tex;
-  else
+    rdp.tbuff_tex = &(rdp.texbufs[rdp.cur_tex_buf^1].images[0]);
+  else if (rdp.tbuff_tex == 0)
     return;
+  FRDP("DrawHiresImage. fb format=%d\n", rdp.tbuff_tex->info.format);
 
-  if (rdp.cycle_mode == 2)
-  {
-    rdp.allow_combine = 0;
-    rdp.update &= ~UPDATE_TEXTURE;
-  }
-  update ();                            // note: allow loading of texture
+  setTBufTex(rdp.tbuff_tex->t_mem, rdp.tbuff_tex->width << rdp.tbuff_tex->size >> 1);
 
-  float Z = 1.0f;
-  if (rdp.zsrc == 1 && (rdp.othermode_l & 0x00000030))
-  {
-    LRDP("Background uses depth compare\n");
-    Z = ScaleZ(rdp.prim_depth);
-    grDepthBufferFunction (GR_CMP_LEQUAL);
-  }
-  else
-  {
-    LRDP("Background not uses depth compare\n");
-    grDepthBufferFunction (GR_CMP_ALWAYS);
-  }
-  grDepthMask (FXFALSE);
+  const float Z = set_sprite_combine_mode ();
   grClipWindow (0, 0, settings.res_x, settings.res_y);
-  grCullMode (GR_CULL_DISABLE);
-  if (rdp.cycle_mode == 2)
-  {
-    grColorCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
-      GR_COMBINE_FACTOR_ONE,
-      GR_COMBINE_LOCAL_NONE,
-      GR_COMBINE_OTHER_TEXTURE,
-//      GR_COMBINE_OTHER_CONSTANT,
-      FXFALSE);
-    grAlphaCombine (GR_COMBINE_FUNCTION_SCALE_OTHER,
-      GR_COMBINE_FACTOR_ONE,
-      GR_COMBINE_LOCAL_NONE,
-      GR_COMBINE_OTHER_TEXTURE,
-      FXFALSE);
-    grConstantColorValue (0xFFFFFFFF);
-    grAlphaBlendFunction (GR_BLEND_ONE, // use alpha compare, but not T0 alpha
-      GR_BLEND_ZERO,
-      GR_BLEND_ZERO,
-      GR_BLEND_ZERO);
-    rdp.allow_combine = 1;
-  }
-
-  if (tbuff_tex->tmu == GR_TMU0)
-  {
-    grTexCombine( GR_TMU1,
-      GR_COMBINE_FUNCTION_NONE,
-      GR_COMBINE_FACTOR_NONE,
-      GR_COMBINE_FUNCTION_NONE,
-      GR_COMBINE_FACTOR_NONE,
-      FXFALSE,
-      FXFALSE );
-    grTexCombine( GR_TMU0,
-      GR_COMBINE_FUNCTION_LOCAL,
-      GR_COMBINE_FACTOR_NONE,
-      GR_COMBINE_FUNCTION_LOCAL,
-      GR_COMBINE_FACTOR_NONE,
-      FXFALSE,
-      FXFALSE );
-  }
-  else
-  {
-    grTexCombine( GR_TMU1,
-      GR_COMBINE_FUNCTION_LOCAL,
-      GR_COMBINE_FACTOR_NONE,
-      GR_COMBINE_FUNCTION_LOCAL,
-      GR_COMBINE_FACTOR_NONE,
-      FXFALSE,
-      FXFALSE );
-    grTexCombine( GR_TMU0,
-      GR_COMBINE_FUNCTION_SCALE_OTHER,
-      GR_COMBINE_FACTOR_ONE,
-      GR_COMBINE_FUNCTION_SCALE_OTHER,
-      GR_COMBINE_FACTOR_ONE,
-      FXFALSE,
-      FXFALSE );
-  }
-  grTexSource( tbuff_tex->tmu, tbuff_tex->tex_addr, GR_MIPMAPLEVELMASK_BOTH, &(tbuff_tex->info) );
 
   if (d.imageW%2 == 1) d.imageW -= 1;
   if (d.imageH%2 == 1) d.imageH -= 1;
@@ -715,10 +642,10 @@ void DrawHiresImage(DRAWIMAGE & d, int screensize = FALSE)
     ul_y = 0.0f;
     ul_u = 0.15f;
     ul_v = 0.15f;
-    lr_x = tbuff_tex->scr_width;
-    lr_y = tbuff_tex->scr_height;
-    lr_u = tbuff_tex->lr_u;
-    lr_v = tbuff_tex->lr_v;
+    lr_x = rdp.tbuff_tex->scr_width;
+    lr_y = rdp.tbuff_tex->scr_height;
+    lr_u = rdp.tbuff_tex->lr_u;
+    lr_v = rdp.tbuff_tex->lr_v;
   }
   else
   {
@@ -736,10 +663,10 @@ void DrawHiresImage(DRAWIMAGE & d, int screensize = FALSE)
     lr_x *= rdp.scale_x;
     ul_y *= rdp.scale_y;
     lr_y *= rdp.scale_y;
-    ul_u *= tbuff_tex->u_scale;
-    lr_u *= tbuff_tex->u_scale;
-    ul_v *= tbuff_tex->v_scale;
-    lr_v *= tbuff_tex->v_scale;
+    ul_u *= rdp.tbuff_tex->u_scale;
+    lr_u *= rdp.tbuff_tex->u_scale;
+    ul_v *= rdp.tbuff_tex->v_scale;
+    lr_v *= rdp.tbuff_tex->v_scale;
     ul_u = max(0.15f, ul_u);
     ul_v = max(0.15f, ul_v);
     if (lr_x > rdp.scissor.lr_x) lr_x = (float)rdp.scissor.lr_x;
@@ -775,6 +702,8 @@ void DrawHiresImage(DRAWIMAGE & d, int screensize = FALSE)
     }
     else
       rdp.tri_n += 2;
+  rdp.tbuff_tex = tbuff_tex;
+
 }
 
 //****************************************************************

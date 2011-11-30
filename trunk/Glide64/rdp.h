@@ -907,5 +907,6 @@ extern int SwapOK;
 
 // ** utility functions
 void load_palette (wxUint32 addr, wxUint16 start, wxUint16 count);
+void setTBufTex(wxUint16 t_mem, wxUint32 cnt);
 
 #endif  // ifndef RDP_H
