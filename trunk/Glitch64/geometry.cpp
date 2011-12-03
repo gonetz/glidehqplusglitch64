@@ -325,6 +325,7 @@ grDrawTriangle( const void *a, const void *b, const void *c )
   LOG("grDrawTriangle()\r\n");
 
   // ugly ? i know but nvidia drivers are losing the viewport otherwise
+
   if(nvidia_viewport_hack && !render_to_texture)
   {
     glViewport(0, viewport_offset, viewport_width, viewport_height);
@@ -437,6 +438,12 @@ grDrawPoint( const void *pt )
   float *fog = (float*)pt + fog_ext_off/sizeof(float);
   LOG("grDrawPoint()\r\n");
 
+  if(nvidia_viewport_hack && !render_to_texture)
+  {
+    glViewport(0, viewport_offset, viewport_width, viewport_height);
+    nvidia_viewport_hack = 0;
+  }
+
   reloadTexture();
 
   if(need_to_compile) compile_shader();
@@ -498,6 +505,12 @@ grDrawLine( const void *a, const void *b )
   float *b_t1 = (float*)b + st1_off/sizeof(float) + 1;
   float *b_fog = (float*)b + fog_ext_off/sizeof(float);
   LOG("grDrawLine()\r\n");
+
+  if(nvidia_viewport_hack && !render_to_texture)
+  {
+    glViewport(0, viewport_offset, viewport_width, viewport_height);
+    nvidia_viewport_hack = 0;
+  }
 
   reloadTexture();
 
@@ -568,6 +581,12 @@ grDrawVertexArray(FxU32 mode, FxU32 Count, void *pointers2)
   void **pointers = (void**)pointers2;
   LOG("grDrawVertexArray(%d,%d)\r\n", mode, Count);
 
+  if(nvidia_viewport_hack && !render_to_texture)
+  {
+    glViewport(0, viewport_offset, viewport_width, viewport_height);
+    nvidia_viewport_hack = 0;
+  }
+
   reloadTexture();
 
   if(need_to_compile) compile_shader();
@@ -632,9 +651,13 @@ grDrawVertexArrayContiguous(FxU32 mode, FxU32 Count, void *pointers, FxU32 strid
   unsigned char *pargb;
   LOG("grDrawVertexArrayContiguous(%d,%d,%d)\r\n", mode, Count, stride);
 
-  // ZIGGY apparently, grDrawVertexArrayContiguous is only used to overwrite the
-  // whole screen, so we treat it as a grClearBuffer, no need to reload the texture
-  buffer_cleared = 1;
+  if(nvidia_viewport_hack && !render_to_texture)
+  {
+    glViewport(0, viewport_offset, viewport_width, viewport_height);
+    nvidia_viewport_hack = 0;
+  }
+
+  reloadTexture();
 
   if(need_to_compile) compile_shader();
 

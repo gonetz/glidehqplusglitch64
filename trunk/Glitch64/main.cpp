@@ -820,6 +820,7 @@ grSstWinOpen(
     SetWindowLong(hwnd_win, GWL_EXSTYLE, WS_EX_APPWINDOW | WS_EX_TOPMOST);
     SetWindowPos(hwnd_win, NULL, 0, 0, width, height, SWP_NOACTIVATE | SWP_NOZORDER | SWP_SHOWWINDOW);
 
+    viewport_offset = 0;
     fullscreen = 1;
   }
 
