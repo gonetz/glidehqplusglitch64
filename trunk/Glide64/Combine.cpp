@@ -5995,27 +5995,20 @@ static void cc__prim_sub_env_mul_t0_add_env__mul_k5 ()
 
 static void cc_prim_sub_env_mul_t1_add_env ()
 {
-  if ((settings.hacks&hack_KI))
-  {
-    TILE & tile0 = rdp.tiles[rdp.cur_tile];
-    wxUint32 tmem0 = tile0.t_mem << 3;
-    wxUint32 tmem1 = rdp.tiles[rdp.cur_tile+1].t_mem << 3;
-    if ((rdp.cur_tile == 7) ||
-        (tmem1 >= tmem0 && tmem1 < tmem0 + (((tile0.lr_s - tile0.ul_s + 1)*(tile0.lr_t - tile0.ul_t + 1))<<tile0.size>>1)))
-    {
-      //t1 is inside t0, so t1 must be zero for correct work
-      cc_env();
-      return;
-    }
-  }
-
   CCMB (GR_COMBINE_FUNCTION_SCALE_OTHER_MINUS_LOCAL_ADD_LOCAL,
     GR_COMBINE_FACTOR_TEXTURE_RGB,
     GR_COMBINE_LOCAL_ITERATED,
     GR_COMBINE_OTHER_CONSTANT);
   CC_PRIM ();
   SETSHADE_ENV ();
-  USE_T1 ();
+  if (rdp.cycle_mode == 0 || ((settings.hacks&hack_KI) && (rdp.cycle2 & 0x0FFFFFFF) == 0x01FF1FFF))
+  {
+    USE_T0 ();
+  }
+  else
+  {
+    USE_T1 ();
+  }
 }
 
 static void cc_prim_sub_env_mul_t1_add_env_mul_t0 ()
