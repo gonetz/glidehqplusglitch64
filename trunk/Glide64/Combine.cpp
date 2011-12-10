@@ -756,9 +756,9 @@ COMBINE cmb;
   rdp.cmb_flags |= flag; \
 }
 #define XSHADEC1MC2ADD(color1, color2, flag) { \
-  rdp.coladd[0] *= (float)( ((int)(color1 & 0xFF000000) >> 24) - (int)((color2 & 0xFF000000) >> 24) )/255.0f; \
-  rdp.coladd[1] *= (float)( ((int)(color1 & 0x00FF0000) >> 16) - (int)((color2 & 0x00FF0000) >> 16) )/255.0f; \
-  rdp.coladd[2] *= (float)( ((int)(color1 & 0x0000FF00) >> 8)  - (int)((color2 & 0x0000FF00) >> 8) )/255.0f; \
+  rdp.coladd[0] *= (float)( max(0, (int)((color1 & 0xFF000000) >> 24) - (int)((color2 & 0xFF000000) >> 24)) )/255.0f; \
+  rdp.coladd[1] *= (float)( max(0, (int)((color1 & 0x00FF0000) >> 16) - (int)((color2 & 0x00FF0000) >> 16)) )/255.0f; \
+  rdp.coladd[2] *= (float)( max(0, (int)((color1 & 0x0000FF00) >> 8)  - (int)((color2 & 0x0000FF00) >> 8)) )/255.0f; \
   rdp.cmb_flags |= flag; \
 }
 #define SUBSHADE_PRIM() XSHADEADD(rdp.prim_color, CMB_SUB)
@@ -811,7 +811,7 @@ COMBINE cmb;
   rdp.cmb_flags |= flag; \
 }
 #define XSHADEC1MC2_A(color1, color2, flag) { \
-  rdp.col[3] *= (float)( (int)(color1 & 0xFF) - (int)(color2 & 0xFF) ) / 255.0f; \
+  rdp.col[3] *= (float)( max(0, (int)(color1 & 0xFF) - (int)(color2 & 0xFF)) ) / 255.0f; \
   rdp.cmb_flags |= flag; \
 }
 #define MULSHADE_A_PRIM() XSHADE_A(rdp.prim_color, CMB_A_MULT)
