@@ -705,9 +705,9 @@ COMBINE cmb;
   rdp.cmb_flags |= flag; \
 }
 #define XSHADEC1MC2(color1, color2, flag) { \
-  rdp.col[0] *= (float)( ((int)(color1 & 0xFF000000) >> 24) - (int)((color2 & 0xFF000000) >> 24) )/255.0f; \
-  rdp.col[1] *= (float)( ((int)(color1 & 0x00FF0000) >> 16) - (int)((color2 & 0x00FF0000) >> 16) )/255.0f; \
-  rdp.col[2] *= (float)( ((int)(color1 & 0x0000FF00) >> 8)  - (int)((color2 & 0x0000FF00) >> 8) )/255.0f; \
+  rdp.col[0] *= (float)( max(0, (int)((color1 & 0xFF000000) >> 24) - (int)((color2 & 0xFF000000) >> 24)) )/255.0f; \
+  rdp.col[1] *= (float)( max(0, (int)((color1 & 0x00FF0000) >> 16) - (int)((color2 & 0x00FF0000) >> 16)) )/255.0f; \
+  rdp.col[2] *= (float)( max(0, (int)((color1 & 0x0000FF00) >> 8)  - (int)((color2 & 0x0000FF00) >> 8)) )/255.0f; \
   rdp.cmb_flags |= flag; \
 }
 #define XSHADE_BYTE(byte, flag) { \
