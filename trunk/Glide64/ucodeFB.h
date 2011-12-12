@@ -407,7 +407,7 @@ static void fb_setcolorimage()
     }
 
   }
-  if (rdp.frame_buffers[rdp.ci_count-1].status == ci_unknown) //status of previous fb was not changed - it is useless
+  if (rdp.ci_count > 0 && rdp.frame_buffers[rdp.ci_count-1].status == ci_unknown) //status of previous fb was not changed - it is useless
   {
     if (fb_hwfbe_enabled && !(settings.frame_buffer & fb_useless_is_useless))
     {
