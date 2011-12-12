@@ -256,7 +256,9 @@ void RDP::Reset()
 RDP::RDP()
 {
   vtx1 = new VERTEX[256];
+  memset(vtx1, 0, sizeof(VERTEX)*256);
   vtx2 = new VERTEX[256];
+  memset(vtx2, 0, sizeof(VERTEX)*256);
   vtxbuf = vtxbuf2 = 0;
   vtx_buffer = n_global = 0;
 
@@ -268,6 +270,7 @@ RDP::RDP()
   };
 
   vtx = new VERTEX[MAX_VTX];
+  memset(vtx, 0, sizeof(VERTEX)*MAX_VTX);
   v0 = vn = 0;
 
   frame_buffers = new COLOR_IMAGE[NUMTEXBUF+2];
