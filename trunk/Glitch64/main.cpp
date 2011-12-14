@@ -124,6 +124,8 @@ LOG("FullScreenResolutions::init()\r\n");
   iModeNum = 0;
   int current = 0;
   char smode[256];
+  memset(&enumMode, 0, sizeof(DEVMODE));
+  memset(&prevInfo, 0, sizeof(ResolutionInfo));
   while (EnumDisplaySettings(NULL, iModeNum++, &enumMode) != 0)
   {
     ResolutionInfo curInfo(enumMode.dmPelsWidth, enumMode.dmPelsHeight, enumMode.dmDisplayFrequency);
@@ -165,6 +167,7 @@ LOG("FullScreenResolutions::init()\r\n");
   aResolutionsStr = new char*[dwNumResolutions];
   int current = 0;
   char smode[256];
+  memset(&prevInfo, 0, sizeof(ResolutionInfo));
   for (iModeNum = 0; modes[iModeNum]; ++iModeNum) {
     ResolutionInfo curInfo(modes[iModeNum]->w, modes[iModeNum]->h, 0);
     if (curInfo != prevInfo) {
