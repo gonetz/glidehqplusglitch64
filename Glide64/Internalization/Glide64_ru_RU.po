@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-15 18:19+0700\n"
-"PO-Revision-Date: 2010-06-15 18:40+0700\n"
-"Last-Translator: Sergey V. Lipskiy <lipski@ac-sw.com>\n"
+"POT-Creation-Date: 2011-12-19 17:29+0700\n"
+"PO-Revision-Date: 2011-12-19 17:56+0700\n"
+"Last-Translator: Navitel <support@navitel.su>\n"
 "Language-Team: \n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -149,7 +150,7 @@ msgstr "Эмуляция буфера глубины"
 msgid "Filtering mode:"
 msgstr ""
 "Фильтрация\n"
-"текстур"
+"текстур:"
 
 #: Config.cpp:141
 msgid "Automatic"
@@ -167,7 +168,7 @@ msgstr "Всегда Point-sampled"
 msgid "Buffer swapping method:"
 msgstr ""
 "Метод смены\n"
-"буфера кадра"
+"буфера кадра:"
 
 #: Config.cpp:148
 msgid "Old"
@@ -183,7 +184,7 @@ msgstr "Гибридный"
 
 #: Config.cpp:153
 msgid "LOD calculation:"
-msgstr "Вычисление LOD"
+msgstr "Вычисление LOD:"
 
 #: Config.cpp:155
 msgid "off"
@@ -199,9 +200,7 @@ msgstr "точно"
 
 #: Config.cpp:160
 msgid "Aspect ratio:"
-msgstr ""
-"Соотношение\n"
-"размеров:"
+msgstr "Формат кадра:"
 
 #: Config.cpp:162
 msgid "4:3 (default)"
@@ -215,258 +214,262 @@ msgstr "Принудительно 16:9"
 msgid "Stretch"
 msgstr "Растянуть"
 
-#: Config.cpp:167
+#: Config.cpp:165
+msgid "Original"
+msgstr "Как в N64"
+
+#: Config.cpp:168
 msgid "Fog"
 msgstr "Туман"
 
-#: Config.cpp:168
+#: Config.cpp:169
 msgid "Buffer clear on every frame"
 msgstr "Очистка буфера каждого кадра"
 
-#: Config.cpp:169
+#: Config.cpp:170
 msgid "Enable frame buffer emulation"
 msgstr "Включить эмуляцию буфера кадра"
 
-#: Config.cpp:170
+#: Config.cpp:171
 msgid "Hardware frame buffer emulation"
 msgstr "Аппаратная эмуляция буфера кадра"
 
-#: Config.cpp:171
+#: Config.cpp:172
 msgid "Get frame buffer info"
 msgstr "Давать информацию о буфере"
 
-#: Config.cpp:172
+#: Config.cpp:173
 msgid "Read every frame (slow!)"
 msgstr "Считывать каждый кадр (медленно!)"
 
-#: Config.cpp:173
+#: Config.cpp:174
 msgid "Render N64 frame buffer as texture"
 msgstr "Выводить буфер N64 как текстуру"
 
-#: Config.cpp:174
+#: Config.cpp:175
 msgid "Detect CPU write to the N64 frame buffer"
 msgstr "Определять, что N64 CPU пишет в буфер"
 
-#: Config.cpp:175
+#: Config.cpp:176
 msgid "Software depth buffer rendering"
 msgstr "Программный рендеринг буфера глубины"
 
-#: Config.cpp:199
-#: Config.cpp:618
+#: Config.cpp:200
+#: Config.cpp:619
 msgid "Texture enhancement"
 msgstr "Улучшение текстур"
 
-#: Config.cpp:200
+#: Config.cpp:201
 msgid "Hi-resolution textures"
 msgstr "Текстуры высокого разрешения"
 
-#: Config.cpp:201
+#: Config.cpp:202
 msgid "Common"
 msgstr "Общие"
 
-#: Config.cpp:202
+#: Config.cpp:203
 msgid "Presets"
 msgstr "Предустановки"
 
-#: Config.cpp:203
 #: Config.cpp:204
+#: Config.cpp:205
 msgid "Performance tweaks"
 msgstr "Улучшение производительности"
 
-#: Config.cpp:205
+#: Config.cpp:206
 msgid "Filter"
 msgstr "Фильтр"
 
-#: Config.cpp:207
-#: Config.cpp:218
-#: Config.cpp:237
+#: Config.cpp:208
+#: Config.cpp:219
+#: Config.cpp:238
 msgid "None"
 msgstr "Никакой"
 
-#: Config.cpp:208
+#: Config.cpp:209
 msgid "Smooth filtering 1"
 msgstr "Сглаживающий фильтр 1"
 
-#: Config.cpp:209
+#: Config.cpp:210
 msgid "Smooth filtering 2"
 msgstr "Сглаживающий фильтр 2"
 
-#: Config.cpp:210
+#: Config.cpp:211
 msgid "Smooth filtering 3"
 msgstr "Сглаживающий фильтр 3"
 
-#: Config.cpp:211
+#: Config.cpp:212
 msgid "Smooth filtering 4"
 msgstr "Сглаживающий фильтр 4"
 
-#: Config.cpp:212
+#: Config.cpp:213
 msgid "Sharp filtering 1"
 msgstr " 1"
 
-#: Config.cpp:213
+#: Config.cpp:214
 msgid "Sharp filtering 2"
 msgstr "Фильтр резкости 2"
 
-#: Config.cpp:216
+#: Config.cpp:217
 msgid "Enhancement"
 msgstr "Улучшение"
 
-#: Config.cpp:219
+#: Config.cpp:220
 msgid "Store"
 msgstr "Хранить"
 
-#: Config.cpp:229
+#: Config.cpp:230
 msgid "Texture cache"
 msgstr "Текстурный кэш"
 
-#: Config.cpp:231
+#: Config.cpp:232
 msgid "Mbytes"
 msgstr "Мбайт"
 
-#: Config.cpp:232
+#: Config.cpp:233
 msgid "Ignore Backgrounds"
 msgstr "Игнорировать текстуры фона"
 
-#: Config.cpp:233
-#: Config.cpp:244
+#: Config.cpp:234
+#: Config.cpp:245
 msgid "Apply texture compression"
 msgstr "Применить компрессию текстур"
 
-#: Config.cpp:234
-#: Config.cpp:245
+#: Config.cpp:235
+#: Config.cpp:246
 msgid "Compress texture cache"
 msgstr "Сжимать текстурный кэш"
 
-#: Config.cpp:235
+#: Config.cpp:236
 msgid "Format"
 msgstr "Формат"
 
-#: Config.cpp:238
+#: Config.cpp:239
 msgid "Rice format"
 msgstr "Формат Rice"
 
-#: Config.cpp:241
+#: Config.cpp:242
 msgid "Tile textures"
 msgstr "Резать на тайлы"
 
-#: Config.cpp:242
+#: Config.cpp:243
 msgid "Force 16bpp textures"
 msgstr "Приводить к 16 бит текстурам"
 
-#: Config.cpp:243
+#: Config.cpp:244
 msgid "Alternative CRC calculation"
 msgstr "Альтернативное вычисление CRC"
 
-#: Config.cpp:246
+#: Config.cpp:247
 msgid "Use alpha channel fully"
 msgstr "Использовать альфа канал полностью"
 
-#: Config.cpp:247
+#: Config.cpp:248
 msgid "Texture dumping/editing mode"
 msgstr "Дамп/редактирование текстур"
 
-#: Config.cpp:248
+#: Config.cpp:249
 msgid "Texture compression method"
 msgstr "Метод компрессии текстур"
 
-#: Config.cpp:254
+#: Config.cpp:255
 msgid "Save texture cache to hard disk"
 msgstr "Сохранять текстурный кэш на диск"
 
-#: Config.cpp:255
+#: Config.cpp:256
 msgid "Best performance"
 msgstr "Наилучшая производительность"
 
-#: Config.cpp:256
+#: Config.cpp:257
 msgid "Best texture quality"
 msgstr "Наилучшее качество текстур"
 
-#: Config.cpp:262
+#: Config.cpp:263
 msgid "Developers settings"
 msgstr "Настройки разработчика"
 
-#: Config.cpp:263
+#: Config.cpp:264
 msgid "Debug/Misc"
 msgstr "Отладка/Разное"
 
-#: Config.cpp:264
+#: Config.cpp:265
 msgid "Autodetect Microcode"
 msgstr "Автоопределение Микрокода"
 
-#: Config.cpp:265
+#: Config.cpp:266
 msgid "Force Microcode:"
 msgstr "Форсировать Микрокод:"
 
-#: Config.cpp:278
+#: Config.cpp:279
 msgid "Wireframe using:"
 msgstr "Каркасный режим:"
 
-#: Config.cpp:280
+#: Config.cpp:281
 msgid "Original colors"
 msgstr "Исходные цвета"
 
-#: Config.cpp:281
+#: Config.cpp:282
 msgid "Vertex colors"
 msgstr "Цвета вершин"
 
-#: Config.cpp:282
+#: Config.cpp:283
 msgid "Red only"
 msgstr "Только красный"
 
-#: Config.cpp:285
+#: Config.cpp:286
 msgid "Log to rdp.txt (SLOW)"
 msgstr "Лог в rdp.txt"
 
-#: Config.cpp:286
+#: Config.cpp:287
 msgid "Unknown combiners as red"
 msgstr "Красные неизвестные комбайнеры"
 
-#: Config.cpp:287
+#: Config.cpp:288
 msgid "Log clear every frame"
 msgstr "Очистка лога каждый кадр"
 
-#: Config.cpp:288
+#: Config.cpp:289
 msgid "Combiner logging"
 msgstr "Лог комбайнеров"
 
-#: Config.cpp:289
+#: Config.cpp:290
 msgid "Run (+log) in window"
 msgstr "Лог в оконном режиме"
 
-#: Config.cpp:290
+#: Config.cpp:291
 msgid "Cmb. clear every frame"
 msgstr "Очистка комб. лога каждый кадр"
 
-#: Config.cpp:291
+#: Config.cpp:292
 msgid "Error log (rdp_e.txt)"
 msgstr "Лог ошибок  (rdp_e.txt)"
 
-#: Config.cpp:292
+#: Config.cpp:293
 msgid "Bilinear filter texture cache"
 msgstr "Билинейная фильтрация текстурного кэша"
 
-#: Config.cpp:324
-#: Config.cpp:545
+#: Config.cpp:325
+#: Config.cpp:546
 msgid " auto"
 msgstr " авто"
 
-#: Config.cpp:381
+#: Config.cpp:382
 msgid "Please choose language:"
 msgstr "Пожалуйста, выберите язык:"
 
-#: Config.cpp:382
+#: Config.cpp:383
 msgid "Language"
 msgstr "Язык"
 
-#: Config.cpp:389
+#: Config.cpp:390
 msgid "Press OK to change to "
 msgstr "Нажмите ОК для смены на "
 
-#: Config.cpp:485
+#: Config.cpp:486
 msgid "Basic settings"
 msgstr "Базовые настройки"
 
-#: Config.cpp:486
+#: Config.cpp:487
 msgid ""
 "Resolution\n"
 "This option selects the fullscreen resolution for 3dfx cards and windowed resolution for other cards\n"
@@ -478,7 +481,7 @@ msgstr ""
 "(ещё раз заметим, что для 3dfx карт плагин нужно перевести в полноэкранный режим)\n"
 "[Рекомендуется: 640x480, 800x600, 1024x768]"
 
-#: Config.cpp:490
+#: Config.cpp:491
 msgid ""
 "Vertical sync\n"
 "This option will enable the vertical sync, which will prevent tearing.\n"
@@ -488,11 +491,11 @@ msgstr ""
 "Эта опция включает кадровую синхронизацию.\n"
 "Примечание: эта опция имеет эффект только если vsync установлен в \"Software Controlled\".\n"
 
-#: Config.cpp:492
+#: Config.cpp:493
 msgid "Select a format, in which screen shots will be saved"
 msgstr "Выберите формат, в котором будут сохраняться скриншоты."
 
-#: Config.cpp:499
+#: Config.cpp:500
 msgid ""
 "Language select:\n"
 "Press the button to invoke language selection dialog.\n"
@@ -503,7 +506,7 @@ msgstr ""
 "Выбранный язык будет активирован после перезапуска\n"
 "диалога настроек."
 
-#: Config.cpp:500
+#: Config.cpp:501
 msgid ""
 "FPS counter\n"
 "When this option is checked, a FPS (frames per second) counter will be shown\n"
@@ -514,7 +517,7 @@ msgstr ""
 "Когда включено, в левом нижнем углу экрана показывается счётчик количества кадров в секунду (FPS, frames per second)\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:502
+#: Config.cpp:503
 msgid ""
 "VI/s counter\n"
 "When this option is checked, a VI/s (vertical interrupts per second) counter\n"
@@ -529,7 +532,7 @@ msgstr ""
 "и 50 VI/s для PAL (E) игр.\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:504
+#: Config.cpp:505
 #, c-format
 msgid ""
 "% speed\n"
@@ -541,7 +544,7 @@ msgstr ""
 "В нижнем левом углу экрана показывает скорость эмуляции в % от скорости игры на N64.\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:506
+#: Config.cpp:507
 msgid ""
 "Clock enabled\n"
 "This option will put a clock in the lower right corner of the screen, showing the current time.\n"
@@ -551,7 +554,7 @@ msgstr ""
 "Если включено, в правом нижнем углу выводятся часы, показывающие текущее время.\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:509
+#: Config.cpp:510
 msgid ""
 "Display hours as 24-hour clock.\n"
 "[Recommended: your preference]"
@@ -559,7 +562,7 @@ msgstr ""
 "Показывать часы в 24х часовом формате.\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:510
+#: Config.cpp:511
 msgid ""
 "Transparent text background\n"
 "If this is checked, all on-screen messages will have a transparent background.  Otherwise, it will have a solid black background.\n"
@@ -569,7 +572,7 @@ msgstr ""
 "Если включено, у всех экранных сообщений будет прозрачный фон, иначе фон будет чёрный.\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:513
+#: Config.cpp:514
 msgid ""
 "Enable \"Emulation settings\" panel. For experienced users only!\n"
 "It shows default emulation settings when game is not loaded, or current game settings otherwise."
@@ -577,7 +580,7 @@ msgstr ""
 "Показывать панель \"Настройки эмуляции\". Только для опытных пользователей!\n"
 "Если игра не загружена, показывает настройки эмуляции по умолчанию, иначе показываются настройки текущей игры."
 
-#: Config.cpp:515
+#: Config.cpp:516
 msgid ""
 "Enable \"Texture enhancement\" panel.\n"
 "It shows various enhancement options for original textures as well as options for hi-resolution textures."
@@ -585,7 +588,7 @@ msgstr ""
 "Показывать панель \"Улучшение текстур\".\n"
 "Показывает различные настройки улучшения исходных текстур, а также настройки текстур высокого разрешения."
 
-#: Config.cpp:516
+#: Config.cpp:517
 msgid ""
 "Full screen resolution:\n"
 "This sets the full screen resolution for non-3dfx video cards.\n"
@@ -597,7 +600,7 @@ msgstr ""
 "В списке должны быть все разрешения, поддерживаемые вашей картой и монитором.\n"
 "[Рекомендуется: родное (максимальное) разрешение вашего монитора, если нет проблем с производительностью]"
 
-#: Config.cpp:519
+#: Config.cpp:520
 msgid ""
 "Anisotropic filtering:\n"
 "This filter sharpens and brings out the details of textures that recede into the distance.\n"
@@ -613,7 +616,7 @@ msgstr ""
 "привести к визуальным артифактам в некоторых играх.\n"
 "[Рекомендуется: на ваше усмотрение, зависит от игры]"
 
-#: Config.cpp:520
+#: Config.cpp:521
 msgid ""
 "Autodetect VRAM Size:\n"
 "Since OpenGL cannot do this reliably at the moment, the option to set this manually is available.\n"
@@ -628,7 +631,7 @@ msgstr ""
 "Если возникнут ошибки в работе плагина, выключите авто определение и установите размер вручную.\n"
 "[Рекомендуется: вкл.]"
 
-#: Config.cpp:522
+#: Config.cpp:523
 msgid ""
 "Use frame buffer objects:\n"
 "Changes the way FB effects are rendered - with or without usage of the OpenGL Frame Buffer Objects (FBO) extension.\n"
@@ -649,11 +652,11 @@ msgstr ""
 "Однако, на некоторые системы работают заметно быстрее с FBO.\n"
 "[Рекомендуется: зависит от игры и видео карты]"
 
-#: Config.cpp:577
+#: Config.cpp:578
 msgid "Emulation settings"
 msgstr "Настройки эмуляции"
 
-#: Config.cpp:578
+#: Config.cpp:579
 msgid ""
 "Filtering mode\n"
 "There are three filtering modes possible:\n"
@@ -669,11 +672,11 @@ msgstr ""
 "* Всегда билинейная - интерполирует тексели текстуры, делая ее более гладкой.\n"
 "[Рекомендуется: Автоматическая]"
 
-#: Config.cpp:582
+#: Config.cpp:583
 msgid ""
 "Buffer swapping method\n"
 "There are 3 buffer swapping methods:\n"
-"* old - swap buffers when vertical interrupt has occured.\n"
+"* old - swap buffers when vertical interrupt has occurred.\n"
 "* new - swap buffers when set of conditions is satisfied. Prevents flicker on some games.\n"
 "* hybrid - mix of first two methods.\n"
 "Can prevent even more flickering then previous method, but also can cause artefacts.\n"
@@ -693,7 +696,7 @@ msgstr ""
 "попытайтесь поменять метод  смены буфера .\n"
 "[Рекомендуется: новый (гибридный для Paper Mario)]"
 
-#: Config.cpp:586
+#: Config.cpp:587
 msgid ""
 "Per-pixel level-of-detail calculation\n"
 "N64 uses special mechanism for mip-mapping, which nearly impossible to reproduce\n"
@@ -715,7 +718,7 @@ msgstr ""
 "* точно - наиболее точный метод вычисления LOD, но более медленный.\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:591
+#: Config.cpp:592
 msgid ""
 "Aspect ratio of the output.\n"
 "Most N64 games use 4:3 aspect ratio, but some support widescreen too.\n"
@@ -732,7 +735,7 @@ msgstr ""
 "остальные режимы добавляют черные полосы по краям экрана,\n"
 "если это необходимо для поддержания выбранного соотношения."
 
-#: Config.cpp:594
+#: Config.cpp:595
 msgid ""
 "Fog enabled\n"
 "Sets fog emulation on//off.\n"
@@ -742,7 +745,7 @@ msgstr ""
 "Включает эмуляцию тумана.\n"
 "[Рекомендуется: вкл]"
 
-#: Config.cpp:596
+#: Config.cpp:597
 msgid ""
 "Buffer clear on every frame\n"
 "Forces the frame buffer to be cleared every frame drawn.\n"
@@ -759,7 +762,7 @@ msgstr ""
 "В таких случаях эта опция должна быть включена.\n"
 "[Рекомендуется: вкл]"
 
-#: Config.cpp:598
+#: Config.cpp:599
 msgid ""
 "Enable frame buffer emulation\n"
 "If on, plugin will try to detect frame buffer usage and apply appropriate frame buffer emulation.\n"
@@ -770,10 +773,10 @@ msgstr ""
 "и применить подходящий метод эмуляции.\n"
 "[Рекомендуется: вкл. для игр, использующих эффекты буфера кадра]"
 
-#: Config.cpp:600
+#: Config.cpp:601
 msgid ""
 "Enable hardware frame buffer emulation\n"
-"If this option is on, plugin will create auxilary frame buffers in video memory instead of copying\n"
+"If this option is on, plugin will create auxiliary frame buffers in video memory instead of copying\n"
 "frame buffer content into main memory. This allows plugin to run frame buffer effects without slowdown\n"
 "and without scaling image down to N64's native resolution. This feature is fully supported by\n"
 "Voodoo 4/5 cards and partially by Voodoo3 and Banshee. Modern cards also fully support it.\n"
@@ -787,7 +790,7 @@ msgstr ""
 "а также частично работает на Voodoo3 и Banshee.\n"
 "[Рекомендуется: вкл. если поддерживается вашей видеокартой]"
 
-#: Config.cpp:603
+#: Config.cpp:604
 msgid ""
 "Get information about frame buffers\n"
 "This is compatibility option. It must be set on for Mupen64 and off for 1964"
@@ -795,7 +798,7 @@ msgstr ""
 "Выдать информацию о буферах кадра\n"
 "Опция для совместимости. Должна быть включена для Mupen64 и выключена для 1964."
 
-#: Config.cpp:605
+#: Config.cpp:606
 msgid ""
 "Read every frame\n"
 "In some games plugin can't detect frame buffer usage.\n"
@@ -810,7 +813,7 @@ msgstr ""
 "память -> работает очень медленно.\n"
 "[Рекомендуется: в основном выкл. (нужна только для нескольких игр)]"
 
-#: Config.cpp:607
+#: Config.cpp:608
 msgid ""
 "Render N64 frame buffer as texture\n"
 "When this option is enabled, content of each N64 frame buffer is rendered\n"
@@ -825,7 +828,7 @@ msgstr ""
 "различные визуальные проблемы в некоторых играх.\n"
 "[Рекомендуется: в основном выкл.]"
 
-#: Config.cpp:609
+#: Config.cpp:610
 msgid ""
 "Detect CPU write to the N64 frame buffer\n"
 "This option works as the previous options, but the plugin is trying to detect,\n"
@@ -841,7 +844,7 @@ msgstr ""
 "в которых картинка застывает или пропадает на некоторое время без видимой причины.\n"
 "[Рекомендуется: в основном выкл.]"
 
-#: Config.cpp:611
+#: Config.cpp:612
 msgid ""
 "Enable depth buffer rendering\n"
 "This option is used to fully emulate N64 depth buffer.\n"
@@ -855,7 +858,7 @@ msgstr ""
 "Для работы на полной скорости требуется быстрый (>1Ггц) процессор.\n"
 "[Рекомендуется: для быстрых процессоров - вкл.]"
 
-#: Config.cpp:619
+#: Config.cpp:620
 msgid ""
 "Filters:\n"
 "Apply a filter to either smooth or sharpen textures.\n"
@@ -873,7 +876,7 @@ msgstr ""
 "Имейте в виду, что в зависимости от игры и вашей системы фильтры могут влиять на скорость работы.\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:623
+#: Config.cpp:624
 msgid ""
 "Texture enhancement:\n"
 "7 different filters are selectable here, each one with a distinctive look.\n"
@@ -892,7 +895,7 @@ msgstr ""
 "которые грузят множество текстур. Отключите опцию 'Игнорировать текстуры фона' для лучшего результата.\n"
 "[Рекомендуется: на ваше усмотрение]"
 
-#: Config.cpp:627
+#: Config.cpp:628
 msgid ""
 "Texture cache size:\n"
 "Enhanced and filtered textures can be cached to aid performance.\n"
@@ -915,7 +918,7 @@ msgstr ""
 "'0' отключает кэширование текстур.\n"
 "[Рекомендуется: зависит от игры и вашей системы]"
 
-#: Config.cpp:633
+#: Config.cpp:634
 msgid ""
 "Ignore Backgrounds:\n"
 "It is used to skip enhancement for long narrow textures, usually used for backgrounds.\n"
@@ -927,7 +930,7 @@ msgstr ""
 "Это может сильно сократить расход видеопамяти и увеличить производительность.\n"
 "[Рекомендуется: вкл. (выкл. в режиме 'Хранить')]"
 
-#: Config.cpp:635
+#: Config.cpp:636
 msgid ""
 "Texture compression:\n"
 "Textures will be compressed using selected texture compression method.\n"
@@ -951,7 +954,7 @@ msgstr ""
 "и равномерной закраске текстур с градиентной закраской.\n"
 "[Рекомендуется: выкл.]"
 
-#: Config.cpp:639
+#: Config.cpp:640
 msgid ""
 "Compress texture cache:\n"
 "Memory will be compressed so that more textures can be held in the texture cache.\n"
@@ -968,7 +971,7 @@ msgstr ""
 "Эта опция позволяет сохранить память даже в случае применения компрессии текстур.\n"
 "[Рекомендуется: вкл.]"
 
-#: Config.cpp:641
+#: Config.cpp:642
 msgid ""
 "Hi-res pack format:\n"
 "Choose which method is to be used for loading Hi-res texture packs.\n"
@@ -982,7 +985,7 @@ msgstr ""
 "Оставьте \"Никакой\", если вам не нужна загрузка тестур высокого разрешения.\n"
 "[Рекомендуется: Формат Rice. По умолчанию:  \"Никакой\"]"
 
-#: Config.cpp:645
+#: Config.cpp:646
 msgid ""
 "Tile textures:\n"
 "When on, wide texture will be split on several tiles to fit in one 256-width texture.\n"
@@ -999,7 +1002,7 @@ msgstr ""
 "или искривления текстур.\n"
 "[Рекомендуется: выкл.]"
 
-#: Config.cpp:647
+#: Config.cpp:648
 msgid ""
 "Force 16bpp textures:\n"
 "The color of the textures will be reduced to 16bpp.\n"
@@ -1018,7 +1021,7 @@ msgstr ""
 "Обычно разница едва видна, но иногда различие заметно, например в текстурах небес.\n"
 "[Рекомендуется: выкл.]"
 
-#: Config.cpp:649
+#: Config.cpp:650
 msgid ""
 "Texture dumping mode:\n"
 "In this mode, you have that ability to dump textures on screen to the appropriate folder.\n"
@@ -1032,7 +1035,7 @@ msgstr ""
 "\n"
 "Горячие клавишы: R - перезагрузить текстуры из набора, D - режим дампа вкл./выкл."
 
-#: Config.cpp:651
+#: Config.cpp:652
 msgid ""
 "Alternative CRC calculation:\n"
 "This option enables emulation of a palette CRC calculation bug in RiceVideo.\n"
@@ -1044,7 +1047,7 @@ msgstr ""
 "Если какие-то текстуры не загружаются, попробуйте переключить эту опцию.\n"
 "[Рекомендуется: зависит от набора текстур, обычно вкл.]"
 
-#: Config.cpp:656
+#: Config.cpp:657
 msgid ""
 "Compress texture cache:\n"
 "When game started, plugin loads all its hi-resolution textures into PC memory.\n"
@@ -1062,7 +1065,7 @@ msgstr ""
 "Эта опция позволяет сохранить память даже в случае применения компрессии текстур.\n"
 "[Рекомендуется: вкл.]"
 
-#: Config.cpp:658
+#: Config.cpp:659
 msgid ""
 "Use Alpha channel fully:\n"
 "When this option is off, 16bit rgba textures will be loaded using RiceVideo style\n"
@@ -1083,7 +1086,7 @@ msgstr ""
 "Опция может вызывать чёрные бордюры у старых и криво сделанных текстур.\n"
 "[Рекомендуется: зависит от набора текстур]"
 
-#: Config.cpp:661
+#: Config.cpp:662
 msgid ""
 "Save texture cache to HD:\n"
 "\n"
@@ -1116,11 +1119,11 @@ msgstr ""
 "\n"
 "[Весьма рекомендуется: вкл.]"
 
-#: Config.cpp:684
+#: Config.cpp:685
 msgid "Debug"
 msgstr "Отладка"
 
-#: Config.cpp:685
+#: Config.cpp:686
 msgid ""
 "Autodetect Microcode\n"
 "If this option is checked, the microcode of the game\n"
@@ -1130,7 +1133,7 @@ msgid ""
 "[Recommended: on]"
 msgstr ""
 
-#: Config.cpp:687
+#: Config.cpp:688
 msgid ""
 "Force Microcode\n"
 "This option ONLY has an effect if Autodetect Microcode\n"
@@ -1141,7 +1144,7 @@ msgid ""
 "[Recommended: any, turn on Autodetect Microcode]"
 msgstr ""
 
-#: Config.cpp:691
+#: Config.cpp:692
 msgid ""
 "Wireframe\n"
 "This option, when checked, makes it so that the plugin will draw only the\n"
@@ -1150,7 +1153,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 
-#: Config.cpp:693
+#: Config.cpp:694
 msgid ""
 "Wireframe Colors\n"
 "This selects the colors to use for the wireframes (if wireframe mode is enabled).\n"
@@ -1161,7 +1164,7 @@ msgid ""
 "[Recommended: Vertex colors]"
 msgstr ""
 
-#: Config.cpp:695
+#: Config.cpp:696
 msgid ""
 "Log to RDP.txt\n"
 "RECOMMENDED FOR DEBUGGING ONLY - this option, when checked, will log EVERY SINGLE\n"
@@ -1170,7 +1173,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 
-#: Config.cpp:697
+#: Config.cpp:698
 msgid ""
 "Unknown combiners as red\n"
 "Objects that use an unimplemented combine mode will show up as red instead of\n"
@@ -1179,7 +1182,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 
-#: Config.cpp:699
+#: Config.cpp:700
 msgid ""
 "Log clear every frame\n"
 "RECOMMENDED FOR DEBUGGING ONLY - this option has no effect unless 'Log to RDP.txt'\n"
@@ -1188,7 +1191,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 
-#: Config.cpp:701
+#: Config.cpp:702
 msgid ""
 "Log unknown combiners\n"
 "RECOMMENDED FOR DEBUGGING ONLY - when checked, this option will cause every\n"
@@ -1198,7 +1201,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 
-#: Config.cpp:703
+#: Config.cpp:704
 msgid ""
 "Run and log in window\n"
 "RECOMMENDED FOR DEBUGGING ONLY - this option will make it so that the plugin will\n"
@@ -1207,7 +1210,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 
-#: Config.cpp:705
+#: Config.cpp:706
 msgid ""
 "Clear unknown combiner log every frame\n"
 "RECOMMENDED FOR DEBUGGING ONLY - this option works much like 'Log clear every frame'\n"
@@ -1216,7 +1219,7 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 
-#: Config.cpp:708
+#: Config.cpp:709
 msgid ""
 "Bilinear filter texture cache\n"
 "RECOMMENDED FOR DEBUGGING ONLY - when checked, this option will make the graphical\n"
@@ -1226,19 +1229,19 @@ msgid ""
 "[Recommended: off]"
 msgstr ""
 
-#: Config.cpp:1100
+#: Config.cpp:1104
 msgid "Glide64 settings"
 msgstr "Настройки Glide64"
 
-#: Config.cpp:1289
+#: Config.cpp:1293
 msgid "About Glide64"
 msgstr "Сведения о Glide64"
 
-#: Config.cpp:1322
+#: Config.cpp:1326
 msgid "authors:"
 msgstr "авторы:"
 
-#: Config.cpp:1326
+#: Config.cpp:1330
 msgid ""
 "Dave2001. Original author and former main developer.\n"
 "He founded Glide64 project on Dec. 29th, 2001.\n"
@@ -1248,7 +1251,7 @@ msgstr ""
 "проекта. Основал проект Glide64 29 Декабря, 2001 г.\n"
 "Покинул проект осенью 2002.\n"
 
-#: Config.cpp:1332
+#: Config.cpp:1336
 msgid ""
 "Gugaman. Developer. Joined the project at winter 2002\n"
 " and left it at fall 2002."
@@ -1256,7 +1259,7 @@ msgstr ""
 "Gugaman. Разработчик. Пришёл в проект зимой 2002 г.,\n"
 "покинул проект осенью 2002 г."
 
-#: Config.cpp:1338
+#: Config.cpp:1342
 msgid ""
 "Sergey 'Gonetz' Lipski. Joined the project at winter 2002.\n"
 "Main developer since fall of 2002."
@@ -1264,23 +1267,23 @@ msgstr ""
 "Сергей 'Gonetz' Липский. Пришёл в проект зимой 2002 г.\n"
 "Основной разработчик с осени 2002 г."
 
-#: Config.cpp:1343
+#: Config.cpp:1347
 msgid "Hiroshi 'KoolSmoky' Morii, Joined the project in 2007. "
 msgstr "Hiroshi 'KoolSmoky' Morii, пришёл в проект в 2007 г. "
 
-#: Config.cpp:1346
+#: Config.cpp:1350
 msgid "Glitch64 (the wrapper) authors:"
 msgstr "авторы Glitch64 (glide3x wrapper):"
 
-#: Config.cpp:1370
+#: Config.cpp:1374
 msgid "GlideHQ author:"
 msgstr "автор GlideHQ:"
 
-#: Config.cpp:1377
+#: Config.cpp:1381
 msgid "beta tester:"
 msgstr "бета тестер:"
 
-#: Config.cpp:1384
+#: Config.cpp:1388
 msgid ""
 "special thanks to:\n"
 " Orkin, Rice, Daniel Borca, Legend.\n"
@@ -1294,8 +1297,10 @@ msgstr ""
 
 #~ msgid "Gfx cannot be drawn in windowed mode"
 #~ msgstr "Плагин не может выводить графику в оконном режиме"
+
 #~ msgid "Press Alt+Enter to switch to fullscreen"
 #~ msgstr "Нажмите Alt+Enter для переключения в оконный режим."
+
 #~ msgid ""
 #~ "Buffer clear on every frame\n"
 #~ "If this option is checked, the buffer will be cleared (screen initialized "
@@ -1308,4 +1313,3 @@ msgstr ""
 #~ "Очистка буфера каждого кадра\n"
 #~ "Если включено, буфер кадра будет очищаться (заливаться чёрным)\n"
 #~ "в начале отрисовки каждого кадра. "
-
