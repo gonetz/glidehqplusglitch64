@@ -219,10 +219,10 @@ typedef struct {
   #define  fb_motionblur           (1<<2)   //emulate motion blur
   #define  fb_ref                  (1<<3)   //read every frame
   #define  fb_read_alpha           (1<<4)   //read alpha
-  #define  fb_hwfbe_buf_clear      (1<<5)   //clear auxilary texture frame buffers
+  #define  fb_hwfbe_buf_clear      (1<<5)   //clear auxiliary texture frame buffers
   #define  fb_depth_render         (1<<6)   //enable software depth render
   #define  fb_optimize_texrect     (1<<7)   //fast texrect rendering with hwfbe
-  #define  fb_ignore_aux_copy      (1<<8)   //do not copy auxilary frame buffers
+  #define  fb_ignore_aux_copy      (1<<8)   //do not copy auxiliary frame buffers
   #define  fb_useless_is_useless   (1<<10)  //
   #define  fb_get_info             (1<<11)  //get frame buffer info
   #define  fb_read_back_to_screen  (1<<12)  //render N64 frame buffer to screen
@@ -486,12 +486,12 @@ typedef enum {
   ci_zimg,      //1, depth image
   ci_unknown,   //2, status is unknown
   ci_useless,   //3, status is unclear
-  ci_old_copy,  //4, auxilary color image, copy of last color image from previous frame
-  ci_copy,      //5, auxilary color image, copy of previous color image
+  ci_old_copy,  //4, auxiliary color image, copy of last color image from previous frame
+  ci_copy,      //5, auxiliary color image, copy of previous color image
   ci_copy_self, //6, main color image, it's content will be used to draw into itself
-  ci_zcopy,     //7, auxilary color image, copy of depth image
-  ci_aux,       //8, auxilary color image
-  ci_aux_copy   //9, auxilary color image, partial copy of previous color image
+  ci_zcopy,     //7, auxiliary color image, copy of depth image
+  ci_aux,       //8, auxiliary color image
+  ci_aux_copy   //9, auxiliary color image, partial copy of previous color image
 } CI_STATUS;
 
 // Frame buffers

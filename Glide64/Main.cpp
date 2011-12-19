@@ -1878,7 +1878,7 @@ void CALL UpdateScreen (void)
     update_screen_count++;
 
 #ifdef FPS
-  // vertical interrupt has occured, increment counter
+  // vertical interrupt has occurred, increment counter
   vi_count ++;
 
   // Check frames per second

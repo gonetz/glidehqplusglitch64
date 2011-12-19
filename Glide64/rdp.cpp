@@ -2199,7 +2199,7 @@ static void rdp_fillrect()
 
         if ((settings.hacks&hack_PMario) && rdp.frame_buffers[rdp.ci_count-1].status == ci_aux)
         {
-          //background of auxilary frame buffers must have zero alpha.
+          //background of auxiliary frame buffers must have zero alpha.
           //make it black, set 0 alpha to plack pixels on frame buffer read
           color = 0;
         }
