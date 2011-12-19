@@ -580,7 +580,7 @@ void ConfigNotebook::set_properties()
     lbFiltering->SetToolTip(tooltip);
     cmbFiltering->SetToolTip(tooltip);
     cmbFiltering->SetSelection(settings.filtering);
-    tooltip = _("Buffer swapping method\nThere are 3 buffer swapping methods:\n* old - swap buffers when vertical interrupt has occured.\n* new - swap buffers when set of conditions is satisfied. Prevents flicker on some games.\n* hybrid - mix of first two methods.\nCan prevent even more flickering then previous method, but also can cause artefacts.\nIf you have flickering problems in a game (or graphics that don't show),\ntry to change swapping method.\n[Recommended: new (hybrid for Paper Mario)]");
+    tooltip = _("Buffer swapping method\nThere are 3 buffer swapping methods:\n* old - swap buffers when vertical interrupt has occurred.\n* new - swap buffers when set of conditions is satisfied. Prevents flicker on some games.\n* hybrid - mix of first two methods.\nCan prevent even more flickering then previous method, but also can cause artefacts.\nIf you have flickering problems in a game (or graphics that don't show),\ntry to change swapping method.\n[Recommended: new (hybrid for Paper Mario)]");
     lbBufferSwap->SetToolTip(tooltip);
     cmbBufferSwap->SetToolTip(tooltip);
     cmbBufferSwap->SetSelection(settings.swapmode);
@@ -598,7 +598,7 @@ void ConfigNotebook::set_properties()
     cbxBuffer->SetValue(settings.buff_clear>0);
     cbxFBEnable->SetToolTip(_("Enable frame buffer emulation\nIf on, plugin will try to detect frame buffer usage and apply appropriate frame buffer emulation.\n[Recommended: on for games which use frame buffer effects]"));
     cbxFBEnable->SetValue(fb_emulation_enabled);
-    cbxFBHWFBE->SetToolTip(_("Enable hardware frame buffer emulation\nIf this option is on, plugin will create auxilary frame buffers in video memory instead of copying\nframe buffer content into main memory. This allows plugin to run frame buffer effects without slowdown\nand without scaling image down to N64's native resolution. This feature is fully supported by\nVoodoo 4/5 cards and partially by Voodoo3 and Banshee. Modern cards also fully support it.\n[Recommended: on, if supported by your hardware]"));
+    cbxFBHWFBE->SetToolTip(_("Enable hardware frame buffer emulation\nIf this option is on, plugin will create auxiliary frame buffers in video memory instead of copying\nframe buffer content into main memory. This allows plugin to run frame buffer effects without slowdown\nand without scaling image down to N64's native resolution. This feature is fully supported by\nVoodoo 4/5 cards and partially by Voodoo3 and Banshee. Modern cards also fully support it.\n[Recommended: on, if supported by your hardware]"));
     cbxFBHWFBE->SetValue(((settings.frame_buffer&fb_hwfbe)>0));
     cbxFBHWFBE->Enable(fb_emulation_enabled);
     cbxFBGetFBI->SetToolTip(_("Get information about frame buffers\nThis is compatibility option. It must be set on for Mupen64 and off for 1964"));
