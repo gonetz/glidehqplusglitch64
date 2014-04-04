@@ -27,11 +27,11 @@
 #
 #    Environment variables:
 #       ARGB=1          enable support for ARGB inputs
-#                       default = no
+#                       default = yes
 #       RADEON=1        enable DXT3,5 workaround for ATI Radeon
-#                       default = no
+#                       default = yes
 #       YUV=1           use YUV to determine representative color
-#                       default = no
+#                       default = yes
 #
 #    Targets:
 #	all:		build dynamic module
@@ -52,17 +52,17 @@ CFLAGS += -fPIC -DPIC
 AR = ar
 RANLIB = ranlib
 
-ifdef ARGB
+#ifdef ARGB
 CFLAGS += -DARGB
-endif
+#endif
 
-ifdef RADEON
+#ifdef RADEON
 CFLAGS += -DRADEON
-endif
+#endif
 
-ifdef YUV
+#ifdef YUV
 CFLAGS += -DYUV
-endif
+#endif
 
 LD = gcc
 LDFLAGS = -static

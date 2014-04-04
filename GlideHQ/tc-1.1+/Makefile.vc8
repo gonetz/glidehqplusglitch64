@@ -32,11 +32,11 @@
 #       DLL=1           build dll
 #                       default = no
 #       ARGB=1          enable support for ARGB inputs
-#                       default = no
+#                       default = yes
 #       RADEON=1        enable DXT3,5 workaround for ATI Radeon
-#                       default = no
+#                       default = yes
 #       YUV=1           use YUV to determine representative color
-#                       default = no
+#                       default = yes
 #
 #    Targets:
 #	all:		build everything
@@ -83,17 +83,17 @@ ASFLAGS += $(CDEFS)
 
 CFLAGS  = -nologo -W3 -WX -D__MSC__=1 -D_CRT_SECURE_NO_DEPRECATE
 
-ifdef ARGB
+#ifdef ARGB
 CFLAGS += -DARGB
-endif
+#endif
 
-ifdef RADEON
+#ifdef RADEON
 CFLAGS += -DRADEON
-endif
+#endif
 
-ifdef YUV
+#ifdef YUV
 CFLAGS += -DYUV
-endif
+#endif
 
 ifdef DLL
 CFLAGS += -D__WIN32__
